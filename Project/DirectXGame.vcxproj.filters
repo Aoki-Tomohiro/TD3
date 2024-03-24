@@ -157,6 +157,24 @@
     <Filter Include="ヘッダー ファイル\Application\Object">
       <UniqueIdentifier>{f4a52438-51f2-43f3-a85d-2f363fc43a1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Block">
+      <UniqueIdentifier>{f823b289-c8f7-46f0-8aa8-732d1bec2170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Block">
+      <UniqueIdentifier>{0ce6df62-21fa-4585-80ff-faacf58cb48d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Player">
+      <UniqueIdentifier>{436a3b8e-6cba-460b-8c16-18bbf99fc7d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Player">
+      <UniqueIdentifier>{e9e3fb21-9a96-4779-ba86-19afab16cc4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Enemy">
+      <UniqueIdentifier>{1e5f905c-8b5a-4138-a1a7-c5ab530d7fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Enemy">
+      <UniqueIdentifier>{92b60e07-82b0-4ca3-8b45-a95413f3499e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\2D\Sprite.cpp">
@@ -347,6 +365,15 @@
     </ClCompile>
     <ClCompile Include="Engine\Base\Display.cpp">
       <Filter>ソース ファイル\Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Block\Block.cpp">
+      <Filter>ソース ファイル\Application\Object\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp">
+      <Filter>ソース ファイル\Application\Object\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Player\Player.cpp">
+      <Filter>ソース ファイル\Application\Object\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -595,6 +622,15 @@
     </ClInclude>
     <ClInclude Include="Engine\Base\FrameRateController.h">
       <Filter>ヘッダー ファイル\Engine\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Block\Block.h">
+      <Filter>ヘッダー ファイル\Application\Object\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Enemy\Enemy.h">
+      <Filter>ヘッダー ファイル\Application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Player\Player.h">
+      <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
