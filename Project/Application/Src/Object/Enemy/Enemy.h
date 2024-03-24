@@ -16,12 +16,21 @@ public:
 
 	const bool GetIsActive() const { return isActive_; };
 
+	const Vector3 GetWorldPosition() const;
+
+	const bool GetIsCopied() const { return isCopied_; };
+
+	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
+
 private:
 	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 
 	bool isActive_ = false;
+
 	int activeTimer_ = 0;
+
+	bool isCopied_ = false;
 };
 

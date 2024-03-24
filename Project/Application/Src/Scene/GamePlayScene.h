@@ -29,6 +29,8 @@ public:
 private:
 	void AddBlock(const Vector3& position, const Vector3& scale);
 
+	void AddEnemy();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -45,7 +47,7 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::unique_ptr<Enemy> enemy_ = nullptr;
+	std::vector<std::unique_ptr<Enemy>> enemies_{};
 
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;
@@ -56,5 +58,7 @@ private:
 
 	//プレイヤーの座標を保存するキュー
 	std::queue<Vector3> playerPosition_{};
+	std::vector<std::queue<Vector3>> enemyPosition_{};
+	int enemyIndex_ = 0;
 };
 

@@ -22,8 +22,7 @@ void GamePlayScene::Initialize()
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
 	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(enemyModel_.get());
+	AddEnemy();
 
 	//ブロックの生成
 	blockModel_.reset(ModelManager::Create());
@@ -44,7 +43,10 @@ void GamePlayScene::Finalize()
 void GamePlayScene::Update()
 {
 	//敵の更新
-	enemy_->Update();
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Update();
+	}
 
 	//プレイヤーの更新
 	player_->Update();
@@ -68,7 +70,7 @@ void GamePlayScene::Update()
 	collisionManager_->CheckAllCollisions();
 
 	//プレイヤーの座標を保存
-	if (!enemy_->GetIsActive())
+	if (!enemies_[0]->GetIsActive())
 	{
 		playerPosition_.push(player_->GetWorldPosition());
 	}
@@ -76,7 +78,31 @@ void GamePlayScene::Update()
 	{
 		playerPosition_.pop();
 		playerPosition_.push(player_->GetWorldPosition());
-		enemy_->SetPosition(playerPosition_.front());
+		enemies_[0]->SetPosition(playerPosition_.front());
+		if (!player_->GetIsCopied())
+		{
+			AddEnemy();
+			player_->SetIsCopied(true);
+		}
+	}
+
+	for (int i = 1; i < enemies_.size(); i++)
+	{
+		if (!enemies_[i]->GetIsActive())
+		{
+			enemyPosition_[i - 1].push(enemies_[i - 1]->GetWorldPosition());
+		}
+		else
+		{
+			enemyPosition_[i - 1].pop();
+			enemyPosition_[i - 1].push(enemies_[i - 1]->GetWorldPosition());
+			enemies_[i]->SetPosition(enemyPosition_[i - 1].front());
+			if (!enemies_[i - 1]->GetIsCopied())
+			{
+				AddEnemy();
+				enemies_[i - 1]->SetIsCopied(true);
+			}
+		}
 	}
 }
 
@@ -98,9 +124,12 @@ void GamePlayScene::Draw()
 	player_->Draw(camera_);
 
 	//敵の描画
-	if (enemy_->GetIsActive())
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		enemy_->Draw(camera_);
+		if (enemy->GetIsActive())
+		{
+			enemy->Draw(camera_);
+		}
 	}
 
 	//ブロックの描画
@@ -138,4 +167,12 @@ void GamePlayScene::AddBlock(const Vector3& position, const Vector3& scale)
 	Block* newBlock = new Block();
 	newBlock->Initialize(blockModel_.get(), position, scale);
 	blocks_.push_back(std::unique_ptr<Block>(newBlock));
+}
+
+void GamePlayScene::AddEnemy()
+{
+	Enemy* newEnemy = new Enemy();
+	newEnemy->Initialize(enemyModel_.get());
+	enemies_.push_back(std::unique_ptr<Enemy>(newEnemy));
+	enemyPosition_.push_back(std::queue<Vector3>());
 }

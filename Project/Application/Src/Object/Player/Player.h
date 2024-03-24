@@ -21,6 +21,10 @@ public:
 
 	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
 
+	const bool GetIsCopied() const { return isCopied_; };
+
+	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -49,5 +53,7 @@ private:
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
 	Vector3 velocity_{};
+
+	bool isCopied_ = false;
 };
 
