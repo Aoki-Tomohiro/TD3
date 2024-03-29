@@ -67,6 +67,13 @@ void GamePlayScene::Update()
 	{
 		collisionManager_->SetColliderList(block.get());
 	}
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsActive())
+		{
+			collisionManager_->SetColliderList(enemy.get());
+		}
+	}
 	collisionManager_->CheckAllCollisions();
 
 	//プレイヤーの座標を保存
@@ -99,7 +106,10 @@ void GamePlayScene::Update()
 			enemies_[i]->SetPosition(enemyPosition_[i - 1].front());
 			if (!enemies_[i - 1]->GetIsCopied())
 			{
-				AddEnemy();
+				if (enemyIndex_ < 5)
+				{
+					AddEnemy();
+				}
 				enemies_[i - 1]->SetIsCopied(true);
 			}
 		}
@@ -175,4 +185,5 @@ void GamePlayScene::AddEnemy()
 	newEnemy->Initialize(enemyModel_.get());
 	enemies_.push_back(std::unique_ptr<Enemy>(newEnemy));
 	enemyPosition_.push_back(std::queue<Vector3>());
+	enemyIndex_++;
 }

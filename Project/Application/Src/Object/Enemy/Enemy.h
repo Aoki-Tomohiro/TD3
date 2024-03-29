@@ -1,7 +1,9 @@
 #pragma once
 #include "Engine/3D/Model/Model.h"
+#include "Engine/Components/Collision/Collider.h"
+#include "Engine/Components/Collision/CollisionConfig.h"
 
-class Enemy
+class Enemy : public Collider
 {
 public:
 	static const int kActiveTime = 60 * 5;
@@ -14,9 +16,13 @@ public:
 
 	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
 
-	const bool GetIsActive() const { return isActive_; };
+	void OnCollision(Collider* collider) override;
 
-	const Vector3 GetWorldPosition() const;
+	const Vector3 GetWorldPosition() const override;
+
+	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
+
+	const bool GetIsActive() const { return isActive_; };
 
 	const bool GetIsCopied() const { return isCopied_; };
 

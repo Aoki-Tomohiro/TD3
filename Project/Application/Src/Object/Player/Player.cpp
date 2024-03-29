@@ -198,51 +198,48 @@ void Player::BehaviorJumpUpdate()
 
 void Player::OnCollision(Collider* collider)
 {
-	if (collider->GetCollisionAttribute() == kCollisionAttributeEnemy)
-	{
-		AABB aabbA = {
-		.min{worldTransform_.translation_.x + GetAABB().min.x,worldTransform_.translation_.y + GetAABB().min.y,worldTransform_.translation_.z + GetAABB().min.z},
-		.max{worldTransform_.translation_.x + GetAABB().max.x,worldTransform_.translation_.y + GetAABB().max.y,worldTransform_.translation_.z + GetAABB().max.z},
-		};
-		AABB aabbB = {
-			.min{collider->GetWorldTransform().translation_.x + collider->GetAABB().min.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().min.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().min.z},
-			.max{collider->GetWorldTransform().translation_.x + collider->GetAABB().max.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().max.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().max.z},
-		};
+	AABB aabbA = {
+	.min{worldTransform_.translation_.x + GetAABB().min.x,worldTransform_.translation_.y + GetAABB().min.y,worldTransform_.translation_.z + GetAABB().min.z},
+	.max{worldTransform_.translation_.x + GetAABB().max.x,worldTransform_.translation_.y + GetAABB().max.y,worldTransform_.translation_.z + GetAABB().max.z},
+	};
+	AABB aabbB = {
+		.min{collider->GetWorldTransform().translation_.x + collider->GetAABB().min.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().min.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().min.z},
+		.max{collider->GetWorldTransform().translation_.x + collider->GetAABB().max.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().max.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().max.z},
+	};
 
-		Vector3 overlapAxis = {
-			std::min<float>(aabbA.max.x,aabbB.max.x) - std::max<float>(aabbA.min.x,aabbB.min.x),
-			std::min<float>(aabbA.max.y,aabbB.max.y) - std::max<float>(aabbA.min.y,aabbB.min.y),
-			std::min<float>(aabbA.max.z,aabbB.max.z) - std::max<float>(aabbA.min.z,aabbB.min.z),
-		};
+	Vector3 overlapAxis = {
+		std::min<float>(aabbA.max.x,aabbB.max.x) - std::max<float>(aabbA.min.x,aabbB.min.x),
+		std::min<float>(aabbA.max.y,aabbB.max.y) - std::max<float>(aabbA.min.y,aabbB.min.y),
+		std::min<float>(aabbA.max.z,aabbB.max.z) - std::max<float>(aabbA.min.z,aabbB.min.z),
+	};
 
-		Vector3 directionAxis{};
-		if (overlapAxis.x < overlapAxis.y && overlapAxis.x < overlapAxis.z) {
-			//X軸方向で最小の重なりが発生している場合
-			directionAxis.x = (worldTransform_.translation_.x < collider->GetWorldTransform().translation_.x) ? -1.0f : 1.0f;
-			directionAxis.y = 0.0f;
-		}
-		else if (overlapAxis.y < overlapAxis.x && overlapAxis.y < overlapAxis.z) {
-			//Y軸方向で最小の重なりが発生している場合
-			directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
-			directionAxis.x = 0.0f;
-
-			//通常状態に戻す
-			behaviorRequest_ = Behavior::kRoot;
-			if (directionAxis.y == 1.0f)
-			{
-				velocity_.y = 0.0f;
-			}
-		}
-		else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
-		{
-			directionAxis.z = (worldTransform_.translation_.z < collider->GetWorldTransform().translation_.z) ? -1.0f : 1.0f;
-			directionAxis.x = 0.0f;
-			directionAxis.y = 0.0f;
-		}
-
-		worldTransform_.translation_ += overlapAxis * directionAxis;
-		worldTransform_.UpdateMatrixFromEuler();
+	Vector3 directionAxis{};
+	if (overlapAxis.x < overlapAxis.y && overlapAxis.x < overlapAxis.z) {
+		//X軸方向で最小の重なりが発生している場合
+		directionAxis.x = (worldTransform_.translation_.x < collider->GetWorldTransform().translation_.x) ? -1.0f : 1.0f;
+		directionAxis.y = 0.0f;
 	}
+	else if (overlapAxis.y < overlapAxis.x && overlapAxis.y < overlapAxis.z) {
+		//Y軸方向で最小の重なりが発生している場合
+		directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
+		directionAxis.x = 0.0f;
+
+		//通常状態に戻す
+		behaviorRequest_ = Behavior::kRoot;
+		if (directionAxis.y == 1.0f)
+		{
+			velocity_.y = 0.0f;
+		}
+	}
+	else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
+	{
+		directionAxis.z = (worldTransform_.translation_.z < collider->GetWorldTransform().translation_.z) ? -1.0f : 1.0f;
+		directionAxis.x = 0.0f;
+		directionAxis.y = 0.0f;
+	}
+
+	worldTransform_.translation_ += overlapAxis * directionAxis;
+	worldTransform_.UpdateMatrixFromEuler();
 }
 
 const Vector3 Player::GetWorldPosition() const

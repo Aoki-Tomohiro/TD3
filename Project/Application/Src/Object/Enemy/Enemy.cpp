@@ -28,6 +28,11 @@ void Enemy::Draw(const Camera& camera)
 	model_->Draw(worldTransform_, camera);
 }
 
+void Enemy::OnCollision(Collider* collider)
+{
+
+}
+
 const Vector3 Enemy::GetWorldPosition() const
 {
 	// ワールド座標を入れる関数
