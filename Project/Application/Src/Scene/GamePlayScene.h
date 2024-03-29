@@ -11,6 +11,7 @@
 #include "Application/Src/Object/Player/Player.h"
 #include "Application/Src/Object/Enemy/Enemy.h"
 #include "Application/Src/Object/Block/Block.h"
+#include "Application/Src/Object/Line/Line.h"
 #include <queue>
 
 class GamePlayScene : public IScene
@@ -52,6 +53,9 @@ private:
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;
 	std::vector<std::unique_ptr<Block>> blocks_{};
+
+	//ライン
+	std::unique_ptr<Line> line_ = nullptr;
 
 	//CollisionManager
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

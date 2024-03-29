@@ -24,6 +24,10 @@ void GamePlayScene::Initialize()
 	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	AddEnemy();
 
+	//ラインの生成
+	line_ = std::make_unique<Line>();
+	line_->Initialize();
+
 	//ブロックの生成
 	blockModel_.reset(ModelManager::Create());
 	AddBlock({ -10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
@@ -56,6 +60,9 @@ void GamePlayScene::Update()
 	{
 		block->Update();
 	}
+
+	//ラインの更新
+	line_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();
@@ -166,6 +173,12 @@ void GamePlayScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//ラインの描画
+	if (enemyIndex_ < 5)
+	{
+		line_->Draw();
+	}
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
