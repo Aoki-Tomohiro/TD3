@@ -46,12 +46,6 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
-	//敵の更新
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		enemy->Update();
-	}
-
 	//プレイヤーの更新
 	player_->Update();
 
@@ -74,52 +68,72 @@ void GamePlayScene::Update()
 	{
 		collisionManager_->SetColliderList(block.get());
 	}
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	if (enemies_[0]->GetIsActive())
 	{
-		if (enemy->GetIsActive())
+		if (!playerPosition_.empty())
 		{
-			collisionManager_->SetColliderList(enemy.get());
+			collisionManager_->SetColliderList(enemies_[0].get());
+		}
+	}
+	for (int i = 1; i < enemies_.size(); i++)
+	{
+		if (enemies_[i]->GetIsActive())
+		{
+			if (!enemyPosition_[i - 1].empty())
+			{
+				collisionManager_->SetColliderList(enemies_[i].get());
+			}
 		}
 	}
 	collisionManager_->CheckAllCollisions();
 
-	//プレイヤーの座標を保存
-	if (!enemies_[0]->GetIsActive())
+	//最初の一体の参照先はプレイヤー本体なので別に処理
+	if (enemies_[0]->GetIsActive())
 	{
-		playerPosition_.push(player_->GetWorldPosition());
-	}
-	else
-	{
-		playerPosition_.pop();
-		playerPosition_.push(player_->GetWorldPosition());
-		enemies_[0]->SetPosition(playerPosition_.front());
+		if (!playerPosition_.empty())
+		{
+			enemies_[0]->SetPosition(playerPosition_.back());
+			playerPosition_.pop_back();
+		}
 		if (!player_->GetIsCopied())
 		{
 			AddEnemy();
 			player_->SetIsCopied(true);
 		}
 	}
+	else
+	{
+		playerPosition_.push_back(player_->GetWorldPosition());
+	}
 
 	for (int i = 1; i < enemies_.size(); i++)
 	{
-		if (!enemies_[i]->GetIsActive())
+		if (enemies_[i]->GetIsActive())
 		{
-			enemyPosition_[i - 1].push(enemies_[i - 1]->GetWorldPosition());
-		}
-		else
-		{
-			enemyPosition_[i - 1].pop();
-			enemyPosition_[i - 1].push(enemies_[i - 1]->GetWorldPosition());
-			enemies_[i]->SetPosition(enemyPosition_[i - 1].front());
-			if (!enemies_[i - 1]->GetIsCopied())
+			if (!enemyPosition_[i - 1].empty())
+			{
+				enemies_[i]->SetPosition(enemyPosition_[i - 1].back());
+				enemyPosition_[i - 1].pop_back();
+			}
+			if (!enemies_[i]->GetIsCopied())
 			{
 				if (enemyIndex_ < 5)
 				{
 					AddEnemy();
+					enemies_[i]->SetIsCopied(true);
 				}
-				enemies_[i - 1]->SetIsCopied(true);
 			}
 		}
+		else
+		{
+			enemyPosition_[i - 1].push_back(player_->GetWorldPosition());
+		}
+	}
+
+	//敵の更新
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Update();
 	}
 }
 
@@ -141,11 +155,21 @@ void GamePlayScene::Draw()
 	player_->Draw(camera_);
 
 	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	if (enemies_[0]->GetIsActive())
 	{
-		if (enemy->GetIsActive())
+		if (!playerPosition_.empty())
 		{
-			enemy->Draw(camera_);
+			enemies_[0]->Draw(camera_);
+		}
+	}
+	for (int i = 1; i < enemies_.size(); i++)
+	{
+		if (enemies_[i]->GetIsActive())
+		{
+			if (!enemyPosition_[i - 1].empty())
+			{
+				enemies_[i]->Draw(camera_);
+			}
 		}
 	}
 
@@ -197,6 +221,6 @@ void GamePlayScene::AddEnemy()
 	Enemy* newEnemy = new Enemy();
 	newEnemy->Initialize(enemyModel_.get());
 	enemies_.push_back(std::unique_ptr<Enemy>(newEnemy));
-	enemyPosition_.push_back(std::queue<Vector3>());
+	enemyPosition_.push_back(std::deque<Vector3>());
 	enemyIndex_++;
 }

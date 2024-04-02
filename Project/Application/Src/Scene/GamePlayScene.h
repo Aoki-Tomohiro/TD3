@@ -61,8 +61,8 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
 	//プレイヤーの座標を保存するキュー
-	std::queue<Vector3> playerPosition_{};
-	std::vector<std::queue<Vector3>> enemyPosition_{};
+	std::deque<Vector3> playerPosition_{};
+	std::vector<std::deque<Vector3>> enemyPosition_{};
 	int enemyIndex_ = 0;
 };
 
