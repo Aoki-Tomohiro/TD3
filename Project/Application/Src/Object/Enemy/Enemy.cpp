@@ -15,11 +15,15 @@ void Enemy::Update()
 	{
 		isActive_ = true;
 	}
+	if ((activeTimer_-kActiveTime) / 60 >= 10) {
+		isActive_ = false;
+	}
 
 	worldTransform_.UpdateMatrixFromEuler();
 
 	ImGui::Begin("Enemy");
 	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
+	ImGui::Text("activeTimer%d", (activeTimer_-kActiveTime)/60);
 	ImGui::End();
 }
 

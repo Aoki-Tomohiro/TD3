@@ -25,6 +25,22 @@ public:
 
 	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
 
+	const bool GetIsCopied2() const { return isCopied2_; };
+
+	void SetIsCopied2(const bool isCopied) { isCopied2_ = isCopied; };
+
+	const bool GetIsCopied3() const { return isCopied3_; };
+
+	void SetIsCopied3(const bool isCopied) { isCopied3_ = isCopied; };
+
+	const bool GetIsCopied3() const { return isCopied4_; };
+
+	void SetIsCopied3(const bool isCopied) { isCopied4_ = isCopied; };
+
+	const bool GetIsCopied3() const { return isCopied5_; };
+
+	void SetIsCopied3(const bool isCopied) { isCopied5_ = isCopied; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -55,5 +71,9 @@ private:
 	Vector3 velocity_{};
 
 	bool isCopied_ = false;
+	bool isCopied2_ = false;
+	bool isCopied3_ = false;
+	bool isCopied4_ = false;
+	bool isCopied5_ = false;
 };
 

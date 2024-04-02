@@ -4,7 +4,7 @@
 class Enemy
 {
 public:
-	static const int kActiveTime = 60 * 5;
+	static const int kActiveTime = 60 * 10;
 
 	void Initialize(Model* model);
 
@@ -22,6 +22,7 @@ public:
 
 	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
 
+	
 private:
 	Model* model_ = nullptr;
 

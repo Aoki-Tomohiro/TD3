@@ -116,6 +116,15 @@ void Player::BehaviorRootUpdate() {
 		}
 	}
 
+	if (input_->IsPushKey(DIK_A)) {
+		worldTransform_.translation_.x -= 0.3f;
+	}
+
+	if (input_->IsPushKey(DIK_D)) {
+		worldTransform_.translation_.x += 0.3f;
+	}
+
+
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
 	{
@@ -132,6 +141,13 @@ void Player::BehaviorRootUpdate() {
 			worldTransform_.translation_.y += kJumpFirstSpeed;
 		}
 	}
+
+	if (input_->IsPushKeyEnter(DIK_SPACE)) {
+		behaviorRequest_ = Behavior::kJump;
+		const float kJumpFirstSpeed = 0.8f;
+		worldTransform_.translation_.y += kJumpFirstSpeed;
+	}
+
 }
 
 void Player::BehaviorJumpInitialize()
@@ -187,6 +203,14 @@ void Player::BehaviorJumpUpdate()
 			move = { 0.0f,0.0f,0.0f };
 			velocity_.x = 0.0f;
 		}
+	}
+
+	if (input_->IsPushKey(DIK_A)) {
+		worldTransform_.translation_.x -= 0.3f;
+	}
+
+	if (input_->IsPushKey(DIK_D)) {
+		worldTransform_.translation_.x += 0.3f;
 	}
 
 	if (worldTransform_.translation_.y <= -10.0f)
