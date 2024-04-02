@@ -33,13 +33,13 @@ public:
 
 	void SetIsCopied3(const bool isCopied) { isCopied3_ = isCopied; };
 
-	const bool GetIsCopied3() const { return isCopied4_; };
+	const bool GetIsCopied4() const { return isCopied4_; };
 
-	void SetIsCopied3(const bool isCopied) { isCopied4_ = isCopied; };
+	void SetIsCopied4(const bool isCopied) { isCopied4_ = isCopied; };
 
-	const bool GetIsCopied3() const { return isCopied5_; };
+	const bool GetIsCopied5() const { return isCopied5_; };
 
-	void SetIsCopied3(const bool isCopied) { isCopied5_ = isCopied; };
+	void SetIsCopied5(const bool isCopied) { isCopied5_ = isCopied; };
 
 private:
 	//プレイヤーの状態

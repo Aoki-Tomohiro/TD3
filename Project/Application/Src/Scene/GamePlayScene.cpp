@@ -452,10 +452,10 @@ void GamePlayScene::UpdataEnemy4() {
 		playerPosition4_.pop();
 		playerPosition4_.push(player_->GetWorldPosition());
 		enemies4_[0]->SetPosition(playerPosition4_.front());
-		if (!player_->GetIsCopied3())
+		if (!player_->GetIsCopied4())
 		{
 			AddEnemy4();
-			player_->SetIsCopied3(true);
+			player_->SetIsCopied4(true);
 		}
 		else {
 
@@ -501,10 +501,10 @@ void GamePlayScene::UpdataEnemy5() {
 		playerPosition5_.pop();
 		playerPosition5_.push(player_->GetWorldPosition());
 		enemies5_[0]->SetPosition(playerPosition5_.front());
-		if (!player_->GetIsCopied3())
+		if (!player_->GetIsCopied5())
 		{
 			AddEnemy5();
-			player_->SetIsCopied3(true);
+			player_->SetIsCopied5(true);
 		}
 		else {
 
