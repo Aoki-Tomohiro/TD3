@@ -10,6 +10,7 @@
 
 #include "Application/Src/Object/Player/Player.h"
 #include "Application/Src/Object/Enemy/Enemy.h"
+#include "Application/Src/Object/Copy/Copy.h"
 #include "Application/Src/Object/Block/Block.h"
 #include <queue>
 
@@ -29,16 +30,17 @@ public:
 private:
 	void AddBlock(const Vector3& position, const Vector3& scale);
 
-	void AddEnemy();
-	void AddEnemy2();
-	void AddEnemy3();
-	void AddEnemy4();
-	void AddEnemy5();
+	void Addcopy();
+	void Addcopy2();
+	void Addcopy3();
+	void Addcopy4();
+	void Addcopy5();
 
-	void UpdataEnemy2();
-	void UpdataEnemy3();
-	void UpdataEnemy4();
-	void UpdataEnemy5();
+	void Updatacopy1();
+	void Updatacopy2();
+	void Updatacopy3();
+	void Updatacopy4();
+	void Updatacopy5();
 
 private:
 	Renderer* renderer_ = nullptr;
@@ -54,13 +56,17 @@ private:
 	std::unique_ptr<Model> playerModel_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 
+	//コピー
+	std::unique_ptr<Model> copyModel_ = nullptr;
+	std::vector<std::unique_ptr<Copy>> copys_{};
+	std::vector<std::unique_ptr<Copy>> copys2_{};
+	std::vector<std::unique_ptr<Copy>> copys3_{};
+	std::vector<std::unique_ptr<Copy>> copys4_{};
+	std::vector<std::unique_ptr<Copy>> copys5_{};
+
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies_{};
-	std::vector<std::unique_ptr<Enemy>> enemies2_{};
-	std::vector<std::unique_ptr<Enemy>> enemies3_{};
-	std::vector<std::unique_ptr<Enemy>> enemies4_{};
-	std::vector<std::unique_ptr<Enemy>> enemies5_{};
+	std::unique_ptr<Enemy> enemy_ = nullptr;
 
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;
@@ -75,11 +81,11 @@ private:
 	std::queue<Vector3> playerPosition3_{};
 	std::queue<Vector3> playerPosition4_{};
 	std::queue<Vector3> playerPosition5_{};
-	std::vector<std::queue<Vector3>> enemyPosition_{};
-	std::vector<std::queue<Vector3>> enemyPosition2_{};
-	std::vector<std::queue<Vector3>> enemyPosition3_{};
-	std::vector<std::queue<Vector3>> enemyPosition4_{};
-	std::vector<std::queue<Vector3>> enemyPosition5_{};
+	std::vector<std::queue<Vector3>> copyPosition_{};
+	std::vector<std::queue<Vector3>> copyPosition2_{};
+	std::vector<std::queue<Vector3>> copyPosition3_{};
+	std::vector<std::queue<Vector3>> copyPosition4_{};
+	std::vector<std::queue<Vector3>> copyPosition5_{};
 	int enemyIndex_ = 0;
 
 	//新しいコピーが出てくるまでの時間

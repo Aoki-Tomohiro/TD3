@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Application\Src\Game\GameManager.cpp" />
     <ClCompile Include="Application\Src\Object\Block\Block.cpp" />
+    <ClCompile Include="Application\Src\Object\Copy\Copy.cpp" />
     <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Src\Object\Player\Player.cpp" />
     <ClCompile Include="Application\Src\Scene\GameClearScene.cpp" />
@@ -103,6 +104,7 @@
   <ItemGroup>
     <ClInclude Include="Application\Src\Game\GameManager.h" />
     <ClInclude Include="Application\Src\Object\Block\Block.h" />
+    <ClInclude Include="Application\Src\Object\Copy\Copy.h" />
     <ClInclude Include="Application\Src\Object\Enemy\Enemy.h" />
     <ClInclude Include="Application\Src\Object\Player\Player.h" />
     <ClInclude Include="Application\Src\Scene\GameClearScene.h" />

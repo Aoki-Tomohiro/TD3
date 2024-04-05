@@ -222,7 +222,7 @@ void Player::BehaviorJumpUpdate()
 
 void Player::OnCollision(Collider* collider)
 {
-	if (collider->GetCollisionAttribute() == kCollisionAttributeEnemy)
+	if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)
 	{
 		AABB aabbA = {
 		.min{worldTransform_.translation_.x + GetAABB().min.x,worldTransform_.translation_.y + GetAABB().min.y,worldTransform_.translation_.z + GetAABB().min.z},

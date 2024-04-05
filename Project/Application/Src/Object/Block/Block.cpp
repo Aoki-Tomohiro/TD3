@@ -9,8 +9,8 @@ void Block::Initialize(Model* model, const Vector3& position, const Vector3& sca
 	worldTransform_.scale_ = scale;
 
 	//衝突属性を設定
-	SetCollisionAttribute(kCollisionAttributeEnemy);
-	SetCollisionMask(kCollisionMaskEnemy);
+	SetCollisionAttribute(kCollisionAttributeBlock);
+	SetCollisionMask(kCollisionMaskBlock);
 	SetCollisionPrimitive(kCollisionPrimitiveAABB);
 	AABB aabb = {
 	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},

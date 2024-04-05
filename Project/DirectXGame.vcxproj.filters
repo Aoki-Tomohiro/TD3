@@ -375,6 +375,9 @@
     <ClCompile Include="Application\Src\Object\Player\Player.cpp">
       <Filter>ソース ファイル\Application\Object\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Application\Src\Object\Copy\Copy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\2D\Sprite.h">
@@ -631,6 +634,9 @@
     </ClInclude>
     <ClInclude Include="Application\Src\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Copy\Copy.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
