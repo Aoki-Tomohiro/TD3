@@ -157,6 +157,24 @@
     <Filter Include="ヘッダー ファイル\Application\Object">
       <UniqueIdentifier>{f4a52438-51f2-43f3-a85d-2f363fc43a1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Player">
+      <UniqueIdentifier>{393bb982-0ed7-445e-80cd-605cd2c7e209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Player">
+      <UniqueIdentifier>{58deac5e-f007-4e5d-b9a1-e3749d61df1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Block">
+      <UniqueIdentifier>{aaa3bd7d-5b78-4aaa-9501-56af4b003d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Block">
+      <UniqueIdentifier>{205a8521-5522-4021-8cdb-20693d0daa7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Copy">
+      <UniqueIdentifier>{85075200-4923-47c0-80ae-f1a08fafb4b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Copy">
+      <UniqueIdentifier>{166d6d23-480b-4f9c-80fb-ef07210ffb65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\2D\Sprite.cpp">
@@ -347,6 +365,24 @@
     </ClCompile>
     <ClCompile Include="Engine\Base\Display.cpp">
       <Filter>ソース ファイル\Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Player\Player.cpp">
+      <Filter>ソース ファイル\Application\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Player\Weapon.cpp">
+      <Filter>ソース ファイル\Application\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Block\Block.cpp">
+      <Filter>ソース ファイル\Application\Object\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Block\BlockManager.cpp">
+      <Filter>ソース ファイル\Application\Object\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Player\Copy.cpp">
+      <Filter>ソース ファイル\Application\Object\Copy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Player\CopyManager.cpp">
+      <Filter>ソース ファイル\Application\Object\Copy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -595,6 +631,24 @@
     </ClInclude>
     <ClInclude Include="Engine\Base\FrameRateController.h">
       <Filter>ヘッダー ファイル\Engine\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Player\Player.h">
+      <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Player\Weapon.h">
+      <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Block\Block.h">
+      <Filter>ヘッダー ファイル\Application\Object\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Block\BlockManager.h">
+      <Filter>ヘッダー ファイル\Application\Object\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Player\Copy.h">
+      <Filter>ヘッダー ファイル\Application\Object\Copy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Player\CopyManager.h">
+      <Filter>ヘッダー ファイル\Application\Object\Copy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
