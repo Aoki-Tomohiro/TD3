@@ -6,6 +6,7 @@
 #include "Engine/Components/Input/Input.h"
 #include "Engine/Components/Audio/Audio.h"
 #include "Engine/Components/Collision/CollisionManager.h"
+#include "Engine/Components/Particle/ParticleManager.h"
 #include "Engine/3D/Model/ModelManager.h"
 #include "Engine/2D/Sprite.h"
 #include "Engine/Math/MathFunction.h"
@@ -13,6 +14,7 @@
 #include "Application/Src/Object/Player/Player.h"
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
+#include "Application/Src/Object/Enemy/EnemyManager.h"
 
 class GamePlayScene : public IScene
 {
@@ -42,6 +44,9 @@ private:
 	//衝突マネージャー
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
+	//パーティクルマネージャー
+	ParticleManager* particleManager_ = nullptr;
+
 	//プレイヤー
 	std::unique_ptr<Model> playerModel_ = nullptr;
 	std::unique_ptr<Model> weaponModel_ = nullptr;
@@ -54,5 +59,9 @@ private:
 	//コピー
 	std::unique_ptr<Model> copyModel_ = nullptr;
 	std::unique_ptr<CopyManager> copyManager_ = nullptr;
+
+	//敵
+	std::unique_ptr<Model> enemyModel_ = nullptr;
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 };
 
