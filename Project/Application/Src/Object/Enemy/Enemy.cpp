@@ -20,6 +20,10 @@ void Enemy::Initialize(Model* model)
 			map[x][y] = 0;
 		}
 	}
+
+	for (int i = 0; i < 36; ++i) {
+		findMap.push_back(std::vector<int>(36, 0)); // 36個の要素を0で初期化して追加
+	}
 }
 
 void Enemy::Update()
@@ -122,8 +126,11 @@ void Enemy::BehaviorRootUpdate() {
 		playerPosition_.x = float(path_[1]->x);
 		playerPosition_.y= float(path_[1]->y);
 		velocity_ = playerPosition_ - worldTransform_.translation_;
-		// パスを更新
-		path_.erase(path_.begin(), path_.begin() + 1);
+		if (worldTransform_.translation_ == Vector3(float(path_[1]->x),float(path_[1]->y),worldTransform_.translation_.z)) {
+			// パスを更新
+			path_.erase(path_.begin() + 1);
+		}
+		
 		//ナップチップの重みごとに次の移動にかかる時間を変更
 		
 		if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 9) {
@@ -137,7 +144,7 @@ void Enemy::BehaviorRootUpdate() {
 	}
 
 	worldTransform_.translation_ += velocity_;
-
+	worldTransform_.translation_ = { float(path_[path_.size()-1]->x),float(path_[path_.size() - 1]->y),0.0f};
 
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
@@ -235,9 +242,7 @@ void Enemy::DistanceFunction() {
 //経路探索
 void Enemy::FindPath() {
 
-	for (int i = 0; i < 36; ++i) {
-		findMap.push_back(std::vector<int>(36, 0)); // 36個の要素を0で初期化して追加
-	}
+	
 
 
 	for (int y = 0; y < 36; ++y) {
