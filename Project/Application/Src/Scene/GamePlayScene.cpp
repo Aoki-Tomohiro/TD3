@@ -72,15 +72,21 @@ void GamePlayScene::Update()
 	//プレイヤーの更新
 	player_->Update();
 
-	//敵の更新
-	enemy_->Update();
-	enemy_->SetPlayerPosition(player_->GetWorldPosition());
-
 	//ブロックの更新
 	for (const std::unique_ptr<Block>& block : blocks_)
 	{
 		block->Update();
+		
 	}
+
+	for (int i =0; i < blocks_.size(); i++) {
+		enemy_->SetBlockPosition(blocks_[i].get()->GetWorldPosition());
+		enemy_->SetBlockSize(blocks_[i].get()->GetSize());
+	}
+	
+	//敵の更新
+	enemy_->SetPlayerPosition(player_->GetWorldPosition());
+	enemy_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();

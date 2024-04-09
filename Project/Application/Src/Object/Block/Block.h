@@ -18,6 +18,8 @@ public:
 
 	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
 
+	const Vector3 GetSize()  const { return worldTransform_.scale_; }
+
 private:
 	Model* model_ = nullptr;
 
