@@ -24,7 +24,7 @@ void Enemy::Initialize(Model* model)
 
 void Enemy::Update()
 {
-
+	FindPath();
 
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
@@ -117,10 +117,11 @@ void Enemy::BehaviorRootUpdate() {
 
 	moveCount_--;
 	// エネミーの移動
-	if (moveCount_ <= 0 && !path_.empty()) {
+	if (!path_.empty()) {
 		//目的地の位置を次のノードの位置に
 		playerPosition_.x = float(path_[1]->x);
-		playerPosition_.y = float(path_[1]->y);
+		playerPosition_.y= float(path_[1]->y);
+		velocity_ = playerPosition_ - worldTransform_.translation_;
 		// パスを更新
 		path_.erase(path_.begin(), path_.begin() + 1);
 		//ナップチップの重みごとに次の移動にかかる時間を変更
@@ -135,9 +136,7 @@ void Enemy::BehaviorRootUpdate() {
 
 	}
 
-	velocity_ = playerPosition_ - worldTransform_.translation_;
-
-
+	worldTransform_.translation_ += velocity_;
 
 
 	//地面より下に行かないようにする
@@ -236,8 +235,14 @@ void Enemy::DistanceFunction() {
 //経路探索
 void Enemy::FindPath() {
 
+	for (int i = 0; i < 36; ++i) {
+		findMap.push_back(std::vector<int>(36, 0)); // 36個の要素を0で初期化して追加
+	}
+
+
 	for (int y = 0; y < 36; ++y) {
 		for (int x = 0; x < 36; ++x) {
+			
 			findMap[x][y] = map[x][y];
 		}
 	}
