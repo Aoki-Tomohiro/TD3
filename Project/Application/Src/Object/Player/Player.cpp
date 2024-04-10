@@ -73,11 +73,15 @@ void Player::Update()
 		break;
 	}
 
+	//着地フラグをリセット
+	isLanded_ = false;
+
 	//地面に埋まらないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
 	{
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;
+		isLanded_ = true;
 	}
 
 	//ワールドトランスフォームの更新
@@ -95,6 +99,7 @@ void Player::Update()
 	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
 	ImGui::DragFloat4("Quaternion", &worldTransform_.quaternion_.x);
 	ImGui::DragFloat3("Velocity", &velocity_.x);
+	ImGui::Checkbox("isLanded", &isLanded_);
 	ImGui::End();
 }
 
@@ -148,6 +153,7 @@ void Player::OnCollision(Collider* collider)
 		if (directionAxis.y == 1.0f)
 		{
 			velocity_.y = 0.0f;
+			isLanded_ = true;
 		}
 	}
 	else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
@@ -224,7 +230,7 @@ void Player::BehaviorRootUpdate()
 	if (input_->IsControllerConnected())
 	{
 		//ジャンプ状態に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_)
 		{
 			behaviorRequest_ = Behavior::kJump;
 			worldTransform_.translation_.y += jumpFirstSpeed_;
@@ -289,6 +295,7 @@ void Player::BehaviorJumpUpdate()
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;
+		isLanded_ = true;
 	}
 
 	//コントローラーが接続されているとき

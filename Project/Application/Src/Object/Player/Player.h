@@ -72,5 +72,7 @@ private:
 	float jumpFirstSpeed_ = 0.8f;
 
 	std::unique_ptr<Weapon> weapon_ = nullptr;
+
+	bool isLanded_ = false;
 };
 

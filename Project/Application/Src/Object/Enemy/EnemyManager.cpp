@@ -8,20 +8,13 @@ void EnemyManager::Initialize(Model* model)
 
 void EnemyManager::Update()
 {
-	//敵の削除
-	enemies_.remove_if([](std::unique_ptr<Enemy>& enemy) {
-		if (!enemy->GetisAlive())
-		{
-			enemy.reset();
-			return true;
-		}
-		return false;
-	});
-
 	//敵の更新
 	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		enemy->Update();
+		if (enemy->GetisAlive())
+		{
+			enemy->Update();
+		}
 	}
 
 	//ImGui
@@ -65,7 +58,18 @@ void EnemyManager::Draw(const Camera& camera)
 	//敵の描画
 	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		enemy->Draw(camera);
+		if (enemy->GetisAlive())
+		{
+			enemy->Draw(camera);
+		}
+	}
+}
+
+void EnemyManager::Reset()
+{
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->SetIsAlive(true);
 	}
 }
 

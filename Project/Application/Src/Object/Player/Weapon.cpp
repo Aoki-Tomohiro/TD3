@@ -8,8 +8,8 @@ void Weapon::Initialize(Model* model)
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 0.1f,2.0f,5.0f };
-	worldTransform_.scale_ = { 1.0f,3.0f,3.0f };
+	worldTransform_.translation_ = { 0.0f,2.0f,5.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 
 	//衝突判定の初期化
 	SetCollisionAttribute(kCollisionAttributeWeapon);
@@ -28,8 +28,8 @@ void Weapon::Update()
 {
 	//AABBのサイズを設定
 	AABB aabb = {
-	.min{.x = -worldTransform_.scale_.x,.y = -worldTransform_.scale_.y,.z = -worldTransform_.scale_.z},
-	.max{.x = worldTransform_.scale_.x,.y = worldTransform_.scale_.y,.z = worldTransform_.scale_.z}
+	.min{-worldTransform_.scale_.x, -worldTransform_.scale_.y, -worldTransform_.scale_.z},
+	.max{worldTransform_.scale_.x, worldTransform_.scale_.y,worldTransform_.scale_.z}
 	};
 	SetAABB(aabb);
 

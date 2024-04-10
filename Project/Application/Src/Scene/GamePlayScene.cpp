@@ -95,7 +95,10 @@ void GamePlayScene::Update()
 	const std::list<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (const std::unique_ptr<Enemy>& enemy : enemies)
 	{
-		collisionManager_->SetColliderList(enemy.get());
+		if (enemy->GetisAlive())
+		{
+			collisionManager_->SetColliderList(enemy.get());
+		}
 	}
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
@@ -180,4 +183,7 @@ void GamePlayScene::Reset()
 	
 	//コピーをリセット
 	copyManager_->Reset();
+
+	//敵をリセット
+	enemyManager_->Reset();
 }

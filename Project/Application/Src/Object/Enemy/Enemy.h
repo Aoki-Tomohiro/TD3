@@ -23,6 +23,8 @@ public:
 
 	const bool GetisAlive() const { return isAlive_; };
 
+	void SetIsAlive(const bool isAlive) { isAlive_ = isAlive; };
+
 	void OnCollision(Collider* collider) override;
 
 	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };

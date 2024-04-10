@@ -11,6 +11,8 @@ public:
 
 	void Draw(const Camera& camera);
 
+	void Reset();
+
 	void AddEnemy(const Vector3& position);
 
 	const std::list<std::unique_ptr<Enemy>>& GetEnemies() { return enemies_; };

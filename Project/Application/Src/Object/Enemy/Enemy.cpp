@@ -33,21 +33,24 @@ void Enemy::Draw(const Camera& camera)
 
 void Enemy::OnCollision(Collider* collider)
 {
-	isAlive_ = false;
-	ParticleEmitter* emitter = ParticleEmitterBuilder()
-		.SetDeleteTime(1.0f)
-		.SetPopArea({0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f})
-		.SetPopAzimuth(0.0f,360.0f)
-		.SetPopColor({1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f})
-		.SetPopCount(100)
-		.SetPopElevation(0.0f,0.0f)
-		.SetPopFrequency(2.0f)
-		.SetPopLifeTime(0.2f,0.4f)
-		.SetPopScale({0.1f,0.1f,0.1f},{0.2f,0.2f,0.2f})
-		.SetPopVelocity({0.4f,0.4f,0.4f},{0.6f,0.6f,0.6f})
-		.SetTranslation(GetWorldPosition())
-		.Build();
-	particleSystem_->AddParticleEmitter(emitter);
+	if (collider->GetCollisionAttribute() == kCollisionAttributeWeapon)
+	{
+		isAlive_ = false;
+		ParticleEmitter* emitter = ParticleEmitterBuilder()
+			.SetDeleteTime(1.0f)
+			.SetPopArea({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+			.SetPopAzimuth(0.0f, 360.0f)
+			.SetPopColor({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f,1.0f })
+			.SetPopCount(100)
+			.SetPopElevation(0.0f, 0.0f)
+			.SetPopFrequency(2.0f)
+			.SetPopLifeTime(0.2f, 0.4f)
+			.SetPopScale({ 0.1f,0.1f,0.1f }, { 0.2f,0.2f,0.2f })
+			.SetPopVelocity({ 0.4f,0.4f,0.4f }, { 0.6f,0.6f,0.6f })
+			.SetTranslation(GetWorldPosition())
+			.Build();
+		particleSystem_->AddParticleEmitter(emitter);
+	}
 }
 
 const Vector3 Enemy::GetWorldPosition() const
