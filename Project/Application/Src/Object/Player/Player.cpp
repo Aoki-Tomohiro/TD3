@@ -35,10 +35,22 @@ void Player::Initialzie(std::vector<Model*> models)
 	globalVariables->AddItem(groupName, "Speed", speed_);
 	globalVariables->AddItem(groupName, "Gravity", gravity_);
 	globalVariables->AddItem(groupName, "JumpFirstSpeed", jumpFirstSpeed_);
+	globalVariables->AddItem(groupName, "MovementRestrictionTime", movementRestrictionTime_);
 }
 
 void Player::Update()
 {
+	//移動ベクトルが0ではないとき
+	if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
+	{
+		//移動制限のタイマーが移動制限時間を超えた時に動けないようにする
+		if (++movementRestrictionTimer_ > movementRestrictionTime_)
+		{
+			isMove_ = false;
+			movementRestrictionTimer_ = 0;
+		}
+	}
+
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
 	{
@@ -100,6 +112,7 @@ void Player::Update()
 	ImGui::DragFloat4("Quaternion", &worldTransform_.quaternion_.x);
 	ImGui::DragFloat3("Velocity", &velocity_.x);
 	ImGui::Checkbox("isLanded", &isLanded_);
+	ImGui::Text("MovementRestrictionTimer : %d", movementRestrictionTimer_);
 	ImGui::End();
 }
 
@@ -117,6 +130,8 @@ void Player::Reset()
 	destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
+	isMove_ = true;
+	movementRestrictionTimer_ = 0;
 }
 
 void Player::OnCollision(Collider* collider)
@@ -188,8 +203,8 @@ void Player::BehaviorRootUpdate()
 	//閾値
 	const float threshold = 0.2f;
 
-	//コントローラーが接続されているとき
-	if (input_->IsControllerConnected())
+	//コントローラーが接続されているときかつ移動出来るとき
+	if (input_->IsControllerConnected() && isMove_)
 	{
 		//スティックの入力を取得
 		velocity_.x = input_->GetLeftStickX();
@@ -255,8 +270,12 @@ void Player::BehaviorJumpUpdate()
 	//閾値
 	const float threshold = 0.2f;
 
-	//スティックの入力を取得
-	velocity_.x = input_->GetLeftStickX();
+	//コントローラーが接続されているときかつ移動出来るとき
+	if (input_->IsControllerConnected() && isMove_)
+	{
+		//スティックの入力を取得
+		velocity_.x = input_->GetLeftStickX();
+	}
 
 	//スティックの入力が閾値を超えていたら
 	if (std::abs(velocity_.x) > threshold)
@@ -290,7 +309,7 @@ void Player::BehaviorJumpUpdate()
 	worldTransform_.translation_ += velocity_;
 
 	//地面についたら通常状態に戻す
-	if (worldTransform_.translation_.y <= -10.0f)
+	if (worldTransform_.translation_.y <= -10.0f || isLanded_)
 	{
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = -10.0f;
@@ -328,4 +347,5 @@ void Player::ApplyGlobalVariables()
 	speed_ = globalVariables->GetFloatValue(groupName, "Speed");
 	gravity_ = globalVariables->GetFloatValue(groupName, "Gravity");
 	jumpFirstSpeed_ = globalVariables->GetFloatValue(groupName, "JumpFirstSpeed");
+	movementRestrictionTime_ = globalVariables->GetIntValue(groupName, "MovementRestrictionTime");
 }

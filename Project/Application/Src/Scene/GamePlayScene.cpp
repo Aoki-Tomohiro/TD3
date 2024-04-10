@@ -106,8 +106,12 @@ void GamePlayScene::Update()
 	//パーティクルの更新
 	particleManager_->Update();
 
-	//プレイヤーの座標を保存
-	copyManager_->SetPlayerPosition(player_->GetWorldPosition());
+	//プレイヤーが動けるとき
+	if (player_->GetIsMove())
+	{
+		//プレイヤーの座標を保存
+		copyManager_->SetPlayerPosition(player_->GetWorldPosition());
+	}
 
 	//リセット処理
 	if (input_->IsControllerConnected())

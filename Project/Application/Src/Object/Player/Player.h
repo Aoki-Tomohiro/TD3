@@ -28,6 +28,8 @@ public:
 
 	Weapon* GetWeapon() { return weapon_.get(); };
 
+	const bool GetIsMove() const { return isMove_; };
+
 private:
 	enum class Behavior
 	{
@@ -51,28 +53,49 @@ private:
 	void ApplyGlobalVariables();
 
 private:
+	//インプット
 	Input* input_ = nullptr;
 
+	//モデル
 	std::vector<Model*> models_{};
 
+	//ワールドトランスフォーム
 	WorldTransform worldTransform_{};
 
+	//状態
 	Behavior behavior_ = Behavior::kRoot;
 
+	//Behaviorのリクエスト
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
+	//クォータニオン
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 
+	//速度ベクトル
 	Vector3 velocity_{};
 
+	//X軸の移動速度
 	float speed_ = 0.3f;
 
+	//重力加速度
 	float gravity_ = 0.05f;
 
+	//ジャンプの初速度
 	float jumpFirstSpeed_ = 0.8f;
 
+	//武器
 	std::unique_ptr<Weapon> weapon_ = nullptr;
 
+	//着地しているか
 	bool isLanded_ = false;
+
+	//移動できるか
+	bool isMove_ = true;
+
+	//移動制限時間
+	int movementRestrictionTime_ = 60 * 10;
+
+	//移動制限のタイマー
+	int movementRestrictionTimer_ = 0;
 };
 
