@@ -28,7 +28,7 @@ void Enemy::Initialize(Model* model)
 
 void Enemy::Update()
 {
-
+	DistanceFunction();
 	FindPath();
 	
 	//Behaviorの遷移処理
@@ -62,7 +62,7 @@ void Enemy::Update()
 	}
 
 	
-	DistanceFunction();
+
 	worldTransform_.UpdateMatrixFromEuler();
 
 	
@@ -115,39 +115,25 @@ void Enemy::BehaviorRootUpdate() {
 
 
 
-	//moveCount_--;
+	moveCount_--;
 	// エネミーの移動
-	if (!path_.empty()) {
-
+	if (moveCount_<=0 && path_.size() > 1) {
 
 		//目的地の位置を次のノードの位置に
 		/*enemyPosition_.x*/ velocity_.x = float(path_[1]->x - 18) * 2;
 		/*enemyPosition_.y*/ velocity_.y = float(path_[1]->y - 18) * -2;
 		
-		worldTransform_.translation_ = velocity_;
-		
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
-		if (worldTransform_.translation_ == Vector3(float(path_[1]->x),float(path_[1]->y),worldTransform_.translation_.z)) {
+		if (worldTransform_.translation_ == velocity_) {
+			// パスを更新
+			path_.erase(path_.begin(),path_.begin() + 1);
 		}
 		
-		// パスを更新
-		path_.erase(path_.begin() + 1);
-
-		//moveCount_ = 60;
-		//ナップチップの重みごとに次の移動にかかる時間を変更
-		if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 9) {
-				
-		}
-		else if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] == 9) {
-				moveCount_ = 60;
-		}
-		
-
+		moveCount_ = 10;
 	}
 
+	worldTransform_.translation_ = velocity_;
 	
-	//worldTransform_.translation_ = { (float(path_[path_.size()-1]->x+35)/2),(float(path_[path_.size()-1]->y-35)*2),0.0f};
-	//worldTransform_.translation_ = { (float(path_[path_.size() - 1]->x-16)*2),(float(path_[path_.size() - 1]->y-18)*-2)  ,0.0f };
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
 	{
@@ -237,6 +223,12 @@ void Enemy::DistanceFunction() {
 		}
 	}
 
+
+
+	//敵の位置から最も近い0を検索
+
+
+
 	blockCount_ = 0;
 	blockSizeCount_ = 0;
 }
@@ -254,8 +246,7 @@ void Enemy::FindPath() {
 		}
 	}
 	
-	path_ = findPath(findMap, int(enemyPosition_.x),int( enemyPosition_.y), int(playerPosition_.x), int(playerPosition_.y));
-	
+	path_ = findPath(findMap, int(enemyPosition_.x), int(enemyPosition_.y), int(playerPosition_.x), int(playerPosition_.y));
 	
 }
 
