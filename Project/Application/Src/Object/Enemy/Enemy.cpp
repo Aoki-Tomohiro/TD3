@@ -8,7 +8,7 @@ void Enemy::Initialize(Model* model)
 	model_ = model;
 	
 	worldTransform_.Initialize();
-	worldTransform_.translation_.y = -10.0f;
+	worldTransform_.translation_.y = 2.0f;
 	
 	//衝突属性を設定
 	SetCollisionAttribute(kCollisionAttributeEnemy);
@@ -28,8 +28,9 @@ void Enemy::Initialize(Model* model)
 
 void Enemy::Update()
 {
-	FindPath();
 
+	FindPath();
+	
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
 	{
@@ -63,23 +64,18 @@ void Enemy::Update()
 	
 	DistanceFunction();
 	worldTransform_.UpdateMatrixFromEuler();
-	for (int i = 0; i < 70; i++) {
-		//worldTransformMap_[i].UpdateMatrixFromEuler();
-	}
 
 	
-
-
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
 	ImGui::Text("MapPlayerPos %d", map[int(playerPosition_.x)][int(playerPosition_.y)]);
+	ImGui::Text("EnemyPos X%d,Y%d", int(enemyPosition_.x), int(enemyPosition_.y));
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
-	ImGui::Text("MapEnemyPos+10 %d", map[int(enemyPosition_.x+10)][int(enemyPosition_.y)]);
-
-
+	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
+	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
+	ImGui::Text("count%d", moveCount_);
 	 for (int y = 0; y < 36; ++y) {
         ImGui::BeginGroup(); // 次の行に表示するセルをグループ化する
-
         for (int x = 0; x < 36; ++x) {
             ImGui::Text("%d", map[x][y]); // 配列の要素を表示
             ImGui::SameLine(); // 次のセルを同じ行に表示する
@@ -107,34 +103,40 @@ void Enemy::BehaviorRootInitialize() {
 }
 
 void Enemy::BehaviorRootUpdate() {
-	velocity_.x = 0.0f;
-	//移動
-	worldTransform_.translation_ += velocity_;
-	//重力加速度
-	const float kGravity = 0.05f;
-	//加速ベクトル
-	Vector3 accelerationVector = { 0.0f, -kGravity, 0.0f };
-	//加速
-	velocity_ += accelerationVector;
+	//velocity_.x = 0.0f;
+	////移動
+	//worldTransform_.translation_ += velocity_;
+	////重力加速度
+	//const float kGravity = 0.05f;
+	////加速ベクトル
+	//Vector3 accelerationVector = { 0.0f, -kGravity, 0.0f };
+	////加速
+	//velocity_ += accelerationVector;
 
 
 
-	moveCount_--;
+	//moveCount_--;
 	// エネミーの移動
 	if (!path_.empty()) {
+
+
 		//目的地の位置を次のノードの位置に
-		playerPosition_.x = float(path_[1]->x);
-		playerPosition_.y= float(path_[1]->y);
-		velocity_ = playerPosition_ - worldTransform_.translation_;
+		/*enemyPosition_.x*/ velocity_.x = float(path_[1]->x - 18) * 2;
+		/*enemyPosition_.y*/ velocity_.y = float(path_[1]->y - 18) * -2;
+		
+		worldTransform_.translation_ = velocity_;
+		
+		//velocity_ = enemyPosition_ - worldTransform_.translation_;
 		if (worldTransform_.translation_ == Vector3(float(path_[1]->x),float(path_[1]->y),worldTransform_.translation_.z)) {
-			// パスを更新
-			path_.erase(path_.begin() + 1);
 		}
 		
+		// パスを更新
+		path_.erase(path_.begin() + 1);
+
+		//moveCount_ = 60;
 		//ナップチップの重みごとに次の移動にかかる時間を変更
-		
 		if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 9) {
-				moveCount_ = 10;
+				
 		}
 		else if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] == 9) {
 				moveCount_ = 60;
@@ -143,9 +145,9 @@ void Enemy::BehaviorRootUpdate() {
 
 	}
 
-	worldTransform_.translation_ += velocity_;
-	worldTransform_.translation_ = { float(path_[path_.size()-1]->x),float(path_[path_.size() - 1]->y),0.0f};
-
+	
+	//worldTransform_.translation_ = { (float(path_[path_.size()-1]->x+35)/2),(float(path_[path_.size()-1]->y-35)*2),0.0f};
+	//worldTransform_.translation_ = { (float(path_[path_.size() - 1]->x-16)*2),(float(path_[path_.size() - 1]->y-18)*-2)  ,0.0f };
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
 	{
@@ -188,8 +190,8 @@ void Enemy::BehaviorJumpUpdate()
 void Enemy::DistanceFunction() {
 	
 	//敵の場所をマップチップに落とし込む
-	enemyPosition_.x = (35 +worldTransform_.translation_.x)/2.0f;
-	enemyPosition_.y = (35 -worldTransform_.translation_.y)/2.0f;
+	enemyPosition_.x = (36 +worldTransform_.translation_.x)/2.0f;
+	enemyPosition_.y = (36 -worldTransform_.translation_.y)/2.0f;
 
 	
 	//脅威値
@@ -226,7 +228,7 @@ void Enemy::DistanceFunction() {
 		map[blockMapPosX][blockMapPosY] = 10;
 		//ブロックの位置
 		for (int j = 0; j <= blockSize_[i].x; j++) {
-			if (blockMapPosX + j <= 35) {
+			if (blockMapPosX + j < 36) {
 				map[blockMapPosX + j][blockMapPosY] = 10;
 			}
 			if (blockMapPosY - j > 0) {
@@ -248,7 +250,7 @@ void Enemy::FindPath() {
 	for (int y = 0; y < 36; ++y) {
 		for (int x = 0; x < 36; ++x) {
 			
-			findMap[x][y] = map[x][y];
+			findMap[y][x] = map[y][x];
 		}
 	}
 	

@@ -117,11 +117,11 @@ void Player::BehaviorRootUpdate() {
 	}
 
 	if (input_->IsPushKey(DIK_A)) {
-		worldTransform_.translation_.x -= 0.3f;
+		worldTransform_.translation_.x -= 1.0f;
 	}
 
 	if (input_->IsPushKey(DIK_D)) {
-		worldTransform_.translation_.x += 0.3f;
+		worldTransform_.translation_.x += 1.0f;
 	}
 
 

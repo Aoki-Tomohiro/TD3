@@ -32,12 +32,12 @@ public:
 	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
 
 	//プレイヤー関連
-	void SetPlayerPosition(const Vector3& pos) { playerPosition_ = {(35 + pos.x)/2.0f ,(35 - pos.y)/2.0f ,pos.z}; };
+	void SetPlayerPosition(const Vector3& pos) { playerPosition_ = {(36 + pos.x)/2.0f ,(36 - pos.y)/2.0f ,pos.z}; };
 
 	//ブロック関連
 
 	void SetBlockPosition(const Vector3& pos) { 
-		blockPosition_[blockCount_] = {(35 + pos.x) / 2.0f,(35 - pos.y) / 2.0f,pos.z};
+		blockPosition_[blockCount_] = {(36 + pos.x) / 2.0f,(36 - pos.y) / 2.0f,pos.z};
 		blockCount_++;
 	}
 
@@ -84,7 +84,7 @@ private:
 
 	Vector3 velocity_{};
 
-	Vector2 enemyPosition_{};
+	Vector3 enemyPosition_{};
 	Vector3 blockPosition_[36] = {};
 	Vector3 blockSize_[36] = {};
 

@@ -45,15 +45,15 @@ std::vector<Node*> findPath(const std::vector<std::vector<int>>& map, int startX
 
 
         // 上下左右の移動
-        int dx[] = { 0, 0, -1, 1 };
-        int dy[] = { -1, 1, 0, 0 };
+        int dx[] = { 0, 0, 1, -1 };
+        int dy[] = { 1, -1, 0, 0 };
         //iが1の時は下,2の時は上,3の時は左,4の時は右を調べる
         for (int i = 0; i < 4; i++) {
             int nextX = current->x + dx[i];
             int nextY = current->y + dy[i];
-
-            if (isValid(nextX, nextY, width, height) && visited[nextX][nextY] == 0/*対象のマスが移動可能で且つまだそのノードを調べていないとき*/) {
-                if (map[nextY][nextX] != 9 && map[nextY][nextX] != 10/*何もない地面ならば*/) {
+            /*
+            if (isValid(nextX, nextY, width, height) && visited[nextX][nextY] <= 10/*対象のマスが移動可能で且つまだそのノードを調べていないとき) {
+                if (map[nextY][nextX] != 9 && map[nextY][nextX] != 10/*何もない地面ならば) {
                     //スタートからの距離にそのマス分のコストをプラスする
                     int g = current->g + 1;
                     //ゴールまでの予想距離を計算する
@@ -66,6 +66,23 @@ std::vector<Node*> findPath(const std::vector<std::vector<int>>& map, int startX
                     visited[nextX][nextY] = true;
                 }
                
+            }*/
+
+            
+            if (isValid(nextX, nextY, width, height)) {
+               
+                if (map[nextY][nextX] != 9 &&map[nextY][nextX] != 10/*何もない地面ならば*/) {
+                    //スタートからの距離にそのマス分のコストをプラスする
+                    int g = current->g + 1;
+                    //ゴールまでの予想距離を計算する
+                    int h = calcH(nextX, nextY, targetX, targetY);
+                    //次に調べるノードを新たに作成する
+                    Node* nextNode = new Node(nextX, nextY, g, h, current);
+                    //パスの最後にnextNodeを追加する
+                    openList.push(nextNode);
+                    //すでにそのノードを訪れた
+                    visited[nextX][nextY] = true;
+                }
             }
         }
     }
