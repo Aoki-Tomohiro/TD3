@@ -388,6 +388,7 @@ void Player::UpdateMovementRestrictionSprite(const Camera& camera)
 	
 	//スプライトのスケールを設定
 	Vector2 currentSize = { movementRestrictionSpriteSize_.x * float(movementRestrictionTimer_) / float(movementRestrictionTime_) ,movementRestrictionSpriteSize_.y };
+	currentSize.x = currentSize.x < 0 ? 0.0f : currentSize.x;
 	movementRestrictionSprite_->SetSize(currentSize);
 }
 
