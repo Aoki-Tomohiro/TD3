@@ -17,6 +17,11 @@ void Player::Initialzie(std::vector<Model*> models)
 	weapon_->Initialize(models_[1]);
 	weapon_->SetParent(worldTransform_);
 
+	//制限時間のスプライトの生成
+	movementRestrictionSprite_.reset(Sprite::Create("white.png", { 0.0f,0.0f }));
+	movementRestrictionSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	movementRestrictionSprite_->SetSize(movementRestrictionSpriteSize_);
+
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
@@ -26,7 +31,6 @@ void Player::Initialzie(std::vector<Model*> models)
 	SetCollisionAttribute(kCollisionAttributePlayer);
 	SetCollisionMask(kCollisionMaskPlayer);
 	SetCollisionPrimitive(kCollisionPrimitiveAABB);
-
 
 	//環境変数の初期化
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
@@ -40,16 +44,11 @@ void Player::Initialzie(std::vector<Model*> models)
 
 void Player::Update()
 {
-	//移動ベクトルが0ではないとき
-	if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
-	{
-		//移動制限のタイマーが移動制限時間を超えた時に動けないようにする
-		if (++movementRestrictionTimer_ > movementRestrictionTime_)
-		{
-			isMove_ = false;
-			movementRestrictionTimer_ = 0;
-		}
-	}
+	//動けない状態かつ着地している状態の時にストップフラグを立てる
+	isStop_ = !isMove_ && isLanded_;
+
+	//移動制限の処理
+	UpdateMovementRestriction();
 
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
@@ -88,14 +87,6 @@ void Player::Update()
 	//着地フラグをリセット
 	isLanded_ = false;
 
-	//地面に埋まらないようにする
-	if (worldTransform_.translation_.y <= -10.0f)
-	{
-		worldTransform_.translation_.y = -10.0f;
-		velocity_.y = 0.0f;
-		isLanded_ = true;
-	}
-
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	worldTransform_.UpdateMatrixFromQuaternion();
@@ -111,6 +102,7 @@ void Player::Update()
 	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
 	ImGui::DragFloat4("Quaternion", &worldTransform_.quaternion_.x);
 	ImGui::DragFloat3("Velocity", &velocity_.x);
+	ImGui::DragFloat2("MovementRestrictionSpriteSize", &movementRestrictionSpriteSize_.x);
 	ImGui::Checkbox("isLanded", &isLanded_);
 	ImGui::Text("MovementRestrictionTimer : %d", movementRestrictionTimer_);
 	ImGui::End();
@@ -125,13 +117,24 @@ void Player::Draw(const Camera& camera)
 	weapon_->Draw(camera);
 }
 
+void Player::DrawUI(const Camera& camera)
+{
+	//移動制限のスプライトの座標を設定
+	UpdateMovementRestrictionSprite(camera);
+
+	//移動制限のスプライトを描画
+	movementRestrictionSprite_->Draw();
+}
+
 void Player::Reset()
 {
 	destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	isMove_ = true;
-	movementRestrictionTimer_ = 0;
+	movementRestrictionTimer_ = movementRestrictionTime_;
+	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };
+	models_[0]->SetColor(color);
 }
 
 void Player::OnCollision(Collider* collider)
@@ -204,14 +207,14 @@ void Player::BehaviorRootUpdate()
 	const float threshold = 0.2f;
 
 	//コントローラーが接続されているときかつ移動出来るとき
-	if (input_->IsControllerConnected() && isMove_)
+	if (input_->IsControllerConnected())
 	{
 		//スティックの入力を取得
 		velocity_.x = input_->GetLeftStickX();
 	}
 
 	//スティックの入力が閾値を超えていたら速度を設定
-	if (std::abs(velocity_.x) > threshold)
+	if (std::abs(velocity_.x) > threshold && isMove_)
 	{
 		//速度を設定
 		velocity_.x = Mathf::Normalize(velocity_).x * speed_;
@@ -241,11 +244,19 @@ void Player::BehaviorRootUpdate()
 	//速度を加算
 	worldTransform_.translation_ += velocity_;
 
+	//地面に埋まらないようにする
+	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
+	{
+		worldTransform_.translation_.y = -10.0f;
+		velocity_.y = 0.0f;
+		isLanded_ = true;
+	}
+
 	//コントローラーが接続されているとき
 	if (input_->IsControllerConnected())
 	{
 		//ジャンプ状態に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_)
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_ && isMove_)
 		{
 			behaviorRequest_ = Behavior::kJump;
 			worldTransform_.translation_.y += jumpFirstSpeed_;
@@ -271,14 +282,14 @@ void Player::BehaviorJumpUpdate()
 	const float threshold = 0.2f;
 
 	//コントローラーが接続されているときかつ移動出来るとき
-	if (input_->IsControllerConnected() && isMove_)
+	if (input_->IsControllerConnected())
 	{
 		//スティックの入力を取得
 		velocity_.x = input_->GetLeftStickX();
 	}
 
 	//スティックの入力が閾値を超えていたら
-	if (std::abs(velocity_.x) > threshold)
+	if (std::abs(velocity_.x) > threshold && isMove_)
 	{
 		//速度を設定
 		velocity_.x = Mathf::Normalize(velocity_).x * speed_;
@@ -309,7 +320,7 @@ void Player::BehaviorJumpUpdate()
 	worldTransform_.translation_ += velocity_;
 
 	//地面についたら通常状態に戻す
-	if (worldTransform_.translation_.y <= -10.0f || isLanded_)
+	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
 	{
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = -10.0f;
@@ -338,6 +349,46 @@ void Player::BehaviorAttackUpdate()
 {
 	//通常状態に戻る
 	behaviorRequest_ = Behavior::kRoot;
+}
+
+void Player::UpdateMovementRestriction()
+{
+	//移動ベクトルが0ではないとき
+	if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
+	{
+		//移動制限のタイマーが0以下になったときに動けないようにする
+		if (--movementRestrictionTimer_ < 0)
+		{
+			isMove_ = false;
+		}
+	}
+
+	//移動制限時間が短くなったら
+	const int divisor = 4;
+	if (movementRestrictionTimer_ < movementRestrictionTime_ / divisor)
+	{
+		//モデルの色を変更
+		Vector4 color = { 1.0f,0.25f,0.0f,1.0f };
+		models_[0]->SetColor(color);
+	}
+}
+
+void Player::UpdateMovementRestrictionSprite(const Camera& camera)
+{
+	//ビューポート行列を計算
+	Matrix4x4 matViewport = Mathf::MakeViewportMatrix(0, 0, Application::kClientWidth, Application::kClientHeight, 0, 1);
+	//ビュー行列とプロジェクション行列とビューポート行列を合成
+	Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
+	//スクリーン座標に変換
+	Vector3 offset = { 0.0f,2.0f,0.0f };
+	Vector3 spritePosition = GetWorldPosition() + offset;
+	spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
+	//スプライトに座標を設定
+	movementRestrictionSprite_->SetPosition({ spritePosition.x,spritePosition.y });
+	
+	//スプライトのスケールを設定
+	Vector2 currentSize = { movementRestrictionSpriteSize_.x * float(movementRestrictionTimer_) / float(movementRestrictionTime_) ,movementRestrictionSpriteSize_.y };
+	movementRestrictionSprite_->SetSize(currentSize);
 }
 
 void Player::ApplyGlobalVariables() 

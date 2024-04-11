@@ -107,7 +107,7 @@ void GamePlayScene::Update()
 	particleManager_->Update();
 
 	//プレイヤーが動けるとき
-	if (player_->GetIsMove())
+	if (!player_->GetIsStop())
 	{
 		//プレイヤーの座標を保存
 		copyManager_->SetPlayerPosition(player_->GetWorldPosition());
@@ -174,6 +174,9 @@ void GamePlayScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//プレイヤーのUIを描画
+	player_->DrawUI(camera_);
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
