@@ -4,7 +4,7 @@
 class CopyManager
 {
 public:
-	void Initialize(Model* model);
+	void Initialize(const std::vector<Model*> models);
 
 	void Update();
 
@@ -12,13 +12,16 @@ public:
 
 	void Reset();
 
-	void SetPlayerPosition(const Vector3& playerPosition) { playerPositions_.push_back(playerPosition); };
+	void SetPlayerPosition(const Vector3& playerPosition, const bool isAttack) {
+		playerPositions_.push_back(playerPosition); 
+		playerPositions_.push_back(isAttack);
+	};
 
 private:
-	Model* model_ = nullptr;
+	std::vector<Model*> models_{};
 
 	std::vector<std::unique_ptr<Copy>> copies_{};
 
-	std::vector<Vector3> playerPositions_{};
+	std::vector<std::variant<Vector3, bool>> playerPositions_{};
 };
 

@@ -40,8 +40,9 @@ void GamePlayScene::Initialize()
 	//コピーを生成
 	copyModel_.reset(ModelManager::Create());
 	copyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	std::vector<Model*> copyModels = { copyModel_.get(),weaponModel_.get() };
 	copyManager_ = std::make_unique<CopyManager>();
-	copyManager_->Initialize(copyModel_.get());
+	copyManager_->Initialize(copyModels);
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
@@ -110,13 +111,13 @@ void GamePlayScene::Update()
 	if (!player_->GetIsStop())
 	{
 		//プレイヤーの座標を保存
-		copyManager_->SetPlayerPosition(player_->GetWorldPosition());
+		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack());
 	}
 
 	//リセット処理
 	if (input_->IsControllerConnected())
 	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		if (player_->GetWeapon()->GetIsAttack())
 		{
 			Reset();
 		}

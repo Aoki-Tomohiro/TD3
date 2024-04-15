@@ -1,11 +1,12 @@
 #pragma once
 #include "Engine/3D/Model/Model.h"
+#include "Application/Src/Object/Player/Weapon.h"
 #include <list>
 
 class Copy
 {
 public:
-	void Initialize(Model* model, const std::vector<Vector3>& playerPositions);
+	void Initialize(std::vector<Model*> models, const std::vector<std::variant<Vector3, bool>>& playerPositions);
 
 	void Update();
 
@@ -14,12 +15,14 @@ public:
 	void Reset();
 
 private:
-	Model* model_ = nullptr;
+	std::vector<Model*> models_{};
 
 	WorldTransform worldTransform_{};
 
-	std::vector<Vector3> playerPositions_{};
+	std::vector<std::variant<Vector3, bool>> playerPositions_{};
 
 	int currentIndex_ = 0;
+
+	std::unique_ptr<Weapon> weapon_ = nullptr;
 };
 
