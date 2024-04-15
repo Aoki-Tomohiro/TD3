@@ -92,6 +92,15 @@ void GamePlayScene::Update()
 	{
 		collisionManager_->SetColliderList(block.get());
 	}
+	//コピー
+	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	for (const std::unique_ptr<Copy>& copy : copies)
+	{
+		if (copy->GetWeapon()->GetIsAttack())
+		{
+			collisionManager_->SetColliderList(copy->GetWeapon());
+		}
+	}
 	//敵
 	const std::list<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (const std::unique_ptr<Enemy>& enemy : enemies)
@@ -111,7 +120,7 @@ void GamePlayScene::Update()
 	if (!player_->GetIsStop())
 	{
 		//プレイヤーの座標を保存
-		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack());
+		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
 	}
 
 	//リセット処理

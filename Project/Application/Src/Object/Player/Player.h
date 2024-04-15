@@ -31,6 +31,8 @@ public:
 
 	Weapon* GetWeapon() { return weapon_.get(); };
 
+	const Quaternion& GetQuaternion() const { return worldTransform_.quaternion_; };
+
 	const bool GetIsStop() const { return isStop_; };
 
 private:

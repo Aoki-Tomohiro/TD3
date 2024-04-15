@@ -6,7 +6,7 @@
 class Copy
 {
 public:
-	void Initialize(std::vector<Model*> models, const std::vector<std::variant<Vector3, bool>>& playerPositions);
+	void Initialize(std::vector<Model*> models, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions);
 
 	void Update();
 
@@ -14,12 +14,14 @@ public:
 
 	void Reset();
 
+	Weapon* GetWeapon() { return weapon_.get(); };
+
 private:
 	std::vector<Model*> models_{};
 
 	WorldTransform worldTransform_{};
 
-	std::vector<std::variant<Vector3, bool>> playerPositions_{};
+	std::vector<std::tuple<Vector3, Quaternion, bool>> playerPositions_{};
 
 	int currentIndex_ = 0;
 

@@ -1,6 +1,6 @@
 #include "Copy.h"
 
-void Copy::Initialize(std::vector<Model*> models, const std::vector<std::variant<Vector3, bool>>& playerPositions)
+void Copy::Initialize(std::vector<Model*> models, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions)
 {
 	//モデルの初期化
 	models_ = models;
@@ -22,12 +22,18 @@ void Copy::Update()
 	//座標を設定
 	if (currentIndex_ < playerPositions_.size())
 	{
-		worldTransform_.translation_ = std::get<Vector3>(playerPositions_[currentIndex_]);
+		Vector3 playerPosition{};
+		Quaternion quaternion{};
+		bool isAttack{};
+		std::tie(playerPosition, quaternion, isAttack) = playerPositions_[currentIndex_];
+		worldTransform_.translation_ = playerPosition;
+		worldTransform_.quaternion_ = quaternion;
+		weapon_->SetIsAttack(isAttack);
 		currentIndex_++;
 	}
 
 	//ワールドトランスフォームの行進
-	worldTransform_.UpdateMatrixFromEuler();
+	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//武器の更新
 	weapon_->Update();
