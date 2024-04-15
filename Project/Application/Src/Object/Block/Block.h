@@ -12,13 +12,21 @@ public:
 
 	void Draw(const Camera& camera);
 
-	void OnCollision(Collider* collider) override;
+	const Vector3 GetSize()  const { return worldTransform_.scale_; }
+	
+	const Vector3& GetPosition() const { return worldTransform_.translation_; };
 
-	const Vector3 GetWorldPosition() const override;
+	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
+
+	void SetScale(const Vector3& scale) { worldTransform_.scale_ = scale; };
+
+	const Vector3& GetScale() const { return worldTransform_.scale_; };
+
+	void OnCollision(Collider* collider) override;
 
 	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
 
-	const Vector3 GetSize()  const { return worldTransform_.scale_; }
+	const Vector3 GetWorldPosition() const override;
 
 private:
 	Model* model_ = nullptr;

@@ -1,52 +1,41 @@
 #pragma once
 #include "Engine/3D/Model/Model.h"
+#include "Engine/Base/ImGuiManager.h"
 #include "Engine/Components/Input/Input.h"
 #include "Engine/Components/Collision/Collider.h"
 #include "Engine/Components/Collision/CollisionConfig.h"
 #include "Engine/Math/MathFunction.h"
+#include "Engine/Utilities/GlobalVariables.h"
+#include "Application/Src/Object/Player/Weapon.h"
 #include <optional>
 
 class Player : public Collider
 {
 public:
-	void Initialize(Model* model);
+
+	void Initialzie(std::vector<Model*> models);
 
 	void Update();
 
 	void Draw(const Camera& camera);
 
-	void OnCollision(Collider* collider) override;
 
-	const Vector3 GetWorldPosition() const override;
+	void Reset();
+
+	void OnCollision(Collider* collider) override;
 
 	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
 
-	const bool GetIsCopied() const { return isCopied_; };
+	const Vector3 GetWorldPosition() const;
 
-	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
-
-	const bool GetIsCopied2() const { return isCopied2_; };
-
-	void SetIsCopied2(const bool isCopied) { isCopied2_ = isCopied; };
-
-	const bool GetIsCopied3() const { return isCopied3_; };
-
-	void SetIsCopied3(const bool isCopied) { isCopied3_ = isCopied; };
-
-	const bool GetIsCopied4() const { return isCopied4_; };
-
-	void SetIsCopied4(const bool isCopied) { isCopied4_ = isCopied; };
-
-	const bool GetIsCopied5() const { return isCopied5_; };
-
-	void SetIsCopied5(const bool isCopied) { isCopied5_ = isCopied; };
+	Weapon* GetWeapon() { return weapon_.get(); };
 
 private:
-	//プレイヤーの状態
 	enum class Behavior
 	{
-		kRoot,//通常状態
-		kJump,//ジャンプ中
+		kRoot,
+		kJump,
+		kAttack,
 	};
 
 	void BehaviorRootInitialize();
@@ -57,10 +46,18 @@ private:
 
 	void BehaviorJumpUpdate();
 
+
+	void BehaviorAttackInitialize();
+
+	void BehaviorAttackUpdate();
+
+	void ApplyGlobalVariables();
+
 private:
 	Input* input_ = nullptr;
 
-	Model* model_ = nullptr;
+	std::vector<Model*> models_{};
+
 
 	WorldTransform worldTransform_{};
 
@@ -68,12 +65,18 @@ private:
 
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
+
+	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
+
 	Vector3 velocity_{};
 
-	bool isCopied_ = false;
-	bool isCopied2_ = false;
-	bool isCopied3_ = false;
-	bool isCopied4_ = false;
-	bool isCopied5_ = false;
+	float speed_ = 0.3f;
+
+	float gravity_ = 0.05f;
+
+	float jumpFirstSpeed_ = 0.8f;
+
+	std::unique_ptr<Weapon> weapon_ = nullptr;
+
 };
 
