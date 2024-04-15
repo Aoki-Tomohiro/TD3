@@ -108,5 +108,8 @@ private:
 	std::vector<Node*> path_;
 	std::vector<std::vector<int>> findMap;
 	int moveCount_;
+	Vector3 nextPosition_;
+	Vector2 nextMapPosition_;
+	bool search_ = false;
 };
 

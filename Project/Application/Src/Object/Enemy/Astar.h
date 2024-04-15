@@ -19,6 +19,7 @@ struct Node {
         return g + h;
     }
 };
+
 class Astar
 {
 public:

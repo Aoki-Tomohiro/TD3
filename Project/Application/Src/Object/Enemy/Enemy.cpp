@@ -24,6 +24,10 @@ void Enemy::Initialize(Model* model)
 	for (int i = 0; i < 36; ++i) {
 		findMap.push_back(std::vector<int>(36, 0)); // 36個の要素を0で初期化して追加
 	}
+
+
+	nextMapPosition_.x = (36 + worldTransform_.translation_.x) / 2.0f;
+	nextMapPosition_.y = (36 - worldTransform_.translation_.y) / 2.0f;
 }
 
 void Enemy::Update()
@@ -67,8 +71,8 @@ void Enemy::Update()
 
 	
 	ImGui::Begin("Enemy");
-	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
-	ImGui::Text("MapPlayerPos %d", map[int(playerPosition_.x)][int(playerPosition_.y)]);
+	ImGui::Text("nextPos X%d,Y%d", int(nextPosition_.x), int(nextPosition_.y));
+	ImGui::Text("MapNextPos %d", map[int(nextPosition_.x)][int(nextPosition_.y)]);
 	ImGui::Text("EnemyPos X%d,Y%d", int(enemyPosition_.x), int(enemyPosition_.y));
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
@@ -91,11 +95,7 @@ void Enemy::Update()
 void Enemy::Draw(const Camera& camera)
 {
 	model_->Draw(worldTransform_, camera);
-	for (int i = 0; i < 80; i++) {
-		//mapModel_[i]->Draw(worldTransformMap_[i], camera);
-	}
-
-
+	
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -104,25 +104,30 @@ void Enemy::BehaviorRootInitialize() {
 
 void Enemy::BehaviorRootUpdate() {
 	//velocity_.x = 0.0f;
-	////移動
+	//移動
 	//worldTransform_.translation_ += velocity_;
-	////重力加速度
-	//const float kGravity = 0.05f;
-	////加速ベクトル
-	//Vector3 accelerationVector = { 0.0f, -kGravity, 0.0f };
-	////加速
-	//velocity_ += accelerationVector;
+	//重力加速度
+	const float kGravity = 0.05f;
+	//加速ベクトル
+	Vector3 accelerationVector = { 0.0f, -kGravity, 0.0f };
+	//加速
+	velocity_ += accelerationVector;
 
-
+	float speed_ = 0.3f;
 
 	moveCount_--;
 	// エネミーの移動
 	if (moveCount_<=0 && path_.size() > 1) {
 
 		//目的地の位置を次のノードの位置に
-		/*enemyPosition_.x*/ velocity_.x = float(path_[1]->x - 18) * 2;
-		/*enemyPosition_.y*/ velocity_.y = float(path_[1]->y - 18) * -2;
+		nextPosition_.x = float(path_[1]->x - 18) * 2;
+		nextPosition_.y = float(path_[1]->y - 18) * -2;
 		
+		//velocity_ = nextPosition_ - worldTransform_.translation_;
+
+		worldTransform_.translation_ = nextPosition_;
+
+
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
 		if (worldTransform_.translation_ == velocity_) {
 			// パスを更新
@@ -132,7 +137,7 @@ void Enemy::BehaviorRootUpdate() {
 		moveCount_ = 10;
 	}
 
-	worldTransform_.translation_ = velocity_;
+	//worldTransform_.translation_ = Mathf::Normalize(velocity_) * speed_;
 	
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
@@ -192,17 +197,13 @@ void Enemy::DistanceFunction() {
 			if (differenceX < 0) {differenceX *= -1;}
 			if (differenceY < 0) {differenceY *= -1;}
 
-			//脅威度の設定
-			if (differenceX < 10 && differenceY < 10) { map[x][y] = 0; }
-			if (differenceX < 9 && differenceY < 9) { map[x][y] = 1; }
-			if (differenceX < 8 && differenceY < 8) { map[x][y] = 2; }
-			if (differenceX < 7 && differenceY < 7) { map[x][y] = 3; }
-			if (differenceX < 6 && differenceY < 6) { map[x][y] = 4; }
-			if (differenceX < 5 && differenceY < 5) { map[x][y] = 5; }
-			if (differenceX < 4 && differenceY < 4) { map[x][y] = 6; }
-			if (differenceX < 3 && differenceY < 3) { map[x][y] = 7; }
-			if (differenceX < 2 && differenceY < 2) { map[x][y] = 8; }
-			if (differenceX < 1 && differenceY < 1) { map[x][y] = 9; }
+			//脅威度の設定 5が自分の位置
+			if (differenceX < 7 && differenceY < 6) { map[x][y] = 0; }
+			if (differenceX < 6 && differenceY < 5) { map[x][y] = 1; }
+			if (differenceX < 5 && differenceY < 4) { map[x][y] = 2; }
+			if (differenceX < 4 && differenceY < 3) { map[x][y] = 3; }
+			if (differenceX < 3 && differenceY < 2) { map[x][y] = 4; }
+			if (differenceX < 2 && differenceY < 1) { map[x][y] = 5; }
 			
 		}
 	}
@@ -226,8 +227,65 @@ void Enemy::DistanceFunction() {
 
 
 	//敵の位置から最も近い0を検索
+	if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 0&& !search_) {
+		search_ = true;
+ 		for (int y = 0; y < 24; ++y) {
+			for (int x = 0; x < 24; ++x) {
+				int differenceX = x - int(enemyPosition_.x);
+				int differenceY = y - int(enemyPosition_.y);
 
 
+				//整数に直す
+				if (differenceX < 0) { differenceX *= -1; }
+				if (differenceY < 0) { differenceY *= -1; }
+
+				if (differenceX < 2 && differenceY < 1) { 
+					if (map[x][y] ==  0) {
+						nextMapPosition_.x = float(x);
+						nextMapPosition_.y = float(y);
+						search_ = false;
+						break;
+					}
+				}
+				if (differenceX < 3 && differenceY < 2) { 
+					if (map[x][y] == 0) {
+						nextMapPosition_.x = float(x);
+						nextMapPosition_.y = float(y);
+						search_ = false;
+						break;
+					}
+				}
+				if (differenceX < 4 && differenceY < 3) { 
+					if (map[x][y] == 0) {
+						nextMapPosition_.x = float(x);
+						nextMapPosition_.y = float(y);
+						search_ = false;
+						break;
+					}
+				}
+				/*
+				if (differenceX < 4 && differenceY < 4) { 
+					if (map[x][y] == 0) {
+						nextMapPosition_.x = float(x);
+						nextMapPosition_.y = float(y);
+						search_ = false;
+						break;
+					}
+				}
+				if (differenceX < 5&& differenceY < 5) { 
+					if (map[x][y] == 0) {
+						nextMapPosition_.x = float(x);
+						nextMapPosition_.y = float(y);
+						search_ = false;
+						break;
+					}
+				}*/
+				
+
+			}
+		}
+	}
+	
 
 	blockCount_ = 0;
 	blockSizeCount_ = 0;
@@ -235,18 +293,15 @@ void Enemy::DistanceFunction() {
 
 //経路探索
 void Enemy::FindPath() {
-
-	
-
-
 	for (int y = 0; y < 36; ++y) {
 		for (int x = 0; x < 36; ++x) {
 			
 			findMap[y][x] = map[y][x];
 		}
 	}
+
 	
-	path_ = findPath(findMap, int(enemyPosition_.x), int(enemyPosition_.y), int(playerPosition_.x), int(playerPosition_.y));
+	path_ = findPath(findMap, int(enemyPosition_.x), int(enemyPosition_.y), int(nextMapPosition_.x), int(nextMapPosition_.y));
 	
 }
 
