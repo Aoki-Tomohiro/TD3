@@ -12,11 +12,13 @@
 class Player : public Collider
 {
 public:
+
 	void Initialzie(std::vector<Model*> models);
 
 	void Update();
 
 	void Draw(const Camera& camera);
+
 
 	void Reset();
 
@@ -44,6 +46,7 @@ private:
 
 	void BehaviorJumpUpdate();
 
+
 	void BehaviorAttackInitialize();
 
 	void BehaviorAttackUpdate();
@@ -55,11 +58,13 @@ private:
 
 	std::vector<Model*> models_{};
 
+
 	WorldTransform worldTransform_{};
 
 	Behavior behavior_ = Behavior::kRoot;
 
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
+
 
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 
@@ -72,5 +77,6 @@ private:
 	float jumpFirstSpeed_ = 0.8f;
 
 	std::unique_ptr<Weapon> weapon_ = nullptr;
+
 };
 

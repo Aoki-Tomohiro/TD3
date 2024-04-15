@@ -1,5 +1,6 @@
 #include "Player.h"
 
+
 void Player::Initialzie(std::vector<Model*> models)
 {
 	//モデルの初期化
@@ -42,6 +43,7 @@ void Player::Update()
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
 	{
+
 		behavior_ = behaviorRequest_.value();
 		switch (behavior_) {
 		case Behavior::kRoot:
@@ -51,6 +53,7 @@ void Player::Update()
 		case Behavior::kJump:
 			BehaviorJumpInitialize();
 			break;
+
 		case Behavior::kAttack:
 			BehaviorAttackInitialize();
 			break;
@@ -68,6 +71,7 @@ void Player::Update()
 	case Behavior::kJump:
 		BehaviorJumpUpdate();
 		break;
+
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();
 		break;
@@ -100,6 +104,7 @@ void Player::Update()
 
 void Player::Draw(const Camera& camera)
 {
+
 	//モデルの描画
 	models_[0]->Draw(worldTransform_, camera);
 
@@ -240,12 +245,14 @@ void Player::BehaviorRootUpdate()
 
 void Player::BehaviorJumpInitialize()
 {
+
 	//ジャンプの初速度を設定
 	velocity_.y = jumpFirstSpeed_;
 }
 
 void Player::BehaviorJumpUpdate()
 {
+
 	//閾値
 	const float threshold = 0.2f;
 
