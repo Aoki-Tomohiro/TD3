@@ -35,7 +35,6 @@ public:
 	void SetPlayerPosition(const Vector3& pos) { playerPosition_ = {(36 + pos.x)/2.0f ,(36 - pos.y)/2.0f ,pos.z}; };
 
 	//ブロック関連
-
 	void SetBlockPosition(const Vector3& pos) { 
 		blockPosition_[blockCount_] = {(36 + pos.x) / 2.0f,(36 - pos.y) / 2.0f,pos.z};
 		blockCount_++;

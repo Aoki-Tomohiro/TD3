@@ -62,11 +62,12 @@ void GamePlayScene::Update()
 	player_->Update();
 
 	//ブロックの更新
-  blockManager_->Update();
-  
-	for (int i =0; i < blocks_.size(); i++) {
-		enemy_->SetBlockPosition(blocks_[i].get()->GetWorldPosition());
-		enemy_->SetBlockSize(blocks_[i].get()->GetSize());
+    blockManager_->Update();
+	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
+	for (const std::unique_ptr<Block>& block : blocks)
+	{
+		enemy_->SetBlockPosition(block.get()->GetWorldPosition());
+		enemy_->SetBlockSize(block.get()->GetSize());
 	}
 	
 	//敵の更新
@@ -89,7 +90,6 @@ void GamePlayScene::Update()
 		collisionManager_->SetColliderList(player_->GetWeapon());
 	}
 	//ブロック
-	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 	for (const std::unique_ptr<Block>& block : blocks)
 	{
 		collisionManager_->SetColliderList(block.get());

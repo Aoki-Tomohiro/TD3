@@ -27,23 +27,19 @@ void Block::Initialize(Model* model, const Vector3& position, const Vector3& sca
 
 void Block::Update()
 {
-
 	//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
 }
 
 void Block::Draw(const Camera& camera)
 {
-
 	//モデルの描画
 	model_->Draw(worldTransform_, camera);
 }
 
-void Block::OnCollision(Collider* colli
+void Block::OnCollision(Collider* collider)
+{
 
-}
-
-const Vector3 Block::GetWorldPosition() const {
 }
 
 const Vector3 Block::GetWorldPosition() const
@@ -53,6 +49,4 @@ const Vector3 Block::GetWorldPosition() const
 	pos.y = worldTransform_.matWorld_.m[3][1];
 	pos.z = worldTransform_.matWorld_.m[3][2];
 	return pos;
-
 }
-
