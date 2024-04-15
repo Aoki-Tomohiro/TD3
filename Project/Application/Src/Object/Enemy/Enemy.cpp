@@ -9,6 +9,7 @@ void Enemy::Initialize(Model* model)
 	
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = 2.0f;
+	startPosition_ = worldTransform_.translation_;
 	
 	//衝突属性を設定
 	SetCollisionAttribute(kCollisionAttributeEnemy);
@@ -29,7 +30,10 @@ void Enemy::Initialize(Model* model)
 void Enemy::Update()
 {
 	DistanceFunction();
-	FindPath();
+	if (path_.size() <= 1)
+	{
+		FindPath();
+	}
 	
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
@@ -73,16 +77,21 @@ void Enemy::Update()
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
-	ImGui::Text("count%d", moveCount_);
-	 for (int y = 0; y < 36; ++y) {
-        ImGui::BeginGroup(); // 次の行に表示するセルをグループ化する
-        for (int x = 0; x < 36; ++x) {
-            ImGui::Text("%d", map[x][y]); // 配列の要素を表示
-            ImGui::SameLine(); // 次のセルを同じ行に表示する
-        }
+	if (path_.size() > 1)
+	{
+		ImGui::Text("PathX : %f, PathY : %f", float(path_[1]->x - 18) * 2.0f, float(path_[1]->y - 18) * -2.0f);
+	}
+	ImGui::Text("PathSize : %d", path_.size());
+	//ImGui::Text("count%d", moveCount_);
+	// for (int y = 0; y < 36; ++y) {
+ //       ImGui::BeginGroup(); // 次の行に表示するセルをグループ化する
+ //       for (int x = 0; x < 36; ++x) {
+ //           ImGui::Text("%d", map[x][y]); // 配列の要素を表示
+ //           ImGui::SameLine(); // 次のセルを同じ行に表示する
+ //       }
 
-        ImGui::EndGroup(); // グループ終了
-    }
+ //       ImGui::EndGroup(); // グループ終了
+ //   }
 	ImGui::End();
 
 	
@@ -117,28 +126,33 @@ void Enemy::BehaviorRootUpdate() {
 
 	moveCount_--;
 	// エネミーの移動
-	if (moveCount_<=0 && path_.size() > 1) {
+	if (/*moveCount_<=0 && */path_.size() > 1) {
 
 		//目的地の位置を次のノードの位置に
-		/*enemyPosition_.x*/ velocity_.x = float(path_[1]->x - 18) * 2;
-		/*enemyPosition_.y*/ velocity_.y = float(path_[1]->y - 18) * -2;
+		///*enemyPosition_.x*/ velocity_.x = float(path_[1]->x - 18) * 2;
+		///*enemyPosition_.y*/ velocity_.y = float(path_[1]->y - 18) * -2;
+		Vector3 targetPosition = { float(path_[1]->x - 18) * 2 ,float(path_[1]->y - 18) * -2 ,0.0f };
+		easingParameter_ += 1.0f / 10.0f;
+		worldTransform_.translation_ = Mathf::Lerp(startPosition_, targetPosition, easingParameter_);
 		
-		//velocity_ = enemyPosition_ - worldTransform_.translation_;
-		if (worldTransform_.translation_ == velocity_) {
+		//velocity_ = enemyPosition_ - worldTransform_.translation_
+		if (easingParameter_ > 1.0f) {
 			// パスを更新
+			easingParameter_ = 0.0f;
+			startPosition_ = worldTransform_.translation_;
 			path_.erase(path_.begin(),path_.begin() + 1);
 		}
 		
 		moveCount_ = 10;
-	}
 
-	worldTransform_.translation_ = velocity_;
-	
-	//地面より下に行かないようにする
-	if (worldTransform_.translation_.y <= -10.0f)
-	{
-		worldTransform_.translation_.y = -10.0f;
+		//worldTransform_.translation_ += velocity_;
 	}
+	
+	////地面より下に行かないようにする
+	//if (worldTransform_.translation_.y <= -10.0f)
+	//{
+	//	worldTransform_.translation_.y = -10.0f;
+	//}
 
 
 	if (jump_) {
@@ -252,46 +266,46 @@ void Enemy::FindPath() {
 
 void Enemy::OnCollision(Collider* collider)
 {
-	if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)
-	{
-		AABB aabbA = {
-		.min{worldTransform_.translation_.x + GetAABB().min.x,worldTransform_.translation_.y + GetAABB().min.y,worldTransform_.translation_.z + GetAABB().min.z},
-		.max{worldTransform_.translation_.x + GetAABB().max.x,worldTransform_.translation_.y + GetAABB().max.y,worldTransform_.translation_.z + GetAABB().max.z},
-		};
-		AABB aabbB = {
-			.min{collider->GetWorldTransform().translation_.x + collider->GetAABB().min.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().min.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().min.z},
-			.max{collider->GetWorldTransform().translation_.x + collider->GetAABB().max.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().max.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().max.z},
-		};
+	//if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)
+	//{
+	//	AABB aabbA = {
+	//	.min{worldTransform_.translation_.x + GetAABB().min.x,worldTransform_.translation_.y + GetAABB().min.y,worldTransform_.translation_.z + GetAABB().min.z},
+	//	.max{worldTransform_.translation_.x + GetAABB().max.x,worldTransform_.translation_.y + GetAABB().max.y,worldTransform_.translation_.z + GetAABB().max.z},
+	//	};
+	//	AABB aabbB = {
+	//		.min{collider->GetWorldTransform().translation_.x + collider->GetAABB().min.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().min.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().min.z},
+	//		.max{collider->GetWorldTransform().translation_.x + collider->GetAABB().max.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().max.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().max.z},
+	//	};
 
-		Vector3 overlapAxis = {
-			std::min<float>(aabbA.max.x,aabbB.max.x) - std::max<float>(aabbA.min.x,aabbB.min.x),
-			std::min<float>(aabbA.max.y,aabbB.max.y) - std::max<float>(aabbA.min.y,aabbB.min.y),
-			std::min<float>(aabbA.max.z,aabbB.max.z) - std::max<float>(aabbA.min.z,aabbB.min.z),
-		};
+	//	Vector3 overlapAxis = {
+	//		std::min<float>(aabbA.max.x,aabbB.max.x) - std::max<float>(aabbA.min.x,aabbB.min.x),
+	//		std::min<float>(aabbA.max.y,aabbB.max.y) - std::max<float>(aabbA.min.y,aabbB.min.y),
+	//		std::min<float>(aabbA.max.z,aabbB.max.z) - std::max<float>(aabbA.min.z,aabbB.min.z),
+	//	};
 
-		Vector3 directionAxis{};
-		if (overlapAxis.x < overlapAxis.y && overlapAxis.x < overlapAxis.z) {
-			//X軸方向で最小の重なりが発生している場合
-			directionAxis.x = (worldTransform_.translation_.x < collider->GetWorldTransform().translation_.x) ? -1.0f : 1.0f;
-			directionAxis.y = 0.0f;
-		}
-		else if (overlapAxis.y < overlapAxis.x && overlapAxis.y < overlapAxis.z) {
-			//Y軸方向で最小の重なりが発生している場合
-			directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
-			directionAxis.x = 0.0f;
+	//	Vector3 directionAxis{};
+	//	if (overlapAxis.x < overlapAxis.y && overlapAxis.x < overlapAxis.z) {
+	//		//X軸方向で最小の重なりが発生している場合
+	//		directionAxis.x = (worldTransform_.translation_.x < collider->GetWorldTransform().translation_.x) ? -1.0f : 1.0f;
+	//		directionAxis.y = 0.0f;
+	//	}
+	//	else if (overlapAxis.y < overlapAxis.x && overlapAxis.y < overlapAxis.z) {
+	//		//Y軸方向で最小の重なりが発生している場合
+	//		directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
+	//		directionAxis.x = 0.0f;
 
 
-		}
-		else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
-		{
-			directionAxis.z = (worldTransform_.translation_.z < collider->GetWorldTransform().translation_.z) ? -1.0f : 1.0f;
-			directionAxis.x = 0.0f;
-			directionAxis.y = 0.0f;
-		}
+	//	}
+	//	else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
+	//	{
+	//		directionAxis.z = (worldTransform_.translation_.z < collider->GetWorldTransform().translation_.z) ? -1.0f : 1.0f;
+	//		directionAxis.x = 0.0f;
+	//		directionAxis.y = 0.0f;
+	//	}
 
-		worldTransform_.translation_ += overlapAxis * directionAxis;
-		worldTransform_.UpdateMatrixFromEuler();
-	}
+	//	worldTransform_.translation_ += overlapAxis * directionAxis;
+	//	worldTransform_.UpdateMatrixFromEuler();
+	//}
 }
 const Vector3 Enemy::GetWorldPosition() const
 {

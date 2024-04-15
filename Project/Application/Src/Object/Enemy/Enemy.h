@@ -108,5 +108,8 @@ private:
 	std::vector<Node*> path_;
 	std::vector<std::vector<int>> findMap;
 	int moveCount_;
+
+	float easingParameter_ = 0.0f;
+	Vector3 startPosition_{};
 };
 
