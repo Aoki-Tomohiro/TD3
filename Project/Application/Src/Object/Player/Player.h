@@ -3,6 +3,7 @@
 #include "Engine/2D/Sprite.h"
 #include "Engine/Base/ImGuiManager.h"
 #include "Engine/Components/Input/Input.h"
+#include "Engine/Components/Audio/Audio.h"
 #include "Engine/Components/Collision/Collider.h"
 #include "Engine/Components/Collision/CollisionConfig.h"
 #include "Engine/Math/MathFunction.h"
@@ -65,6 +66,9 @@ private:
 	//インプット
 	Input* input_ = nullptr;
 
+	//オーディオ
+	Audio* audio_ = nullptr;
+
 	//モデル
 	std::vector<Model*> models_{};
 
@@ -115,5 +119,11 @@ private:
 
 	//制限時間のスプライトのサイズ
 	Vector2 movementRestrictionSpriteSize_ = { 64.0f,12.0f };
+	
+	//オーディオハンドル
+	uint32_t moveAudioHandle_ = 0;
+	uint32_t attackAudioHandle_ = 0;
+	int moveAudioTimer_ = 0;
+	int moveAudioWaitTime_ = 20;
 };
 

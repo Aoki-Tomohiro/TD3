@@ -132,6 +132,11 @@ void GamePlayScene::Update()
 		}
 	}
 
+	if (input_->IsPushKeyEnter(DIK_R))
+	{
+		Reset();
+	}
+
 	//ImGui
 	ImGui::Begin("GamePlayScene");
 	ImGui::End();

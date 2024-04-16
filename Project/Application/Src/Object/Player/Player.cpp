@@ -8,6 +8,9 @@ void Player::Initialzie(std::vector<Model*> models)
 	//Inputクラスのインスタンスを取得
 	input_ = Input::GetInstance();
 
+	//Audioクラスのインスタンスを取得
+	audio_ = Audio::GetInstance();
+
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.quaternion_ = destinationQuaternion_;
@@ -21,6 +24,10 @@ void Player::Initialzie(std::vector<Model*> models)
 	movementRestrictionSprite_.reset(Sprite::Create("white.png", { 0.0f,0.0f }));
 	movementRestrictionSprite_->SetAnchorPoint({ 0.5f,0.5f });
 	movementRestrictionSprite_->SetSize(movementRestrictionSpriteSize_);
+
+	//音声データの読み込み
+	moveAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Move.wav");
+	attackAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Attack.wav");
 
 	//衝突判定の初期化
 	AABB aabb = {
@@ -105,6 +112,7 @@ void Player::Update()
 	ImGui::DragFloat2("MovementRestrictionSpriteSize", &movementRestrictionSpriteSize_.x);
 	ImGui::Checkbox("isLanded", &isLanded_);
 	ImGui::Text("MovementRestrictionTimer : %d", movementRestrictionTimer_);
+	ImGui::DragInt("MoveSEWaitTime", &moveAudioWaitTime_);
 	ImGui::End();
 }
 
@@ -205,12 +213,23 @@ void Player::BehaviorRootUpdate()
 {
 	//閾値
 	const float threshold = 0.2f;
+	velocity_.x = 0.0f;
 
 	//コントローラーが接続されているときかつ移動出来るとき
 	if (input_->IsControllerConnected())
 	{
 		//スティックの入力を取得
 		velocity_.x = input_->GetLeftStickX();
+	}
+
+	//キーボード入力
+	if (input_->IsPushKey(DIK_A))
+	{
+		velocity_.x = -1.0f;
+	}
+	else if(input_->IsPushKey(DIK_D))
+	{
+		velocity_.x = 1.0f;
 	}
 
 	//スティックの入力が閾値を超えていたら速度を設定
@@ -230,11 +249,20 @@ void Player::BehaviorRootUpdate()
 
 		//クォータニオンを作成
 		destinationQuaternion_ = Mathf::MakeRotateAxisAngleQuaternion(cross, std::acos(dot));
+
+		//移動中に音声を再生する
+		if (++moveAudioTimer_ > moveAudioWaitTime_)
+		{
+			audio_->SoundPlayWave(moveAudioHandle_, false, 0.4f);
+			moveAudioTimer_ = 0;
+		}
 	}
 	else
 	{
 		//速度を0で初期化
 		velocity_.x = 0.0f;
+		//移動中の音声のタイマーを初期化
+		moveAudioTimer_ = 0;
 	}
 
 	//加速ベクトル
@@ -268,6 +296,18 @@ void Player::BehaviorRootUpdate()
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
+
+	//キーボード入力
+	if (input_->IsPushKeyEnter(DIK_W) && isLanded_ && isMove_)
+	{
+		behaviorRequest_ = Behavior::kJump;
+		worldTransform_.translation_.y += jumpFirstSpeed_;
+	}
+
+	if (input_->IsPushKeyEnter(DIK_SPACE))
+	{
+		behaviorRequest_ = Behavior::kAttack;
+	}
 }
 
 void Player::BehaviorJumpInitialize()
@@ -280,12 +320,23 @@ void Player::BehaviorJumpUpdate()
 {
 	//閾値
 	const float threshold = 0.2f;
+	velocity_.x = 0.0f;
 
 	//コントローラーが接続されているときかつ移動出来るとき
 	if (input_->IsControllerConnected())
 	{
 		//スティックの入力を取得
 		velocity_.x = input_->GetLeftStickX();
+	}
+
+	//キーボード入力
+	if (input_->IsPushKey(DIK_A))
+	{
+		velocity_.x = -1.0f;
+	}
+	else if (input_->IsPushKey(DIK_D))
+	{
+		velocity_.x = 1.0f;
 	}
 
 	//スティックの入力が閾値を超えていたら
@@ -337,6 +388,12 @@ void Player::BehaviorJumpUpdate()
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
+
+	//キーボード入力
+	if (input_->IsPushKeyEnter(DIK_SPACE))
+	{
+		behaviorRequest_ = Behavior::kAttack;
+	}
 }
 
 void Player::BehaviorAttackInitialize()
@@ -349,6 +406,7 @@ void Player::BehaviorAttackUpdate()
 {
 	//通常状態に戻る
 	behaviorRequest_ = Behavior::kRoot;
+	audio_->SoundPlayWave(attackAudioHandle_, false, 0.4f);
 }
 
 void Player::UpdateMovementRestriction()
