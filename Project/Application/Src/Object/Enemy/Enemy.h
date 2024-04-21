@@ -96,6 +96,9 @@ private:
 	int blockCount_ = 0;
 	int blockSizeCount_ = 0;
 
+
+	//ジャンプの情報
+
 	bool jump_ = false;
 
 	//マップチップ

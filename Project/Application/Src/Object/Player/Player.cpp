@@ -241,11 +241,26 @@ void Player::BehaviorRootUpdate()
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
+
+
+	if (input_->IsPushKey(DIK_A)) {
+		worldTransform_.translation_.x -= 0.3f;
+	}
+
+	if (input_->IsPushKey(DIK_D)) {
+		worldTransform_.translation_.x += 0.3f;
+	}
+
+	if (input_->IsPushKeyEnter(DIK_SPACE)) {
+		behaviorRequest_ = Behavior::kJump;
+		const float kJumpFirstSpeed = 0.8f;
+		worldTransform_.translation_.y += kJumpFirstSpeed;
+	}
+
 }
 
 void Player::BehaviorJumpInitialize()
 {
-
 	//ジャンプの初速度を設定
 	velocity_.y = jumpFirstSpeed_;
 }
@@ -306,6 +321,15 @@ void Player::BehaviorJumpUpdate()
 		{
 			behaviorRequest_ = Behavior::kAttack;
 		}
+	}
+
+
+	if (input_->IsPushKey(DIK_A)) {
+		worldTransform_.translation_.x -= 0.3f;
+	}
+
+	if (input_->IsPushKey(DIK_D)) {
+		worldTransform_.translation_.x += 0.3f;
 	}
 }
 
