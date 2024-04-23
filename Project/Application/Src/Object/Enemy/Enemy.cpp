@@ -272,8 +272,12 @@ void Enemy::BehaviorJumpUpdate()
 
 	if (worldTransform_.translation_.y <= -10.0f || velocity_.y <= -0.7f)
 	{
-		//worldTransform_.translation_.y = -10.0f;
 		behaviorRequest_ = Behavior::kRoot;
+		//worldTransform_.translation_.y = -10.0f;
+		if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10) {
+			
+		}
+		
 	}
 }
 
@@ -444,11 +448,11 @@ void Enemy::DistanceFunction() {
 
 					for (int x = 1; x <= 3; x++) {
 						if (playerPosition_.y <= enemyPosition_.y) {
-							if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
+							if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x < enemyPosition_.x) {
 								jump_ = true;
 								break;
 							}
-							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x >= enemyPosition_.x) {
+							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x)+1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x >= enemyPosition_.x) {
 								jump_ = true;
 								break;
 							}
