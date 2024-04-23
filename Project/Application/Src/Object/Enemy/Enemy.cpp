@@ -82,7 +82,7 @@ void Enemy::Update()
 	ImGui::Text("MapNextPos %d", map[int(nextPosition_.x)][int(nextPosition_.y)]);
 	ImGui::Text("EnemyPos X%d,Y%d", int(enemyPosition_.x), int(enemyPosition_.y));
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
-	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)+1]);
+	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
 	ImGui::Text("%d", blockHit_);
@@ -112,7 +112,7 @@ void Enemy::BehaviorRootInitialize() {
 }
 
 void Enemy::BehaviorRootUpdate() {
-	
+
 	//velocity_.x = 0.0f;
 	//移動
 	//worldTransform_.translation_ += velocity_;
@@ -134,9 +134,12 @@ void Enemy::BehaviorRootUpdate() {
 		nextPosition_.y = float(path_[1]->y - 18) * -2;
 
 		//velocity_ = nextPosition_ - worldTransform_.translation_;
-
 		worldTransform_.translation_ = nextPosition_;
 
+		if (velocity_.x == 0.0f) {
+			
+		}
+	
 
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
 		if (worldTransform_.translation_ == velocity_) {
@@ -146,7 +149,7 @@ void Enemy::BehaviorRootUpdate() {
 
 		moveCount_ = 10;
 	}
-	
+
 
 	if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10) {
 		velocity_.y = 0;
@@ -154,18 +157,26 @@ void Enemy::BehaviorRootUpdate() {
 	}
 	else {
 
-		if (playerPosition_.x < enemyPosition_.x) {
-			//velocity_.x = 0.3f;
+		if (velocity_.y >= -1.0f) {
+			if (playerPosition_.x < enemyPosition_.x) {
+				velocity_.x = 0.3f;
+			}
+			else {
+				velocity_.x = -0.3f;
+			}
 		}
 		else {
-			//velocity_.x = -0.3f;
+			velocity_.x = 0.0f;
 		}
+
+
+
 
 		worldTransform_.translation_ += velocity_;
 	}
 
-	
-	
+
+
 
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
@@ -405,7 +416,7 @@ void Enemy::DistanceFunction() {
 								jump_ = true;
 								break;
 							}
-							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10&& playerPosition_.x >= enemyPosition_.x) {
+							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x >= enemyPosition_.x) {
 								jump_ = true;
 								break;
 							}
@@ -504,6 +515,14 @@ void Enemy::OnCollision(Collider* collider)
 			//Y軸方向で最小の重なりが発生している場合
 			directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
 			directionAxis.x = 0.0f;
+
+
+
+			if (directionAxis.y == 1.0f)
+			{
+				//velocity_.x = 0.0f;
+			}
+			
 
 		}
 		else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
