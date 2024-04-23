@@ -1,7 +1,6 @@
 #include "CommandQueue.h"
 #include "GraphicsCore.h"
 #include <cassert>
-
 void CommandQueue::Initialize()
 {
 	//デバイスを取得

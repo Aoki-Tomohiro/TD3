@@ -11,6 +11,8 @@ public:
 	void Update();
 
 	void Draw(const Camera& camera);
+
+	const Vector3 GetSize()  const { return worldTransform_.scale_; }
 	
 	const Vector3& GetPosition() const { return worldTransform_.translation_; };
 

@@ -1,5 +1,6 @@
 #include "Player.h"
 
+
 void Player::Initialzie(std::vector<Model*> models)
 {
 	//モデルの初期化
@@ -60,6 +61,7 @@ void Player::Update()
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
 	{
+
 		behavior_ = behaviorRequest_.value();
 		switch (behavior_) {
 		case Behavior::kRoot:
@@ -69,6 +71,7 @@ void Player::Update()
 		case Behavior::kJump:
 			BehaviorJumpInitialize();
 			break;
+
 		case Behavior::kAttack:
 			BehaviorAttackInitialize();
 			break;
@@ -86,6 +89,7 @@ void Player::Update()
 	case Behavior::kJump:
 		BehaviorJumpUpdate();
 		break;
+
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();
 		break;
@@ -118,6 +122,7 @@ void Player::Update()
 
 void Player::Draw(const Camera& camera)
 {
+
 	//モデルの描画
 	models_[0]->Draw(worldTransform_, camera);
 
@@ -297,16 +302,18 @@ void Player::BehaviorRootUpdate()
 		}
 	}
 
-	//キーボード入力
-	if (input_->IsPushKeyEnter(DIK_W) && isLanded_ && isMove_)
-	{
-		behaviorRequest_ = Behavior::kJump;
-		worldTransform_.translation_.y += jumpFirstSpeed_;
+	if (input_->IsPushKey(DIK_A)) {
+		worldTransform_.translation_.x -= 0.3f;
 	}
 
-	if (input_->IsPushKeyEnter(DIK_SPACE))
-	{
-		behaviorRequest_ = Behavior::kAttack;
+	if (input_->IsPushKey(DIK_D)) {
+		worldTransform_.translation_.x += 0.3f;
+	}
+
+	if (input_->IsPushKeyEnter(DIK_SPACE)) {
+		behaviorRequest_ = Behavior::kJump;
+		const float kJumpFirstSpeed = 0.8f;
+		worldTransform_.translation_.y += kJumpFirstSpeed;
 	}
 }
 
@@ -318,6 +325,7 @@ void Player::BehaviorJumpInitialize()
 
 void Player::BehaviorJumpUpdate()
 {
+
 	//閾値
 	const float threshold = 0.2f;
 	velocity_.x = 0.0f;
@@ -389,10 +397,12 @@ void Player::BehaviorJumpUpdate()
 		}
 	}
 
-	//キーボード入力
-	if (input_->IsPushKeyEnter(DIK_SPACE))
-	{
-		behaviorRequest_ = Behavior::kAttack;
+	if (input_->IsPushKey(DIK_A)) {
+		worldTransform_.translation_.x -= 0.3f;
+	}
+
+	if (input_->IsPushKey(DIK_D)) {
+		worldTransform_.translation_.x += 0.3f;
 	}
 }
 

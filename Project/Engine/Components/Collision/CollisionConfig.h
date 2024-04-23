@@ -3,6 +3,7 @@
 
 //CollisionAttribute
 const uint32_t kCollisionAttributePlayer = 0b0001;
+
 const uint32_t kCollisionAttributeEnemy = 0b0010;
 const uint32_t kCollisionAttributeWeapon = 0b0100;
 const uint32_t kCollisionAttributeBlock = 0b1000;

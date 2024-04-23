@@ -157,6 +157,12 @@
     <Filter Include="ヘッダー ファイル\Application\Object">
       <UniqueIdentifier>{f4a52438-51f2-43f3-a85d-2f363fc43a1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Enemy">
+      <UniqueIdentifier>{1e5f905c-8b5a-4138-a1a7-c5ab530d7fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Enemy">
+      <UniqueIdentifier>{92b60e07-82b0-4ca3-8b45-a95413f3499e}</UniqueIdentifier>
+	</Filter>
     <Filter Include="ヘッダー ファイル\Application\Object\Player">
       <UniqueIdentifier>{393bb982-0ed7-445e-80cd-605cd2c7e209}</UniqueIdentifier>
     </Filter>
@@ -372,6 +378,12 @@
     <ClCompile Include="Engine\Base\Display.cpp">
       <Filter>ソース ファイル\Engine\Base</Filter>
     </ClCompile>
+    <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp">
+      <Filter>ソース ファイル\Application\Object\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Enemy\Astar.cpp">
+      <Filter>ソース ファイル</Filter>
+	</ClCompile>
     <ClCompile Include="Application\Src\Object\Player\Player.cpp">
       <Filter>ソース ファイル\Application\Object\Player</Filter>
     </ClCompile>
@@ -644,6 +656,12 @@
     <ClInclude Include="Engine\Base\FrameRateController.h">
       <Filter>ヘッダー ファイル\Engine\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Application\Src\Object\Enemy\Enemy.h">
+      <Filter>ヘッダー ファイル\Application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Enemy\Astar.h">
+      <Filter>ヘッダー ファイル</Filter>
+	</ClInclude>	
     <ClInclude Include="Application\Src\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
     </ClInclude>

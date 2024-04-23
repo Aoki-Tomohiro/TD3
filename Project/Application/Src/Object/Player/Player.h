@@ -14,6 +14,7 @@
 class Player : public Collider
 {
 public:
+
 	void Initialzie(std::vector<Model*> models);
 
 	void Update();
@@ -51,6 +52,7 @@ private:
 	void BehaviorJumpInitialize();
 
 	void BehaviorJumpUpdate();
+
 
 	void BehaviorAttackInitialize();
 

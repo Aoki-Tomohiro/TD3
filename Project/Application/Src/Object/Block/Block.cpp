@@ -11,15 +11,18 @@ void Block::Initialize(Model* model, const Vector3& position, const Vector3& sca
 	worldTransform_.translation_ = position;
 	worldTransform_.scale_ = scale;
 
+
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
 	.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z},
 	};
 	SetAABB(aabb);
+
 	SetCollisionAttribute(kCollisionAttributeBlock);
 	SetCollisionMask(kCollisionMaskBlock);
 	SetCollisionPrimitive(kCollisionPrimitiveAABB);
+
 }
 
 void Block::Update()
@@ -36,6 +39,7 @@ void Block::Draw(const Camera& camera)
 
 void Block::OnCollision(Collider* collider)
 {
+
 }
 
 const Vector3 Block::GetWorldPosition() const

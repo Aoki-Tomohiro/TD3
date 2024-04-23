@@ -9,8 +9,8 @@
 #include "Engine/Components/Particle/ParticleManager.h"
 #include "Engine/3D/Model/ModelManager.h"
 #include "Engine/2D/Sprite.h"
+#include "Application/Src/Object/Enemy/Enemy.h"
 #include "Engine/Math/MathFunction.h"
-
 #include "Application/Src/Object/Player/Player.h"
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
@@ -32,6 +32,21 @@ public:
 	void Reset();
 
 private:
+	void AddBlock(const Vector3& position, const Vector3& scale);
+
+	void Addcopy();
+	void Addcopy2();
+	void Addcopy3();
+	void Addcopy4();
+	void Addcopy5();
+
+	void Updatacopy1();
+	void Updatacopy2();
+	void Updatacopy3();
+	void Updatacopy4();
+	void Updatacopy5();
+
+private:
 	Renderer* renderer_ = nullptr;
 
 	Input* input_ = nullptr;
@@ -40,6 +55,12 @@ private:
 
 	//カメラ
 	Camera camera_{};
+
+
+	//敵
+	std::unique_ptr<Model> enemyModel_ = nullptr;
+	std::unique_ptr<Enemy> enemy_ = nullptr;
+
 
 	//衝突マネージャー
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

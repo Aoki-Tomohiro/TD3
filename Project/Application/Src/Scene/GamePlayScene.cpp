@@ -1,5 +1,6 @@
 #include "GamePlayScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include "Engine/Base/ImGuiManager.h"
 
 void GamePlayScene::Initialize()
 {
@@ -12,6 +13,14 @@ void GamePlayScene::Initialize()
 	//カメラの初期化
 	camera_.Initialize();
 	camera_.fov_ = 45.0f * 3.141592654f / 180.0f;
+
+
+
+	//敵の生成
+	enemyModel_.reset(ModelManager::Create());
+	enemyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Initialize(enemyModel_.get());
 
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
@@ -61,11 +70,22 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
+
 	//プレイヤーの更新
 	player_->Update();
 
 	//ブロックの更新
-	blockManager_->Update();
+    blockManager_->Update();
+	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
+	for (const std::unique_ptr<Block>& block : blocks)
+	{
+		enemy_->SetBlockPosition(block.get()->GetWorldPosition());
+		enemy_->SetBlockSize(block.get()->GetSize());
+	}
+	
+	//敵の更新
+	enemy_->SetPlayerPosition(player_->GetWorldPosition());
+	enemy_->Update();
 
 	//コピーの更新
 	copyManager_->Update();
@@ -80,13 +100,13 @@ void GamePlayScene::Update()
 	collisionManager_->ClearColliderList();
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
+	collisionManager_->SetColliderList(enemy_.get());
 	//武器
 	if (player_->GetWeapon()->GetIsAttack())
 	{
 		collisionManager_->SetColliderList(player_->GetWeapon());
 	}
 	//ブロック
-	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 	for (const std::unique_ptr<Block>& block : blocks)
 	{
 		collisionManager_->SetColliderList(block.get());
@@ -133,7 +153,7 @@ void GamePlayScene::Update()
 	ImGui::End();
 }
 
-void GamePlayScene::Draw() 
+void GamePlayScene::Draw()
 {
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
@@ -149,6 +169,10 @@ void GamePlayScene::Draw()
 #pragma region 3Dオブジェクト描画
 	//プレイヤーの描画
 	player_->Draw(camera_);
+
+	//敵の描画
+ 
+	enemy_->Draw(camera_);
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
@@ -188,6 +212,7 @@ void GamePlayScene::DrawUI()
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
+
 
 void GamePlayScene::Reset()
 {
