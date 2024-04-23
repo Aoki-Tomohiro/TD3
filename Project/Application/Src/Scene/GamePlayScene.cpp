@@ -84,6 +84,7 @@ void GamePlayScene::Update()
 	collisionManager_->ClearColliderList();
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
+	collisionManager_->SetColliderList(enemy_.get());
 	//武器
 	if (player_->GetWeapon()->GetIsAttack())
 	{

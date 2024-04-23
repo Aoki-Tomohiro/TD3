@@ -18,6 +18,7 @@ public:
 	void Draw(const Camera& camera);
 
 	void OnCollision(Collider* collider) override;
+	
 
 	const Vector3 GetWorldPosition() const override;
 
@@ -95,6 +96,10 @@ private:
 
 	int blockCount_ = 0;
 	int blockSizeCount_ = 0;
+
+	bool blockHit_ = false;
+
+	//ジャンプの情報
 
 	bool jump_ = false;
 
