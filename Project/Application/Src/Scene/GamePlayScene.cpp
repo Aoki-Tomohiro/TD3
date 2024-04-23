@@ -98,16 +98,17 @@ void GamePlayScene::Update()
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
 
-	//プレイヤーの座標を保存
-	copyManager_->SetPlayerPosition(player_->GetWorldPosition());
+	//プレイヤーが動けるとき
+	if (!player_->GetIsStop())
+	{
+		//プレイヤーの座標を保存
+		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
+	}
 
 	//リセット処理
-	if (input_->IsControllerConnected())
+	if (player_->GetWeapon()->GetIsAttack())
 	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
-		{
-			Reset();
-		}
+		Reset();
 	}
 
 	//ImGui

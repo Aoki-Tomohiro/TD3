@@ -257,6 +257,10 @@ void Player::BehaviorRootUpdate()
 		worldTransform_.translation_.y += kJumpFirstSpeed;
 	}
 
+	if (input_->IsPushKeyEnter(DIK_E))
+	{
+		behaviorRequest_ = Behavior::kAttack;
+	}
 }
 
 void Player::BehaviorJumpInitialize()
@@ -330,6 +334,11 @@ void Player::BehaviorJumpUpdate()
 
 	if (input_->IsPushKey(DIK_D)) {
 		worldTransform_.translation_.x += 0.3f;
+	}
+
+	if (input_->IsPushKeyEnter(DIK_E))
+	{
+		behaviorRequest_ = Behavior::kAttack;
 	}
 }
 

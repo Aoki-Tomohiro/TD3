@@ -8,7 +8,8 @@ void Weapon::Initialize(Model* model)
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 1.0f,3.0f,3.0f };
+	worldTransform_.translation_ = { 0.0f,2.0f,5.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 
 	//衝突判定の初期化
 	SetCollisionAttribute(kCollisionAttributeWeapon);
@@ -19,6 +20,7 @@ void Weapon::Initialize(Model* model)
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Weapon";
 	globalVariables->CreateGroup(groupName);
+	globalVariables->AddItem(groupName, "Translation", worldTransform_.translation_);
 	globalVariables->AddItem(groupName, "Scale", worldTransform_.scale_);
 }
 
@@ -26,8 +28,8 @@ void Weapon::Update()
 {
 	//AABBのサイズを設定
 	AABB aabb = {
-	.min{.x = -worldTransform_.scale_.x,.y = -worldTransform_.scale_.y,.z = -worldTransform_.scale_.z},
-	.max{.x = worldTransform_.scale_.x,.y = worldTransform_.scale_.y,.z = worldTransform_.scale_.z}
+	.min{-worldTransform_.scale_.x, -worldTransform_.scale_.y, -worldTransform_.scale_.z},
+	.max{worldTransform_.scale_.x, worldTransform_.scale_.y,worldTransform_.scale_.z}
 	};
 	SetAABB(aabb);
 
@@ -36,8 +38,6 @@ void Weapon::Update()
 	model_->SetColor(color);
 
 	//ワールドトランスフォームの更新
-	worldTransform_.translation_.z = worldTransform_.parent_->scale_.z + worldTransform_.scale_.z;
-	worldTransform_.translation_.y = worldTransform_.parent_->scale_.y * 2.0f;
 	worldTransform_.UpdateMatrixFromEuler();
 
 	//環境変数の適応
@@ -67,5 +67,6 @@ void Weapon::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Weapon";
+	worldTransform_.translation_ = globalVariables->GetVector3Value(groupName, "Translation");
 	worldTransform_.scale_ = globalVariables->GetVector3Value(groupName, "Scale");
 }
