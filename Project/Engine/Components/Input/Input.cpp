@@ -79,13 +79,6 @@ void Input::Update()
 	keyboardDevice_->GetDeviceState(sizeof(key_), key_);
 	//マウスの入力状態を取得する
 	mouseDevice_->GetDeviceState(sizeof(DIMOUSESTATE), &mouse_);
-
-	//コントローラーの状態を取得
-	DWORD dwResult = XInputGetState(0, &state_);
-	if (dwResult == ERROR_SUCCESS) 
-	{
-		ZeroMemory(&state_, sizeof(XINPUT_STATE));
-	}
 }
 
 bool Input::IsPushKey(uint8_t keyNum)

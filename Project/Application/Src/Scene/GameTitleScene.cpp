@@ -17,7 +17,22 @@ void GameTitleScene::Finalize()
 
 void GameTitleScene::Update() 
 {
+	if (input_->IsControllerConnected())
+	{
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+		{
+			sceneManager_->ChangeScene("GamePlayScene");
+		}
+	}
 
+	if (input_->IsPushKeyEnter(DIK_SPACE))
+	{
+		sceneManager_->ChangeScene("GamePlayScene");
+	}
+
+	ImGui::Begin("GameTitleScene");
+	ImGui::Text("A or SPACE : GamePlayScene");
+	ImGui::End();
 }
 
 void GameTitleScene::Draw()

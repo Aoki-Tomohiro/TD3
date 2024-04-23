@@ -47,6 +47,9 @@ void GameCore::Initialize()
 	lightManager_ = LightManager::GetInstance();
 	lightManager_->Initialize();
 
+	//環境変数の読み込み
+	GlobalVariables::GetInstance()->LoadFiles();
+
 	//RandomGeneratorの初期化
 	RandomGenerator::Initialize();
 }
