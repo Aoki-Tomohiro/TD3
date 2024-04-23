@@ -19,8 +19,10 @@ void GamePlayScene::Initialize()
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
 	enemyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	bombModel_.reset(ModelManager::CreateFromOBJ("Sphere", Opaque));
+	std::vector<Model*> enemyModels = { enemyModel_.get(),bombModel_.get() };
 	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(enemyModel_.get());
+	enemy_->Initialize(enemyModels);
 
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
@@ -85,6 +87,12 @@ void GamePlayScene::Update()
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
 	collisionManager_->SetColliderList(enemy_.get());
+	//爆弾
+	const std::vector<std::unique_ptr<Bomb>>& bombs = enemy_->GetBombs();
+	for (const std::unique_ptr<Bomb>& bomb : bombs)
+	{
+		collisionManager_->SetColliderList(bomb.get());
+	}
 	//武器
 	if (player_->GetWeapon()->GetIsAttack())
 	{

@@ -162,7 +162,7 @@
     </Filter>
     <Filter Include="ヘッダー ファイル\Application\Object\Enemy">
       <UniqueIdentifier>{92b60e07-82b0-4ca3-8b45-a95413f3499e}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="ヘッダー ファイル\Application\Object\Player">
       <UniqueIdentifier>{393bb982-0ed7-445e-80cd-605cd2c7e209}</UniqueIdentifier>
     </Filter>
@@ -377,7 +377,7 @@
     </ClCompile>
     <ClCompile Include="Application\Src\Object\Enemy\Astar.cpp">
       <Filter>ソース ファイル</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Application\Src\Object\Player\Player.cpp">
       <Filter>ソース ファイル\Application\Object\Player</Filter>
     </ClCompile>
@@ -395,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="Application\Src\Object\Player\CopyManager.cpp">
       <Filter>ソース ファイル\Application\Object\Copy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Enemy\Bomb.cpp">
+      <Filter>ソース ファイル\Application\Object\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -649,7 +652,7 @@
     </ClInclude>
     <ClInclude Include="Application\Src\Object\Enemy\Astar.h">
       <Filter>ヘッダー ファイル</Filter>
-	</ClInclude>	
+    </ClInclude>
     <ClInclude Include="Application\Src\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
     </ClInclude>
@@ -667,6 +670,9 @@
     </ClInclude>
     <ClInclude Include="Application\Src\Object\Player\CopyManager.h">
       <Filter>ヘッダー ファイル\Application\Object\Copy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Enemy\Bomb.h">
+      <Filter>ヘッダー ファイル\Application\Object\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

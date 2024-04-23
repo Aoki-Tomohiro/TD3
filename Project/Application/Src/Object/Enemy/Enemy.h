@@ -4,6 +4,7 @@
 #include "Engine/Components/Collision/CollisionConfig.h"
 #include "Engine/Math/MathFunction.h"
 #include "Astar.h"
+#include "Bomb.h"
 #include <optional>
 
 class Enemy : public Collider
@@ -11,7 +12,7 @@ class Enemy : public Collider
 public:
 	static const int kActiveTime = 60 * 10;
 
-	void Initialize(Model* model);
+	void Initialize(std::vector<Model*> models);
 
 	void Update();
 
@@ -47,6 +48,8 @@ public:
 
 	}
 
+	const std::vector<std::unique_ptr<Bomb>>& GetBombs() const { return bombs_; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -70,9 +73,11 @@ private:
 	//経路探索関数
 	void FindPath();
 
+	void CreateBomb();
+
 
 private:
-	Model* model_ = nullptr;
+	std::vector<Model*> models_{};
 
 
 	WorldTransform worldTransform_{};
@@ -115,5 +120,10 @@ private:
 	Vector3 nextPosition_;
 	Vector2 nextMapPosition_;
 	bool search_ = false;
+
+	//爆弾
+	std::vector<std::unique_ptr<Bomb>> bombs_{};
+	int bombSpawnTimer_ = 0;
+	static const int kBombSpawnTime = 20;
 };
 

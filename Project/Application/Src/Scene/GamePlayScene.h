@@ -57,6 +57,7 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
+	std::unique_ptr<Model> bombModel_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 
 

@@ -2,10 +2,9 @@
 #include "Engine/Base/ImGuiManager.h"
 #include <Engine/3D/Model/ModelManager.h>
 
-void Enemy::Initialize(Model* model)
+void Enemy::Initialize(std::vector<Model*> models)
 {
-	assert(model);
-	model_ = model;
+	models_ = models;
 
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = 2.0f;
@@ -74,6 +73,10 @@ void Enemy::Update()
 
 	worldTransform_.UpdateMatrixFromEuler();
 
+	for (std::unique_ptr<Bomb>& bomb : bombs_)
+	{
+		bomb->Update();
+	}
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
@@ -102,8 +105,12 @@ void Enemy::Update()
 
 void Enemy::Draw(const Camera& camera)
 {
-	model_->Draw(worldTransform_, camera);
+	models_[0]->Draw(worldTransform_, camera);
 
+	for (std::unique_ptr<Bomb>& bomb : bombs_)
+	{
+		bomb->Draw(camera);
+	}
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -145,6 +152,8 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 		moveCount_ = 10;
+
+		CreateBomb();
 	}
 	
 
@@ -475,6 +484,7 @@ void Enemy::FindPath() {
 	}
 
 }
+
 void Enemy::OnCollision(Collider* collider)
 {
 	if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)
@@ -531,4 +541,15 @@ const Vector3 Enemy::GetWorldPosition() const
 	worldPos.y = worldTransform_.matWorld_.m[3][1];
 	worldPos.z = worldTransform_.matWorld_.m[3][2];
 	return worldPos;
+}
+
+void Enemy::CreateBomb()
+{
+	if (++bombSpawnTimer_ > kBombSpawnTime)
+	{
+		bombSpawnTimer_ = 0;
+		Bomb* newBomb = new Bomb();
+		newBomb->Initialize(models_[1], worldTransform_.translation_);
+		bombs_.push_back(std::unique_ptr<Bomb>(newBomb));
+	}
 }

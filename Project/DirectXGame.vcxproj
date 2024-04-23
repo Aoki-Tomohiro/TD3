@@ -22,6 +22,7 @@
     <ClCompile Include="Application\Src\Game\GameManager.cpp" />
     <ClCompile Include="Application\Src\Object\Block\Block.cpp" />
     <ClCompile Include="Application\Src\Object\Enemy\Astar.cpp" />
+    <ClCompile Include="Application\Src\Object\Enemy\Bomb.cpp" />
     <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Src\Object\Block\BlockManager.cpp" />
     <ClCompile Include="Application\Src\Object\Player\CopyManager.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="Application\Src\Game\GameManager.h" />
     <ClInclude Include="Application\Src\Object\Block\Block.h" />
     <ClInclude Include="Application\Src\Object\Enemy\Astar.h" />
+    <ClInclude Include="Application\Src\Object\Enemy\Bomb.h" />
     <ClInclude Include="Application\Src\Object\Enemy\Enemy.h" />
     <ClInclude Include="Application\Src\Object\Block\BlockManager.h" />
     <ClInclude Include="Application\Src\Object\Player\CopyManager.h" />
