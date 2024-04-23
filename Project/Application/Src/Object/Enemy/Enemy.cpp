@@ -125,6 +125,41 @@ void Enemy::BehaviorRootUpdate() {
 
 	float speed_ = 0.3f;
 
+	if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10) {
+		velocity_.y = 0.00f;
+		velocity_.x = 0.00f;
+	}
+	else {
+
+		if (velocity_.y >= -1.0f) {
+			if (playerPosition_.x < enemyPosition_.x) {
+				if (map[int(enemyPosition_.x-1)][int(enemyPosition_.y) + 1] != 10) {
+					velocity_.x = -0.3f;
+				}else if (map[int(enemyPosition_.x + 1)][int(enemyPosition_.y) + 1] != 10) {
+					velocity_.x = 0.3f;
+				}
+				
+			}
+			else {
+				if (map[int(enemyPosition_.x - 1)][int(enemyPosition_.y) + 1] != 10) {
+					velocity_.x = -0.3f;
+				}
+				else if (map[int(enemyPosition_.x + 1)][int(enemyPosition_.y) + 1] != 10) {
+					velocity_.x = 0.3f;
+				}
+			}
+		}
+		else {
+			velocity_.x = 0.0f;
+		}
+
+
+
+
+		worldTransform_.translation_ += velocity_;
+	}
+
+
 	moveCount_--;
 	// エネミーの移動
 	if (moveCount_ <= 0 && path_.size() > 1) {
@@ -134,10 +169,10 @@ void Enemy::BehaviorRootUpdate() {
 		nextPosition_.y = float(path_[1]->y - 18) * -2;
 
 		//velocity_ = nextPosition_ - worldTransform_.translation_;
-		worldTransform_.translation_ = nextPosition_;
+
 
 		if (velocity_.x == 0.0f) {
-			
+			worldTransform_.translation_ = nextPosition_;
 		}
 	
 
@@ -151,30 +186,7 @@ void Enemy::BehaviorRootUpdate() {
 	}
 
 
-	if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10) {
-		velocity_.y = 0;
-		velocity_.x = 0;
-	}
-	else {
-
-		if (velocity_.y >= -1.0f) {
-			if (playerPosition_.x < enemyPosition_.x) {
-				velocity_.x = 0.3f;
-			}
-			else {
-				velocity_.x = -0.3f;
-			}
-		}
-		else {
-			velocity_.x = 0.0f;
-		}
-
-
-
-
-		worldTransform_.translation_ += velocity_;
-	}
-
+	
 
 
 
