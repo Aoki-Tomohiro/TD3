@@ -181,6 +181,12 @@
     <Filter Include="ヘッダー ファイル\Application\Object\Copy">
       <UniqueIdentifier>{166d6d23-480b-4f9c-80fb-ef07210ffb65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\Enemy">
+      <UniqueIdentifier>{edfdc7f2-664b-4f31-bb51-7dbc21657f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\Enemy">
+      <UniqueIdentifier>{5f0b2ddd-e22e-4e11-aaca-03a70d365782}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\2D\Sprite.cpp">
@@ -395,6 +401,12 @@
     </ClCompile>
     <ClCompile Include="Application\Src\Object\Player\CopyManager.cpp">
       <Filter>ソース ファイル\Application\Object\Copy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp">
+      <Filter>ソース ファイル\Application\Object\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\Enemy\EnemyManager.cpp">
+      <Filter>ソース ファイル\Application\Object\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -667,6 +679,12 @@
     </ClInclude>
     <ClInclude Include="Application\Src\Object\Player\CopyManager.h">
       <Filter>ヘッダー ファイル\Application\Object\Copy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Enemy\Enemy.h">
+      <Filter>ヘッダー ファイル\Application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\Enemy\EnemyManager.h">
+      <Filter>ヘッダー ファイル\Application\Object\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,7 @@ class Enemy : public Collider
 {
 public:
 	static const int kActiveTime = 60 * 10;
-
+  
 	void Initialize(Model* model);
 
 	void Update();
@@ -19,7 +19,6 @@ public:
 
 	void OnCollision(Collider* collider) override;
 	
-
 	const Vector3 GetWorldPosition() const override;
 
 	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
@@ -66,17 +65,13 @@ private:
 	//プレイヤーとの距離の計算
 	void DistanceFunction();
 
-
 	//経路探索関数
 	void FindPath();
-
 
 private:
 	Model* model_ = nullptr;
 
-
 	WorldTransform worldTransform_{};
-
 
 	Behavior behavior_ = Behavior::kRoot;
 

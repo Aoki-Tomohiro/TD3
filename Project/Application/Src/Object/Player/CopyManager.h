@@ -12,13 +12,15 @@ public:
 
 	void Reset();
 
-	void SetPlayerPosition(const Vector3& playerPosition) { playerPositions_.push_back(playerPosition); };
+	const std::vector<std::unique_ptr<Copy>>& GetCopies() const { return copies_; };
+
+	void SetPlayerPosition(const Vector3& playerPosition, const Quaternion& quaternion, const bool isAttack) { playerPositions_.push_back({ playerPosition,quaternion, isAttack }); };
 
 private:
 	Model* model_ = nullptr;
 
 	std::vector<std::unique_ptr<Copy>> copies_{};
 
-	std::vector<Vector3> playerPositions_{};
+	std::vector<std::tuple<Vector3, Quaternion, bool>> playerPositions_{};
 };
 

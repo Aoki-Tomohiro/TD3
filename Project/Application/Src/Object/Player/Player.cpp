@@ -9,6 +9,9 @@ void Player::Initialzie(std::vector<Model*> models)
 	//Inputクラスのインスタンスを取得
 	input_ = Input::GetInstance();
 
+	//Audioクラスのインスタンスを取得
+	audio_ = Audio::GetInstance();
+
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.quaternion_ = destinationQuaternion_;
@@ -17,6 +20,15 @@ void Player::Initialzie(std::vector<Model*> models)
 	weapon_ = std::make_unique<Weapon>();
 	weapon_->Initialize(models_[1]);
 	weapon_->SetParent(worldTransform_);
+
+	//制限時間のスプライトの生成
+	movementRestrictionSprite_.reset(Sprite::Create("white.png", { 0.0f,0.0f }));
+	movementRestrictionSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	movementRestrictionSprite_->SetSize(movementRestrictionSpriteSize_);
+
+	//音声データの読み込み
+	moveAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Move.wav");
+	attackAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Attack.wav");
 
 	//衝突判定の初期化
 	AABB aabb = {
@@ -28,7 +40,6 @@ void Player::Initialzie(std::vector<Model*> models)
 	SetCollisionMask(kCollisionMaskPlayer);
 	SetCollisionPrimitive(kCollisionPrimitiveAABB);
 
-
 	//環境変数の初期化
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
@@ -36,10 +47,17 @@ void Player::Initialzie(std::vector<Model*> models)
 	globalVariables->AddItem(groupName, "Speed", speed_);
 	globalVariables->AddItem(groupName, "Gravity", gravity_);
 	globalVariables->AddItem(groupName, "JumpFirstSpeed", jumpFirstSpeed_);
+	globalVariables->AddItem(groupName, "MovementRestrictionTime", movementRestrictionTime_);
 }
 
 void Player::Update()
 {
+	//動けない状態かつ着地している状態の時にストップフラグを立てる
+	isStop_ = !isMove_ && isLanded_;
+
+	//移動制限の処理
+	UpdateMovementRestriction();
+
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
 	{
@@ -77,12 +95,8 @@ void Player::Update()
 		break;
 	}
 
-	//地面に埋まらないようにする
-	if (worldTransform_.translation_.y <= -10.0f)
-	{
-		worldTransform_.translation_.y = -10.0f;
-		velocity_.y = 0.0f;
-	}
+	//着地フラグをリセット
+	isLanded_ = false;
 
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
@@ -99,6 +113,10 @@ void Player::Update()
 	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
 	ImGui::DragFloat4("Quaternion", &worldTransform_.quaternion_.x);
 	ImGui::DragFloat3("Velocity", &velocity_.x);
+	ImGui::DragFloat2("MovementRestrictionSpriteSize", &movementRestrictionSpriteSize_.x);
+	ImGui::Checkbox("isLanded", &isLanded_);
+	ImGui::Text("MovementRestrictionTimer : %d", movementRestrictionTimer_);
+	ImGui::DragInt("MoveSEWaitTime", &moveAudioWaitTime_);
 	ImGui::End();
 }
 
@@ -112,11 +130,24 @@ void Player::Draw(const Camera& camera)
 	weapon_->Draw(camera);
 }
 
+void Player::DrawUI(const Camera& camera)
+{
+	//移動制限のスプライトの座標を設定
+	UpdateMovementRestrictionSprite(camera);
+
+	//移動制限のスプライトを描画
+	movementRestrictionSprite_->Draw();
+}
+
 void Player::Reset()
 {
 	destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
+	isMove_ = true;
+	movementRestrictionTimer_ = movementRestrictionTime_;
+	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };
+	models_[0]->SetColor(color);
 }
 
 void Player::OnCollision(Collider* collider)
@@ -153,6 +184,7 @@ void Player::OnCollision(Collider* collider)
 		if (directionAxis.y == 1.0f)
 		{
 			velocity_.y = 0.0f;
+			isLanded_ = true;
 		}
 	}
 	else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
@@ -186,16 +218,27 @@ void Player::BehaviorRootUpdate()
 {
 	//閾値
 	const float threshold = 0.2f;
+	velocity_.x = 0.0f;
 
-	//コントローラーが接続されているとき
+	//コントローラーが接続されているときかつ移動出来るとき
 	if (input_->IsControllerConnected())
 	{
 		//スティックの入力を取得
 		velocity_.x = input_->GetLeftStickX();
 	}
 
+	//キーボード入力
+	if (input_->IsPushKey(DIK_A))
+	{
+		velocity_.x = -1.0f;
+	}
+	else if(input_->IsPushKey(DIK_D))
+	{
+		velocity_.x = 1.0f;
+	}
+
 	//スティックの入力が閾値を超えていたら速度を設定
-	if (std::abs(velocity_.x) > threshold)
+	if (std::abs(velocity_.x) > threshold && isMove_)
 	{
 		//速度を設定
 		velocity_.x = Mathf::Normalize(velocity_).x * speed_;
@@ -211,11 +254,20 @@ void Player::BehaviorRootUpdate()
 
 		//クォータニオンを作成
 		destinationQuaternion_ = Mathf::MakeRotateAxisAngleQuaternion(cross, std::acos(dot));
+
+		//移動中に音声を再生する
+		if (++moveAudioTimer_ > moveAudioWaitTime_)
+		{
+			audio_->SoundPlayWave(moveAudioHandle_, false, 0.4f);
+			moveAudioTimer_ = 0;
+		}
 	}
 	else
 	{
 		//速度を0で初期化
 		velocity_.x = 0.0f;
+		//移動中の音声のタイマーを初期化
+		moveAudioTimer_ = 0;
 	}
 
 	//加速ベクトル
@@ -225,11 +277,19 @@ void Player::BehaviorRootUpdate()
 	//速度を加算
 	worldTransform_.translation_ += velocity_;
 
+	//地面に埋まらないようにする
+	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
+	{
+		worldTransform_.translation_.y = -10.0f;
+		velocity_.y = 0.0f;
+		isLanded_ = true;
+	}
+
 	//コントローラーが接続されているとき
 	if (input_->IsControllerConnected())
 	{
 		//ジャンプ状態に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_ && isMove_)
 		{
 			behaviorRequest_ = Behavior::kJump;
 			worldTransform_.translation_.y += jumpFirstSpeed_;
@@ -241,7 +301,6 @@ void Player::BehaviorRootUpdate()
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
-
 
 	if (input_->IsPushKey(DIK_A)) {
 		worldTransform_.translation_.x -= 0.3f;
@@ -256,7 +315,6 @@ void Player::BehaviorRootUpdate()
 		const float kJumpFirstSpeed = 0.8f;
 		worldTransform_.translation_.y += kJumpFirstSpeed;
 	}
-
 }
 
 void Player::BehaviorJumpInitialize()
@@ -270,12 +328,27 @@ void Player::BehaviorJumpUpdate()
 
 	//閾値
 	const float threshold = 0.2f;
+	velocity_.x = 0.0f;
 
-	//スティックの入力を取得
-	velocity_.x = input_->GetLeftStickX();
+	//コントローラーが接続されているときかつ移動出来るとき
+	if (input_->IsControllerConnected())
+	{
+		//スティックの入力を取得
+		velocity_.x = input_->GetLeftStickX();
+	}
+
+	//キーボード入力
+	if (input_->IsPushKey(DIK_A))
+	{
+		velocity_.x = -1.0f;
+	}
+	else if (input_->IsPushKey(DIK_D))
+	{
+		velocity_.x = 1.0f;
+	}
 
 	//スティックの入力が閾値を超えていたら
-	if (std::abs(velocity_.x) > threshold)
+	if (std::abs(velocity_.x) > threshold && isMove_)
 	{
 		//速度を設定
 		velocity_.x = Mathf::Normalize(velocity_).x * speed_;
@@ -306,11 +379,12 @@ void Player::BehaviorJumpUpdate()
 	worldTransform_.translation_ += velocity_;
 
 	//地面についたら通常状態に戻す
-	if (worldTransform_.translation_.y <= -10.0f)
+	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
 	{
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;
+		isLanded_ = true;
 	}
 
 	//コントローラーが接続されているとき
@@ -322,7 +396,6 @@ void Player::BehaviorJumpUpdate()
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
-
 
 	if (input_->IsPushKey(DIK_A)) {
 		worldTransform_.translation_.x -= 0.3f;
@@ -343,6 +416,48 @@ void Player::BehaviorAttackUpdate()
 {
 	//通常状態に戻る
 	behaviorRequest_ = Behavior::kRoot;
+	audio_->SoundPlayWave(attackAudioHandle_, false, 0.4f);
+}
+
+void Player::UpdateMovementRestriction()
+{
+	//移動ベクトルが0ではないとき
+	if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
+	{
+		//移動制限のタイマーが0以下になったときに動けないようにする
+		if (--movementRestrictionTimer_ < 0)
+		{
+			isMove_ = false;
+		}
+	}
+
+	//移動制限時間が短くなったら
+	const int divisor = 4;
+	if (movementRestrictionTimer_ < movementRestrictionTime_ / divisor)
+	{
+		//モデルの色を変更
+		Vector4 color = { 1.0f,0.25f,0.0f,1.0f };
+		models_[0]->SetColor(color);
+	}
+}
+
+void Player::UpdateMovementRestrictionSprite(const Camera& camera)
+{
+	//ビューポート行列を計算
+	Matrix4x4 matViewport = Mathf::MakeViewportMatrix(0, 0, Application::kClientWidth, Application::kClientHeight, 0, 1);
+	//ビュー行列とプロジェクション行列とビューポート行列を合成
+	Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
+	//スクリーン座標に変換
+	Vector3 offset = { 0.0f,2.0f,0.0f };
+	Vector3 spritePosition = GetWorldPosition() + offset;
+	spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
+	//スプライトに座標を設定
+	movementRestrictionSprite_->SetPosition({ spritePosition.x,spritePosition.y });
+	
+	//スプライトのスケールを設定
+	Vector2 currentSize = { movementRestrictionSpriteSize_.x * float(movementRestrictionTimer_) / float(movementRestrictionTime_) ,movementRestrictionSpriteSize_.y };
+	currentSize.x = currentSize.x < 0 ? 0.0f : currentSize.x;
+	movementRestrictionSprite_->SetSize(currentSize);
 }
 
 void Player::ApplyGlobalVariables() 
@@ -352,4 +467,5 @@ void Player::ApplyGlobalVariables()
 	speed_ = globalVariables->GetFloatValue(groupName, "Speed");
 	gravity_ = globalVariables->GetFloatValue(groupName, "Gravity");
 	jumpFirstSpeed_ = globalVariables->GetFloatValue(groupName, "JumpFirstSpeed");
+	movementRestrictionTime_ = globalVariables->GetIntValue(groupName, "MovementRestrictionTime");
 }

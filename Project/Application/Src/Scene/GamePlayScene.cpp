@@ -25,6 +25,10 @@ void GamePlayScene::Initialize()
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
 
+	//パーティクルマネージャーのインスタンスを取得
+	particleManager_ = ParticleManager::GetInstance();
+	particleManager_->Clear();
+
 	//プレイヤーを生成
 	playerModel_.reset(ModelManager::Create());
 	playerModel_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
@@ -48,6 +52,15 @@ void GamePlayScene::Initialize()
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize(copyModel_.get());
 
+	//敵の生成
+	enemyModel_.reset(ModelManager::Create());
+	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize(enemyModel_.get());
+	enemyManager_->AddEnemy({ 13.7f,-3.7f,0.0f });
+	enemyManager_->AddEnemy({ 10.7f,-3.7f,0.0f });
+	enemyManager_->AddEnemy({ 13.7f,-1.2f,0.0f });
+	enemyManager_->AddEnemy({ 10.7f,-1.2f,0.0f });
 }
 
 void GamePlayScene::Finalize()
@@ -77,6 +90,9 @@ void GamePlayScene::Update()
 	//コピーの更新
 	copyManager_->Update();
 
+	//敵の更新
+	enemyManager_->Update();
+
 	//カメラの更新
 	camera_.UpdateMatrix();
 
@@ -95,19 +111,41 @@ void GamePlayScene::Update()
 	{
 		collisionManager_->SetColliderList(block.get());
 	}
+	//コピー
+	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	for (const std::unique_ptr<Copy>& copy : copies)
+	{
+		if (copy->GetWeapon()->GetIsAttack())
+		{
+			collisionManager_->SetColliderList(copy->GetWeapon());
+		}
+	}
+	//敵
+	const std::list<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+	for (const std::unique_ptr<Enemy>& enemy : enemies)
+	{
+		if (enemy->GetisAlive())
+		{
+			collisionManager_->SetColliderList(enemy.get());
+		}
+	}
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
 
-	//プレイヤーの座標を保存
-	copyManager_->SetPlayerPosition(player_->GetWorldPosition());
+	//パーティクルの更新
+	particleManager_->Update();
+
+	//プレイヤーが動けるとき
+	if (!player_->GetIsStop())
+	{
+		//プレイヤーの座標を保存
+		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
+	}
 
 	//リセット処理
-	if (input_->IsControllerConnected())
+	if (player_->GetWeapon()->GetIsAttack())
 	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
-		{
-			Reset();
-		}
+		Reset();
 	}
 
 	//ImGui
@@ -142,6 +180,8 @@ void GamePlayScene::Draw()
 	//コピーの描画
 	copyManager_->Draw(camera_);
 
+	//敵の描画
+	enemyManager_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();
@@ -150,6 +190,9 @@ void GamePlayScene::Draw()
 #pragma region パーティクル描画
 	//パーティクル描画前処理
 	renderer_->PreDrawParticles();
+
+	//パーティクルの描画
+	particleManager_->Draw(camera_);
 
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
@@ -161,6 +204,9 @@ void GamePlayScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//プレイヤーのUIを描画
+	player_->DrawUI(camera_);
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -175,4 +221,7 @@ void GamePlayScene::Reset()
 	
 	//コピーをリセット
 	copyManager_->Reset();
+
+	//敵をリセット
+	enemyManager_->Reset();
 }

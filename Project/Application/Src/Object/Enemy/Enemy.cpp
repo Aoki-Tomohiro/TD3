@@ -96,14 +96,11 @@ void Enemy::Update()
 		ImGui::EndGroup(); // グループ終了
 	}
 	ImGui::End();
-
-
 }
 
 void Enemy::Draw(const Camera& camera)
 {
 	model_->Draw(worldTransform_, camera);
-
 }
 
 void Enemy::BehaviorRootInitialize() {
