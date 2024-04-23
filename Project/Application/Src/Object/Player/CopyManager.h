@@ -4,7 +4,7 @@
 class CopyManager
 {
 public:
-	void Initialize(const std::vector<Model*> models);
+	void Initialize(Model* model);
 
 	void Update();
 
@@ -17,7 +17,7 @@ public:
 	void SetPlayerPosition(const Vector3& playerPosition, const Quaternion& quaternion, const bool isAttack) { playerPositions_.push_back({ playerPosition,quaternion, isAttack }); };
 
 private:
-	std::vector<Model*> models_{};
+	Model* model_ = nullptr;
 
 	std::vector<std::unique_ptr<Copy>> copies_{};
 

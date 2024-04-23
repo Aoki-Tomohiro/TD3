@@ -1,12 +1,12 @@
 #pragma once
-#include "Engine/3D/Model/Model.h"
+#include "Engine/3D/Model/ModelManager.h"
 #include "Application/Src/Object/Player/Weapon.h"
 #include <list>
 
-class Copy
+class Copy : public Collider
 {
 public:
-	void Initialize(std::vector<Model*> models, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions);
+	void Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions);
 
 	void Update();
 
@@ -14,16 +14,28 @@ public:
 
 	void Reset();
 
+	void OnCollision(Collider* collider) override;
+
+	const WorldTransform& GetWorldTransform() const override { return worldTransform_; };
+
+	const Vector3 GetWorldPosition() const;
+
 	Weapon* GetWeapon() { return weapon_.get(); };
 
 private:
-	std::vector<Model*> models_{};
+	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_{};
+
+	Vector3 velocity_{};
+
+	float gravity_ = 0.05f;
 
 	std::vector<std::tuple<Vector3, Quaternion, bool>> playerPositions_{};
 
 	int currentIndex_ = 0;
+
+	std::unique_ptr<Model> weaponModel_ = nullptr;
 
 	std::unique_ptr<Weapon> weapon_ = nullptr;
 };

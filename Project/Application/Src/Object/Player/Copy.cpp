@@ -1,9 +1,10 @@
 #include "Copy.h"
 
-void Copy::Initialize(std::vector<Model*> models, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions)
+void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions)
 {
 	//モデルの初期化
-	models_ = models;
+	assert(model);
+	model_ = model;
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -12,8 +13,9 @@ void Copy::Initialize(std::vector<Model*> models, const std::vector<std::tuple<V
 	playerPositions_ = playerPositions;
 
 	//武器の生成
+	weaponModel_.reset(ModelManager::CreateFromOBJ("Cube", Transparent));
 	weapon_ = std::make_unique<Weapon>();
-	weapon_->Initialize(models_[1]);
+	weapon_->Initialize(weaponModel_.get());
 	weapon_->SetParent(worldTransform_);
 }
 
@@ -31,24 +33,35 @@ void Copy::Update()
 		weapon_->SetIsAttack(isAttack);
 		currentIndex_++;
 	}
+	else
+	{
+		weapon_->SetIsAttack(false);
+		//加速ベクトル
+		Vector3 accelerationVector = { 0.0f, -gravity_, 0.0f };
+		//加速
+		velocity_ += accelerationVector;
+		//速度を加算
+		worldTransform_.translation_ += velocity_;
+	}
+
+	//地面に埋まらないようにする
+	if (worldTransform_.translation_.y <= -10.0f)
+	{
+		worldTransform_.translation_.y = -10.0f;
+		velocity_.y = 0.0f;
+	}
 
 	//ワールドトランスフォームの行進
 	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//武器の更新
 	weapon_->Update();
-
-	//武器の判定をつける
-	if (currentIndex_ < playerPositions_.size())
-	{
-		weapon_->SetIsAttack(std::get<bool>(playerPositions_[currentIndex_]));
-	}
 }
 
 void Copy::Draw(const Camera& camera)
 {
 	//モデルの描画
-	models_[0]->Draw(worldTransform_, camera);
+	model_->Draw(worldTransform_, camera);
 
 	//武器の描画
 	weapon_->Draw(camera);
@@ -57,4 +70,58 @@ void Copy::Draw(const Camera& camera)
 void Copy::Reset()
 {
 	currentIndex_ = 0;
+	velocity_ = { 0.0f,0.0f,0.0f };
+}
+
+void Copy::OnCollision(Collider* collider)
+{
+	AABB aabbA = {
+	.min{worldTransform_.translation_.x + GetAABB().min.x,worldTransform_.translation_.y + GetAABB().min.y,worldTransform_.translation_.z + GetAABB().min.z},
+	.max{worldTransform_.translation_.x + GetAABB().max.x,worldTransform_.translation_.y + GetAABB().max.y,worldTransform_.translation_.z + GetAABB().max.z},
+	};
+	AABB aabbB = {
+		.min{collider->GetWorldTransform().translation_.x + collider->GetAABB().min.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().min.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().min.z},
+		.max{collider->GetWorldTransform().translation_.x + collider->GetAABB().max.x,collider->GetWorldTransform().translation_.y + collider->GetAABB().max.y,collider->GetWorldTransform().translation_.z + collider->GetAABB().max.z},
+	};
+
+	Vector3 overlapAxis = {
+		std::min<float>(aabbA.max.x,aabbB.max.x) - std::max<float>(aabbA.min.x,aabbB.min.x),
+		std::min<float>(aabbA.max.y,aabbB.max.y) - std::max<float>(aabbA.min.y,aabbB.min.y),
+		std::min<float>(aabbA.max.z,aabbB.max.z) - std::max<float>(aabbA.min.z,aabbB.min.z),
+	};
+
+	Vector3 directionAxis{};
+	if (overlapAxis.x < overlapAxis.y && overlapAxis.x < overlapAxis.z) {
+		//X軸方向で最小の重なりが発生している場合
+		directionAxis.x = (worldTransform_.translation_.x < collider->GetWorldTransform().translation_.x) ? -1.0f : 1.0f;
+		directionAxis.y = 0.0f;
+	}
+	else if (overlapAxis.y < overlapAxis.x && overlapAxis.y < overlapAxis.z) {
+		//Y軸方向で最小の重なりが発生している場合
+		directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
+		directionAxis.x = 0.0f;
+		if (directionAxis.y == 1.0f)
+		{
+			velocity_.y = 0.0f;
+		}
+	}
+	else if (overlapAxis.z < overlapAxis.x && overlapAxis.z < overlapAxis.y)
+	{
+		directionAxis.z = (worldTransform_.translation_.z < collider->GetWorldTransform().translation_.z) ? -1.0f : 1.0f;
+		directionAxis.x = 0.0f;
+		directionAxis.y = 0.0f;
+	}
+
+	worldTransform_.translation_ += overlapAxis * directionAxis;
+	worldTransform_.UpdateMatrixFromQuaternion();
+	weapon_->Update();
+}
+
+const Vector3 Copy::GetWorldPosition() const
+{
+	Vector3 pos{};
+	pos.x = worldTransform_.matWorld_.m[3][0];
+	pos.y = worldTransform_.matWorld_.m[3][1];
+	pos.z = worldTransform_.matWorld_.m[3][2];
+	return pos;
 }

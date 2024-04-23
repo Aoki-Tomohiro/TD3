@@ -40,9 +40,8 @@ void GamePlayScene::Initialize()
 	//コピーを生成
 	copyModel_.reset(ModelManager::Create());
 	copyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
-	std::vector<Model*> copyModels = { copyModel_.get(),weaponModel_.get() };
 	copyManager_ = std::make_unique<CopyManager>();
-	copyManager_->Initialize(copyModels);
+	copyManager_->Initialize(copyModel_.get());
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
@@ -124,15 +123,7 @@ void GamePlayScene::Update()
 	}
 
 	//リセット処理
-	if (input_->IsControllerConnected())
-	{
-		if (player_->GetWeapon()->GetIsAttack())
-		{
-			Reset();
-		}
-	}
-
-	if (input_->IsPushKeyEnter(DIK_R))
+	if (player_->GetWeapon()->GetIsAttack())
 	{
 		Reset();
 	}
