@@ -162,20 +162,40 @@ void Enemy::BehaviorRootUpdate() {
 
 	moveCount_--;
 	// エネミーの移動
-	if (moveCount_ <= 0 && path_.size() > 1) {
+	if (velocity_.x == 0.0f &&path_.size() > 1) {
 
 		//目的地の位置を次のノードの位置に
 		nextPosition_.x = float(path_[1]->x - 18) * 2;
 		nextPosition_.y = float(path_[1]->y - 18) * -2;
 
-		//velocity_ = nextPosition_ - worldTransform_.translation_;
+
+		
+		if (nextPosition_.x > worldTransform_.translation_.x) {
+			velocity_.x = 0.3f;
+		}
+		else {
+			velocity_.x = -0.3f;
+		
+		}
+
+
+		worldTransform_.translation_ += velocity_;
+
+		float differenceX = float(nextPosition_.x) - worldTransform_.translation_.x;
+		if (differenceX < 0) { differenceX *= -1; }
+
+
+		if (differenceX <= 0.2f) {
+			velocity_.x = 0.0f;
+		}
 
 
 		if (velocity_.x == 0.0f) {
-			worldTransform_.translation_ = nextPosition_;
+			//worldTransform_.translation_ = nextPosition_;
+			
 		}
 	
-
+		
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
 		if (worldTransform_.translation_ == velocity_) {
 			// パスを更新
@@ -250,7 +270,7 @@ void Enemy::BehaviorJumpUpdate()
 	nextMapPosition_.x = (36 + worldTransform_.translation_.x) / 2.0f;
 	nextMapPosition_.y = (36 - worldTransform_.translation_.y) / 2.0f;
 
-	if (worldTransform_.translation_.y <= -10.0f || velocity_.y <= -0.8f)
+	if (worldTransform_.translation_.y <= -10.0f || velocity_.y <= -0.7f)
 	{
 		//worldTransform_.translation_.y = -10.0f;
 		behaviorRequest_ = Behavior::kRoot;

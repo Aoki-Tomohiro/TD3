@@ -54,7 +54,7 @@ std::vector<Node*> findPath(const std::vector<std::vector<int>>& map, int startX
 
             if (isValid(nextX, nextY, width, height) && visited[nextX][nextY] == 0) {
                
-                if (map[nextX][nextY] != 10 && map[nextX][nextY] <= map[startX][startY]/*何もない地面ならば*/) {
+                if (map[nextX][nextY] != 10 && map[nextX][nextY] < map[startX][startY]/*何もない地面ならば*/) {
                     //スタートからの距離にそのマス分のコストをプラスする
                     int g = current->g + 1;
                     //ゴールまでの予想距離を計算する
