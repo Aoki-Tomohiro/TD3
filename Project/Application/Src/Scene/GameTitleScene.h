@@ -27,5 +27,23 @@ private:
 	Input* input_ = nullptr;
 
 	Audio* audio_ = nullptr;
+
+	uint32_t bgmHandle_ = 0;
+
+	uint32_t decisionHandle_ = 0;
+
+	std::unique_ptr<Sprite> backGroundSprite_ = nullptr;
+
+	std::unique_ptr<Sprite> pushASprite_ = nullptr;
+
+	Vector2 pushASpritePosition_ = { 290.0f,500.0f };
+
+	std::unique_ptr<Sprite> titleSprite_ = nullptr;
+
+	//Vector2 titleSpritePosition_ = { 400.0f,120.0f };
+	Vector2 titleSpritePosition_ = { 300.0f,50.0f };
+
+	//Vector2 titleSpriteSize_ = { 441.0f,251.0f };
+	Vector2 titleSpriteSize_ = { 661.0f,376.0f };
 };
 
