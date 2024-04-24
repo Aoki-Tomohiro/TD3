@@ -48,6 +48,9 @@ void GamePlayScene::Initialize()
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize(copyModel_.get());
 
+	//スプライトの生成
+	TextureManager::Load("cont.png");
+	contSprite_.reset(Sprite::Create("cont.png", spritePosition_));
 }
 
 void GamePlayScene::Finalize()
@@ -111,8 +114,14 @@ void GamePlayScene::Update()
 		Reset();
 	}
 
+	//コントローラーのUIの座標とサイズを設定
+	contSprite_->SetPosition(spritePosition_);
+	contSprite_->SetSize(spriteScale_);
+
 	//ImGui
 	ImGui::Begin("GamePlayScene");
+	ImGui::DragFloat2("SpritePosition", &spritePosition_.x, 0.1f);
+	ImGui::DragFloat2("SpriteScale", &spriteScale_.x, 0.01f);
 	ImGui::End();
 }
 
@@ -134,7 +143,6 @@ void GamePlayScene::Draw()
 	player_->Draw(camera_);
 
 	//敵の描画
- 
 	enemy_->Draw(camera_);
 
 	//ブロックの描画
@@ -142,7 +150,6 @@ void GamePlayScene::Draw()
 
 	//コピーの描画
 	copyManager_->Draw(camera_);
-
 
 	//3Dオブジェクト描画
 	renderer_->Render();
@@ -162,6 +169,12 @@ void GamePlayScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//プレイヤーのUIの描画
+	player_->DrawUI(camera_);
+
+	//スプライトの描画
+	contSprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
