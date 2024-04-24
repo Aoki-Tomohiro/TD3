@@ -18,7 +18,7 @@ void GamePlayScene::Initialize()
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
-	enemyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize(enemyModel_.get());
 
@@ -57,7 +57,6 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
-
 	//プレイヤーの更新
 	player_->Update();
 
@@ -69,13 +68,19 @@ void GamePlayScene::Update()
 		enemy_->SetBlockPosition(block.get()->GetWorldPosition());
 		enemy_->SetBlockSize(block.get()->GetSize());
 	}
-	
-	//敵の更新
-	enemy_->SetPlayerPosition(player_->GetWorldPosition());
-	enemy_->Update();
 
 	//コピーの更新
 	copyManager_->Update();
+
+	//敵の更新
+	enemy_->SetPlayerPosition(player_->GetWorldPosition());
+	enemy_->ClearCopy();
+	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+	{
+		enemy_->SetCopy(copy.get());
+	}
+	
+	enemy_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();

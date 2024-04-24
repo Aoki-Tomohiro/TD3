@@ -80,7 +80,10 @@ void Enemy::Update()
 	ImGui::Text("MapPlayerPos %d", map[int(playerPosition_.x)][int(playerPosition_.y)]);
 	ImGui::Text("nextPos X%d,Y%d", int(nextPosition_.x), int(nextPosition_.y));
 	ImGui::Text("MapNextPos %d", map[int(nextPosition_.x)][int(nextPosition_.y)]);
-	ImGui::Text("EnemyPos X%d,Y%d", int(enemyPosition_.x), int(enemyPosition_.y));
+	if(copy_.size() !=0){
+		ImGui::Text("CopyPos X%d,Y%d", int(copy_[0]->GetWorldPosition().x), int(copy_[0]->GetWorldPosition().y));
+	}
+	
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
 	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
@@ -170,16 +173,25 @@ void Enemy::BehaviorRootUpdate() {
 
 
 		
-		if (nextPosition_.x > worldTransform_.translation_.x) {
-			velocity_.x = 0.3f;
-		}
-		else {
-			velocity_.x = -0.3f;
-		
-		}
 
 
-		worldTransform_.translation_ += velocity_;
+		for (int i = 0; i < copy_.size(); ++i) {
+
+			if (velocity_.x == 0.3 && worldTransform_.translation_.y == copy_[i]->GetWorldPosition().x) {
+				if (worldTransform_.translation_.x + 0.3f == copy_[i]->GetWorldPosition().x) {
+					//velocity_.x = 0.0f;
+				}
+			}
+			else if (velocity_.x == -0.3 && worldTransform_.translation_.y == copy_[i]->GetWorldPosition().x) {
+				if (worldTransform_.translation_.x - 0.3f == copy_[i]->GetWorldPosition().x) {
+					//velocity_.x = 0.0f;
+				}
+			}
+			
+
+
+
+		}
 
 		float differenceX = float(nextPosition_.x) - worldTransform_.translation_.x;
 		if (differenceX < 0) { differenceX *= -1; }
@@ -190,10 +202,21 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 
-		if (velocity_.x == 0.0f) {
-			//worldTransform_.translation_ = nextPosition_;
-			
+
+		if (nextPosition_.x > worldTransform_.translation_.x) {
+			velocity_.x = 0.3f;
 		}
+		else {
+			velocity_.x = -0.3f;
+
+		}
+
+		worldTransform_.translation_ += velocity_;
+
+		
+
+
+		
 	
 		
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
@@ -284,8 +307,14 @@ void Enemy::DistanceFunction() {
 	enemyPosition_.x = (36 + worldTransform_.translation_.x) / 2.0f;
 	enemyPosition_.y = (36 - worldTransform_.translation_.y) / 2.0f;
 
+	for (int y = 0; y < 36; ++y) {
+		for (int x = 0; x < 36; ++x) {
+			map[x][y] = 0;
+		}
+	}
 
 	//脅威値
+	//プレーヤー
 	for (int y = 0; y < 36; ++y) {
 		for (int x = 0; x < 36; ++x) {
 
@@ -298,42 +327,44 @@ void Enemy::DistanceFunction() {
 			if (differenceY < 0) { differenceY *= -1; }
 
 			//脅威度の設定 5が自分の位置
-			if (differenceX < 6 && differenceY < 6) { map[x][y] = 0; }
-			if (differenceX < 5 && differenceY < 5) { map[x][y] = 1; }
-			if (differenceX < 4 && differenceY < 4) { map[x][y] = 2; }
-			if (differenceX < 3 && differenceY < 3) { map[x][y] = 3; }
-			if (differenceX < 2 && differenceY < 2) { map[x][y] = 4; }
-			if (differenceX < 1 && differenceY < 1) { map[x][y] = 5; }
+
+			if (differenceX < 3 && differenceY < 3) {
+				if (map[x][y] <= 1) {
+					map[x][y] = 1;
+				}
+
+			}
+			if (differenceX < 2 && differenceY < 2) {
+				if (map[x][y] <= 2) {
+					map[x][y] = 2;
+				}
+
+			}
+			if (differenceX < 1 && differenceY < 1) {
+				if (map[x][y] <= 3) {
+					map[x][y] = 3;
+				}
+			}
+
 
 		}
 	}
 
+	
 	//ブロックの番号１０
 	for (int i = 0; i <= blockCount_; i++) {
 		int blockMapPosX = int(blockPosition_[i].x);
 		int blockMapPosY = int(blockPosition_[i].y);
 		map[blockMapPosX][blockMapPosY] = 10;
 
-		if (playerPosition_.y > blockMapPosY) {
-			//ブロックより下にいる時
-			map[blockMapPosX][blockMapPosY - 1] = 0;
-			map[blockMapPosX][blockMapPosY - 2] = 0;
-			map[blockMapPosX][blockMapPosY - 3] = 0;
 
-		}
-		else {
-			//ブロックより上にいる時
-			map[blockMapPosX][blockMapPosY + 1] = 0;
-			map[blockMapPosX][blockMapPosY + 2] = 0;
-			map[blockMapPosX][blockMapPosY + 3] = 0;
-
-		}
 
 		//ブロックの位置
 		for (int j = 0; j <= blockSize_[i].x; j++) {
+			//上側
 			if (blockMapPosX + j < 36) {
 				map[blockMapPosX + j][blockMapPosY] = 10;
-
+				//右側
 				if (playerPosition_.y > blockMapPosY) {
 					//ブロックより下にいる時
 					map[blockMapPosX + j][blockMapPosY - 1] = 0;
@@ -348,9 +379,10 @@ void Enemy::DistanceFunction() {
 				}
 
 			}
+			//下側
 			if (blockMapPosY - j > 0) {
 				map[blockMapPosX - j][blockMapPosY] = 10;
-
+				//左側
 				if (playerPosition_.y > blockMapPosY) {
 					//ブロックより下にいる時
 					map[blockMapPosX - j][blockMapPosY - 1] = 0;
@@ -359,16 +391,68 @@ void Enemy::DistanceFunction() {
 
 				}
 				else {
-					/*/ブロックより上にいる時
-					map[blockMapPosX - j][blockMapPosY + 1] = 0;
-					map[blockMapPosX - j][blockMapPosY + 2] = 0;
-					map[blockMapPosX - j][blockMapPosY + 3] = 0;
-					*/
+					//ブロックより上にいる時
+					map[blockMapPosX - 1][blockMapPosY + 1] = 0;
+					map[blockMapPosX - 1][blockMapPosY + 2] = 0;
+					map[blockMapPosX - 1][blockMapPosY + 3] = 0;
+					map[blockMapPosX - 2][blockMapPosY + 1] = 0;
+					map[blockMapPosX - 2][blockMapPosY + 2] = 0;
+					map[blockMapPosX - 2][blockMapPosY + 3] = 0;
+					map[blockMapPosX - 3][blockMapPosY + 1] = 0;
+					map[blockMapPosX - 3][blockMapPosY + 2] = 0;
+					map[blockMapPosX - 3][blockMapPosY + 3] = 0;
+
 				}
 			}
 		}
 	}
 
+
+
+
+	//コピー
+	for (int y = 0; y < 36; ++y) {
+		for (int x = 0; x < 36; ++x) {
+			for (int i = 0; i < copy_.size(); ++i) {
+
+				//プレイヤーの位置からの差
+				int differenceX = x - int((36 + copy_[i]->GetWorldPosition().x) / 2.0f);
+				int differenceY = y - int((36 - copy_[i]->GetWorldPosition().y) / 2.0f);
+
+				//整数に直す
+				if (differenceX < 0) { differenceX *= -1; }
+				if (differenceY < 0) { differenceY *= -1; }
+
+				//脅威度の設定 3が自分の位置
+				
+				if (differenceX < 3 && differenceY < 3) {
+					if (map[x][y] <= 1) {
+						map[x][y] = 1;
+					}
+
+				}
+				if (differenceX < 2 && differenceY < 2) {
+					if (map[x][y] <= 2) {
+						map[x][y] = 2;
+					}
+
+				}
+				if (differenceX < 1 && differenceY < 1) {
+					if (map[x][y] <= 3) {
+						map[x][y] = 3;
+					}
+				}
+			}
+
+
+		}
+	}
+
+	
+	
+	
+	
+	
 
 
 	//敵の位置から最も近い0を検索
@@ -389,9 +473,6 @@ void Enemy::DistanceFunction() {
 					if (map[x][y] < map[int(enemyPosition_.x)][int(enemyPosition_.y)]) {
 						nextMapPosition_.x = float(x);
 						nextMapPosition_.y = float(y);
-						if (int(playerPosition_.y) != int(enemyPosition_.y)) {
-
-						}
 						break;
 					}
 				}
@@ -400,103 +481,79 @@ void Enemy::DistanceFunction() {
 					if (map[x][y] < map[int(enemyPosition_.x)][int(enemyPosition_.y)]) {
 						nextMapPosition_.x = float(x);
 						nextMapPosition_.y = float(y);
-						if (int(playerPosition_.y) != int(enemyPosition_.y)) {
-							//search_ = false;
-						}
+						
 						break;
 					}
 				}
-				if (differenceX <= 3 && differenceY <= 3 && y > 16) {
-
-					if (map[x][y] < map[int(enemyPosition_.x)][int(enemyPosition_.y)]) {
-						nextMapPosition_.x = float(x);
-						nextMapPosition_.y = float(y);
-						if (int(playerPosition_.y) != int(enemyPosition_.y)) {
-							//search_ = false;
-						}
-						break;
-					}
-
-
-				}
-
-				if (differenceX <= 4 && differenceY <= 4 && y > 16) {
-
-					if (map[x][y] < map[int(enemyPosition_.x)][int(enemyPosition_.y)]) {
-						nextMapPosition_.x = float(x);
-						nextMapPosition_.y = float(y);
-						if (int(playerPosition_.y) != int(enemyPosition_.y)) {
-							//search_ = false;
-						}
-						break;
-					}
-
-
-
-				}
+				
 				if (differenceX <= 5 && differenceY <= 5 && y > 16) {
 
-					if (map[x][y] < map[int(enemyPosition_.x)][int(enemyPosition_.y)]) {
-						nextMapPosition_.x = float(x);
-						nextMapPosition_.y = float(y);
-						break;
-					}
+				
 
 					for (int x = 1; x <= 3; x++) {
 						if (playerPosition_.y <= enemyPosition_.y) {
 							if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x < enemyPosition_.x) {
-								jump_ = true;
+								if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 3)] == 0) {
+									jump_ = true;
+								}
+								else {
+									jump_ = false;
+								}
 								break;
 							}
 							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x >= enemyPosition_.x) {
-								jump_ = true;
+								if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0) {
+									jump_ = true;
+								}
+								else {
+									jump_ = false;
+								}
 								break;
 							}
 						}
+
+						for (int i = 0; i < copy_.size(); ++i){
+
+							if (copy_[i]->GetWorldPosition().y <= enemyPosition_.y) {
+								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 1][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x < enemyPosition_.x) {
+									if (map[int(enemyPosition_.x) +2][int(enemyPosition_.y -3)] == 0 && (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 2)] == 10|| map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 2)] == 10)) {
+										jump_ = true;
+									}
+									else {
+										jump_ = false;
+									}
+									
+									break;
+								}
+								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 1][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x >= enemyPosition_.x) {
+									if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 && (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 2)] == 10 || map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 2)] == 10)) {
+										jump_ = true;
+									}
+									else {
+										jump_ = false;
+									}
+									break;
+								}
+							}
+						}
+
 
 					}
 
 
-					/*
-					for (int i = 0; i <= blockCount_; i++) {
-						int blockMapPosX = int(blockPosition_[i].x);
-						int blockMapPosY = int(blockPosition_[i].y);
-
-						if (playerPosition_.y > blockMapPosY) {
-							if (map[x][y] == 10) {
-								nextMapPosition_.x = float(x);
-								nextMapPosition_.y = float(y - 1);
-								break;
-							}
-						}
-						else {
-							if (map[x][y] == 10) {
-								nextMapPosition_.x = float(x);
-								nextMapPosition_.y = float(y + 1);
-								break;
-							}
-						}
-					}*/
+					
 
 
 				}
-
+				
 
 			}
 
-			if (!search_) {
-				//break;
-			}
+			
 
 
 		}
 	}
-
-
-
-
-
-
 
 
 	blockCount_ = 0;

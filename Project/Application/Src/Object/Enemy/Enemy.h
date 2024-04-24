@@ -5,6 +5,7 @@
 #include "Engine/Math/MathFunction.h"
 #include "Astar.h"
 #include <optional>
+#include "Application/Src/Object/Player/Copy.h"
 
 class Enemy : public Collider
 {
@@ -34,7 +35,8 @@ public:
 
 	//プレイヤー関連
 	void SetPlayerPosition(const Vector3& pos) { playerPosition_ = {(36 + pos.x)/2.0f ,(36 - pos.y)/2.0f ,pos.z}; };
-
+	void SetCopy(Copy* copy) {copy_.push_back(copy);};
+	void ClearCopy() { copy_.clear(); };
 	//ブロック関連
 	void SetBlockPosition(const Vector3& pos) { 
 		blockPosition_[blockCount_] = {(36 + pos.x) / 2.0f,(36 - pos.y) / 2.0f,pos.z};
@@ -107,6 +109,11 @@ private:
 	int map[36][36] = {};
 	//プレイヤー座標
 	Vector3 playerPosition_{};
+
+
+	//コピーの座標
+	std::vector<Copy*> copy_{};
+	int copyNum_;
 
 	//経路探索
 	std::vector<Node*> path_;
