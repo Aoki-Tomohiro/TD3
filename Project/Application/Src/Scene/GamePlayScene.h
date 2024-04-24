@@ -44,6 +44,8 @@ private:
 	void Updatacopy4();
 	void Updatacopy5();
 
+	void AddEnemy(const Vector3& position);
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -57,7 +59,7 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::unique_ptr<Enemy> enemy_ = nullptr;
+	std::vector<std::unique_ptr<Enemy>> enemies_{};
 
 
 	//衝突マネージャー
@@ -80,5 +82,8 @@ private:
 	std::unique_ptr<Sprite> contSprite_ = nullptr;
 	Vector2 spritePosition_ = { 0.0f,540.0f };
 	Vector2 spriteScale_ = { 360.0f,220.0f };
+
+	//パーティクルマネージャー
+	ParticleManager* particleManager_ = nullptr;
 };
 

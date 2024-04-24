@@ -2,6 +2,8 @@
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Base/ImGuiManager.h"
 
+int GameClearScene::copyCount_ = 0;
+
 void GameClearScene::Initialize() 
 {
 	renderer_ = Renderer::GetInstance();
@@ -90,6 +92,7 @@ void GameClearScene::Update()
 		{
 			sceneManager_->ChangeScene("GameTitleScene");
 			audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+			copyCount_ = 0;
 		}
 	}
 
@@ -97,6 +100,7 @@ void GameClearScene::Update()
 	{
 		sceneManager_->ChangeScene("GameTitleScene");
 		audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+		copyCount_ = 0;
 	}
 
 	ImGui::Begin("GameClearScene");

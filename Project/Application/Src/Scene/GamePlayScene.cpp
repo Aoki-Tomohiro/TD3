@@ -1,6 +1,7 @@
 #include "GamePlayScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Base/ImGuiManager.h"
+#include "Application/Src/Scene/GameClearScene.h"
 
 void GamePlayScene::Initialize()
 {
@@ -19,8 +20,9 @@ void GamePlayScene::Initialize()
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
 	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(enemyModel_.get());
+	AddEnemy({ 0.0f,2.0f,0.0f });
+	AddEnemy({ 10.0f,-10.0f,0.0f });
+	AddEnemy({ -10.0f,-10.0f,0.0f });
 
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
@@ -51,6 +53,10 @@ void GamePlayScene::Initialize()
 	//スプライトの生成
 	TextureManager::Load("cont.png");
 	contSprite_.reset(Sprite::Create("cont.png", spritePosition_));
+
+	//パーティクルマネージャーのインスタンスを取得
+	particleManager_ = ParticleManager::GetInstance();
+	particleManager_->Clear();
 }
 
 void GamePlayScene::Finalize()
@@ -68,22 +74,34 @@ void GamePlayScene::Update()
 	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 	for (const std::unique_ptr<Block>& block : blocks)
 	{
-		enemy_->SetBlockPosition(block.get()->GetWorldPosition());
-		enemy_->SetBlockSize(block.get()->GetSize());
+		for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		{
+			if (enemy->GetIsActive())
+			{
+				enemy->SetBlockPosition(block.get()->GetWorldPosition());
+				enemy->SetBlockSize(block.get()->GetSize());
+			}
+		}
 	}
 
 	//コピーの更新
 	copyManager_->Update();
 
 	//敵の更新
-	enemy_->SetPlayerPosition(player_->GetWorldPosition());
-	enemy_->ClearCopy();
-	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		enemy_->SetCopy(copy.get());
+		if (enemy->GetIsActive())
+		{
+			enemy->SetPlayerPosition(player_->GetWorldPosition());
+			enemy->ClearCopy();
+			for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+			{
+				enemy->SetCopy(copy.get());
+			}
+
+			enemy->Update();
+		}
 	}
-	
-	enemy_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();
@@ -92,7 +110,13 @@ void GamePlayScene::Update()
 	collisionManager_->ClearColliderList();
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
-	collisionManager_->SetColliderList(enemy_.get());
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsActive())
+		{
+			collisionManager_->SetColliderList(enemy.get());
+		}
+	}
 	//武器
 	if (player_->GetWeapon()->GetIsAttack())
 	{
@@ -103,8 +127,20 @@ void GamePlayScene::Update()
 	{
 		collisionManager_->SetColliderList(block.get());
 	}
+	//コピー
+	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+	{
+		collisionManager_->SetColliderList(copy.get());
+		if (copy->GetWeapon()->GetIsAttack())
+		{
+			collisionManager_->SetColliderList(copy->GetWeapon());
+		}
+	}
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
+
+	//パーティクルの更新
+	particleManager_->Update();
 
 	//プレイヤーが動けるとき
 	if (!player_->GetIsStop())
@@ -113,8 +149,23 @@ void GamePlayScene::Update()
 		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
 	}
 
+	//ゲームクリア
+	bool isClear = true;
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsActive())
+		{
+			isClear = false;
+		}
+	}
+	if (isClear)
+	{
+		sceneManager_->ChangeScene("GameClearScene");
+		GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
+	}
+
 	//リセット処理
-	if (player_->GetWeapon()->GetIsAttack())
+	if (player_->GetWeapon()->GetIsAttack() && !isClear)
 	{
 		Reset();
 	}
@@ -148,7 +199,13 @@ void GamePlayScene::Draw()
 	player_->Draw(camera_);
 
 	//敵の描画
-	enemy_->Draw(camera_);
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsActive())
+		{
+			enemy->Draw(camera_);
+		}
+	}
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
@@ -163,6 +220,9 @@ void GamePlayScene::Draw()
 #pragma region パーティクル描画
 	//パーティクル描画前処理
 	renderer_->PreDrawParticles();
+
+	//パーティクルの描画
+	particleManager_->Draw(camera_);
 
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
@@ -194,4 +254,17 @@ void GamePlayScene::Reset()
 	
 	//コピーをリセット
 	copyManager_->Reset();
+
+	//敵をリセット
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Reset();
+	}
+}
+
+void GamePlayScene::AddEnemy(const Vector3& position)
+{
+	Enemy* enemy = new Enemy();
+	enemy->Initialize(enemyModel_.get(), position);
+	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
 }

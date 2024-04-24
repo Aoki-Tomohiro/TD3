@@ -2,13 +2,15 @@
 #include "Engine/Base/ImGuiManager.h"
 #include <Engine/3D/Model/ModelManager.h>
 
-void Enemy::Initialize(Model* model)
+void Enemy::Initialize(Model* model, const Vector3& position)
 {
 	assert(model);
 	model_ = model;
 
 	worldTransform_.Initialize();
-	worldTransform_.translation_.y = 2.0f;
+	//worldTransform_.translation_.y = 2.0f;
+	worldTransform_.translation_ = position;
+	startPosition_ = position;
 
 	AABB aabb = {
 	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
@@ -33,6 +35,9 @@ void Enemy::Initialize(Model* model)
 
 	nextMapPosition_.x = (36 + worldTransform_.translation_.x) / 2.0f;
 	nextMapPosition_.y = (36 - worldTransform_.translation_.y) / 2.0f;
+
+	//パーティクルの初期化
+	particleSystem_ = ParticleManager::Create("Enemy");
 }
 
 void Enemy::Update()
@@ -107,6 +112,12 @@ void Enemy::Draw(const Camera& camera)
 {
 	model_->Draw(worldTransform_, camera);
 
+}
+
+void Enemy::Reset()
+{
+	isActive_ = true;
+	worldTransform_.translation_ = startPosition_;
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -628,6 +639,25 @@ void Enemy::OnCollision(Collider* collider)
 
 		worldTransform_.translation_ += overlapAxis * directionAxis;
 		worldTransform_.UpdateMatrixFromEuler();
+	}
+
+	if (collider->GetCollisionAttribute() == kCollisionAttributeWeapon)
+	{
+		ParticleEmitter* emitter = ParticleEmitterBuilder()
+			.SetDeleteTime(1.0f)
+			.SetPopArea({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+			.SetPopAzimuth(0.0f, 360.0f)
+			.SetPopColor({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f,1.0f })
+			.SetPopCount(100)
+			.SetPopElevation(0.0f, 0.0f)
+			.SetPopFrequency(2.0f)
+			.SetPopLifeTime(0.2f, 0.4f)
+			.SetPopScale({ 0.1f,0.1f,0.1f }, { 0.2f,0.2f,0.2f })
+			.SetPopVelocity({ 0.4f,0.4f,0.4f }, { 0.6f,0.6f,0.6f })
+			.SetTranslation(GetWorldPosition())
+			.Build();
+		particleSystem_->AddParticleEmitter(emitter);
+		isActive_ = false;
 	}
 }
 const Vector3 Enemy::GetWorldPosition() const

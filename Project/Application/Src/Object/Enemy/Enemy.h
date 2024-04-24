@@ -6,13 +6,14 @@
 #include "Astar.h"
 #include <optional>
 #include "Application/Src/Object/Player/Copy.h"
+#include "Engine/Components/Particle/ParticleManager.h"
 
 class Enemy : public Collider
 {
 public:
 	static const int kActiveTime = 60 * 10;
 
-	void Initialize(Model* model);
+	void Initialize(Model* model, const Vector3& position);
 
 	void Update();
 
@@ -48,6 +49,8 @@ public:
 		blockSizeCount_++;
 
 	}
+
+	void Reset();
 
 private:
 	//プレイヤーの状態
@@ -90,7 +93,7 @@ private:
 	Vector3 blockPosition_[36] = {};
 	Vector3 blockSize_[36] = {};
 
-	bool isActive_ = false;
+	bool isActive_ = true;
 
 	int activeTimer_ = 0;
 
@@ -122,5 +125,11 @@ private:
 	Vector3 nextPosition_;
 	Vector2 nextMapPosition_;
 	bool search_ = false;
+
+	//初期座標
+	Vector3 startPosition_{};
+
+	//パーティクル
+	ParticleSystem* particleSystem_ = nullptr;
 };
 

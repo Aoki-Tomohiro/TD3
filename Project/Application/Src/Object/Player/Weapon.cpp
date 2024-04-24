@@ -34,7 +34,7 @@ void Weapon::Update()
 	SetAABB(aabb);
 
 	//攻撃時に赤くする
-	Vector4 color = isAttack_ ? Vector4{ 1.0f,0.0f,0.0f,0.6f } : Vector4{ 0.0f,1.0f,1.0f,0.6f };
+	Vector4 color = isAttack_ ? Vector4{ 1.0f,0.0f,0.0f,0.3f } : Vector4{ 0.0f,1.0f,1.0f,0.3f };
 	model_->SetColor(color);
 
 	//ワールドトランスフォームの更新

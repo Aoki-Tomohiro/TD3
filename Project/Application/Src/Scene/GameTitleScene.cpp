@@ -22,6 +22,7 @@ void GameTitleScene::Initialize()
 	decisionHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Decision.wav");
 
 	//BGMの再生
+	audio_->StopAudio(bgmHandle_);
 	audio_->SoundPlayWave(bgmHandle_, true, 0.1f);
 }
 
