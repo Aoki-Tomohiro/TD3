@@ -79,7 +79,7 @@ void Copy::Draw(const Camera& camera)
 
 void Copy::Reset()
 {
-	currentIndex_ = 0;
+	//currentIndex_ = 0;
 	velocity_ = { 0.0f,0.0f,0.0f };
 }
 
@@ -136,4 +136,25 @@ const Vector3 Copy::GetWorldPosition() const
 	pos.y = worldTransform_.matWorld_.m[3][1];
 	pos.z = worldTransform_.matWorld_.m[3][2];
 	return pos;
+}
+
+void Copy::Reverse()
+{
+	if (currentIndex_ > 0)
+	{
+		Vector3 playerPosition{};
+		Quaternion quaternion{};
+		bool isAttack{};
+		std::tie(playerPosition, quaternion, isAttack) = playerPositions_[currentIndex_];
+		worldTransform_.translation_ = playerPosition;
+		worldTransform_.quaternion_ = quaternion;
+		weapon_->SetIsAttack(isAttack);
+		currentIndex_--;
+	}
+
+	//ワールドトランスフォームの行進
+	worldTransform_.UpdateMatrixFromQuaternion();
+
+	//武器の更新
+	weapon_->Update();
 }

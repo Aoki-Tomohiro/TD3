@@ -79,6 +79,9 @@ void Enemy::Update()
 
 	worldTransform_.UpdateMatrixFromEuler();
 
+	//座標を保存
+	positions_.push_back(worldTransform_.translation_);
+
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
@@ -117,7 +120,7 @@ void Enemy::Draw(const Camera& camera)
 void Enemy::Reset()
 {
 	isActive_ = true;
-	worldTransform_.translation_ = startPosition_;
+	//worldTransform_.translation_ = startPosition_;
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -586,6 +589,14 @@ void Enemy::FindPath() {
 	}
 
 }
+void Enemy::Reverse()
+{
+	if (!positions_.empty())
+	{
+		worldTransform_.translation_ = positions_.back();
+		positions_.pop_back();
+	}
+}
 void Enemy::OnCollision(Collider* collider)
 {
 	if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)
@@ -639,6 +650,11 @@ void Enemy::OnCollision(Collider* collider)
 
 		worldTransform_.translation_ += overlapAxis * directionAxis;
 		worldTransform_.UpdateMatrixFromEuler();
+		if (!positions_.empty())
+		{
+			Vector3& position = positions_.back();
+			position = worldTransform_.translation_;
+		}
 	}
 
 	if (collider->GetCollisionAttribute() == kCollisionAttributeWeapon)

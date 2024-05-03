@@ -36,6 +36,13 @@ public:
 
 	const bool GetIsStop() const { return isStop_; };
 
+	void SetPosition(const Vector3& position, const Quaternion& quaternion, const bool isAttack) { 
+		worldTransform_.translation_ = position;
+		worldTransform_.quaternion_ = quaternion; 
+		weapon_->SetIsAttack(isAttack);
+		worldTransform_.UpdateMatrixFromQuaternion();
+	}
+
 private:
 	enum class Behavior
 	{

@@ -22,6 +22,8 @@ public:
 
 	Weapon* GetWeapon() { return weapon_.get(); };
 
+	void Reverse();
+
 private:
 	Model* model_ = nullptr;
 

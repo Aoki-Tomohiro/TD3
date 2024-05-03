@@ -143,9 +143,9 @@ void Player::DrawUI(const Camera& camera)
 
 void Player::Reset()
 {
-	destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
-	worldTransform_.quaternion_ = destinationQuaternion_;
-	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
+	//destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+	//worldTransform_.quaternion_ = destinationQuaternion_;
+	//worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	isMove_ = true;
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };

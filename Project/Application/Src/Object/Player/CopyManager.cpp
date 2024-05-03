@@ -33,6 +33,23 @@ void CopyManager::Reset()
 		copy->Reset();
 	}
 
+	////新しいコピーの生成
+	//Copy* copy = new Copy();
+	//copy->Initialize(model_, playerPositions_);
+	//copies_.push_back(std::unique_ptr<Copy>(copy));
+	//playerPositions_.clear();
+}
+
+void CopyManager::Reverse()
+{
+	for (std::unique_ptr<Copy>& copy : copies_)
+	{
+		copy->Reverse();
+	}
+}
+
+void CopyManager::AddCopy()
+{
 	//新しいコピーの生成
 	Copy* copy = new Copy();
 	copy->Initialize(model_, playerPositions_);

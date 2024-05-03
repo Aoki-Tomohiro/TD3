@@ -66,113 +66,143 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
-	//プレイヤーの更新
-	player_->Update();
-
-	//ブロックの更新
-    blockManager_->Update();
-	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
-	for (const std::unique_ptr<Block>& block : blocks)
+	if (!isReversed_)
 	{
+		//プレイヤーの更新
+		player_->Update();
+
+		//ブロックの更新
+		blockManager_->Update();
+		const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
+		for (const std::unique_ptr<Block>& block : blocks)
+		{
+			for (const std::unique_ptr<Enemy>& enemy : enemies_)
+			{
+				if (enemy->GetIsActive())
+				{
+					enemy->SetBlockPosition(block.get()->GetWorldPosition());
+					enemy->SetBlockSize(block.get()->GetSize());
+				}
+			}
+		}
+
+		//コピーの更新
+		copyManager_->Update();
+
+		//敵の更新
 		for (const std::unique_ptr<Enemy>& enemy : enemies_)
 		{
 			if (enemy->GetIsActive())
 			{
-				enemy->SetBlockPosition(block.get()->GetWorldPosition());
-				enemy->SetBlockSize(block.get()->GetSize());
+				enemy->SetPlayerPosition(player_->GetWorldPosition());
+				enemy->ClearCopy();
+				for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+				{
+					enemy->SetCopy(copy.get());
+				}
+
+				enemy->Update();
 			}
 		}
-	}
 
-	//コピーの更新
-	copyManager_->Update();
+		//カメラの更新
+		camera_.UpdateMatrix();
 
-	//敵の更新
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
+		//コライダーをクリア
+		collisionManager_->ClearColliderList();
+		//プレイヤー
+		collisionManager_->SetColliderList(player_.get());
+		for (const std::unique_ptr<Enemy>& enemy : enemies_)
 		{
-			enemy->SetPlayerPosition(player_->GetWorldPosition());
-			enemy->ClearCopy();
-			for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+			if (enemy->GetIsActive())
 			{
-				enemy->SetCopy(copy.get());
+				collisionManager_->SetColliderList(enemy.get());
+			}
+		}
+		//武器
+		if (player_->GetWeapon()->GetIsAttack())
+		{
+			collisionManager_->SetColliderList(player_->GetWeapon());
+		}
+		//ブロック
+		for (const std::unique_ptr<Block>& block : blocks)
+		{
+			collisionManager_->SetColliderList(block.get());
+		}
+		//コピー
+		for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+		{
+			collisionManager_->SetColliderList(copy.get());
+			if (copy->GetWeapon()->GetIsAttack())
+			{
+				collisionManager_->SetColliderList(copy->GetWeapon());
+			}
+		}
+		//衝突判定
+		collisionManager_->CheckAllCollisions();
+
+		//プレイヤーが動けるとき
+		if (!player_->GetIsStop())
+		{
+			//プレイヤーの座標を保存
+			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
+		}
+
+		//ゲームクリア
+		bool isClear = true;
+		for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		{
+			if (enemy->GetIsActive())
+			{
+				isClear = false;
+			}
+		}
+		if (isClear)
+		{
+			sceneManager_->ChangeScene("GameClearScene");
+			GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
+		}
+
+		//リセット処理
+		if (player_->GetWeapon()->GetIsAttack() && !isClear)
+		{
+			reversePlayerPositions = copyManager_->GetPlayerPositions();
+			isReversed_ = true;
+			Reset();
+		}
+
+		//コントローラーのUIの座標とサイズを設定
+		contSprite_->SetPosition(spritePosition_);
+		contSprite_->SetSize(spriteScale_);
+	}
+	else
+	{
+		if (!reversePlayerPositions.empty())
+		{
+			//プレイヤーを逆再生
+			auto it = reversePlayerPositions.back();
+			reversePlayerPositions.pop_back();
+			player_->SetPosition(std::get<0>(it), std::get<1>(it), std::get<2>(it));
+			player_->GetWeapon()->Update();
+
+			//敵を逆再生
+			for (const std::unique_ptr<Enemy>& enemy : enemies_)
+			{
+				enemy->Reverse();
 			}
 
-			enemy->Update();
+			//コピーを逆再生
+			copyManager_->Reverse();
 		}
-	}
-
-	//カメラの更新
-	camera_.UpdateMatrix();
-
-	//コライダーをクリア
-	collisionManager_->ClearColliderList();
-	//プレイヤー
-	collisionManager_->SetColliderList(player_.get());
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
+		else
 		{
-			collisionManager_->SetColliderList(enemy.get());
+			isReversed_ = false;
+			copyManager_->AddCopy();
 		}
 	}
-	//武器
-	if (player_->GetWeapon()->GetIsAttack())
-	{
-		collisionManager_->SetColliderList(player_->GetWeapon());
-	}
-	//ブロック
-	for (const std::unique_ptr<Block>& block : blocks)
-	{
-		collisionManager_->SetColliderList(block.get());
-	}
-	//コピー
-	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
-	{
-		collisionManager_->SetColliderList(copy.get());
-		if (copy->GetWeapon()->GetIsAttack())
-		{
-			collisionManager_->SetColliderList(copy->GetWeapon());
-		}
-	}
-	//衝突判定
-	collisionManager_->CheckAllCollisions();
 
 	//パーティクルの更新
 	particleManager_->Update();
-
-	//プレイヤーが動けるとき
-	if (!player_->GetIsStop())
-	{
-		//プレイヤーの座標を保存
-		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
-	}
-
-	//ゲームクリア
-	bool isClear = true;
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
-		{
-			isClear = false;
-		}
-	}
-	if (isClear)
-	{
-		sceneManager_->ChangeScene("GameClearScene");
-		GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
-	}
-
-	//リセット処理
-	if (player_->GetWeapon()->GetIsAttack() && !isClear)
-	{
-		Reset();
-	}
-
-	//コントローラーのUIの座標とサイズを設定
-	contSprite_->SetPosition(spritePosition_);
-	contSprite_->SetSize(spriteScale_);
 
 	//ImGui
 	ImGui::Begin("GamePlayScene");
