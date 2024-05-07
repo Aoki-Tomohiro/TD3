@@ -142,6 +142,7 @@ void Copy::Reverse()
 {
 	if (currentIndex_ > 0)
 	{
+		currentIndex_--;
 		Vector3 playerPosition{};
 		Quaternion quaternion{};
 		bool isAttack{};
@@ -149,7 +150,6 @@ void Copy::Reverse()
 		worldTransform_.translation_ = playerPosition;
 		worldTransform_.quaternion_ = quaternion;
 		weapon_->SetIsAttack(isAttack);
-		currentIndex_--;
 	}
 
 	//ワールドトランスフォームの行進

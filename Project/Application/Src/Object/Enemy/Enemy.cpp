@@ -595,6 +595,7 @@ void Enemy::Reverse()
 	{
 		worldTransform_.translation_ = positions_.back();
 		positions_.pop_back();
+		worldTransform_.UpdateMatrixFromEuler();
 	}
 }
 void Enemy::OnCollision(Collider* collider)
