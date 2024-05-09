@@ -120,10 +120,7 @@ void GamePlayScene::Update()
 			}
 		}
 		//武器
-		if (player_->GetWeapon()->GetIsAttack())
-		{
-			collisionManager_->SetColliderList(player_->GetWeapon());
-		}
+		collisionManager_->SetColliderList(player_->GetWeapon());
 		//ブロック
 		for (const std::unique_ptr<Block>& block : blocks)
 		{
@@ -133,10 +130,7 @@ void GamePlayScene::Update()
 		for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
 		{
 			collisionManager_->SetColliderList(copy.get());
-			if (copy->GetWeapon()->GetIsAttack())
-			{
-				collisionManager_->SetColliderList(copy->GetWeapon());
-			}
+			collisionManager_->SetColliderList(copy->GetWeapon());
 		}
 		//衝突判定
 		collisionManager_->CheckAllCollisions();

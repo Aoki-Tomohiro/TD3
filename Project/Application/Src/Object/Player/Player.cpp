@@ -139,6 +139,9 @@ void Player::DrawUI(const Camera& camera)
 
 	//移動制限のスプライトを描画
 	movementRestrictionSprite_->Draw();
+
+	//武器のUIの描画
+	//weapon_->DrawUI(camera);
 }
 
 void Player::Reset()
