@@ -43,6 +43,8 @@ public:
 		worldTransform_.UpdateMatrixFromQuaternion();
 	}
 
+	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
+
 private:
 	enum class Behavior
 	{
@@ -132,5 +134,8 @@ private:
 	uint32_t attackAudioHandle_ = 0;
 	int moveAudioTimer_ = 0;
 	int moveAudioWaitTime_ = 20;
+
+	//チュートリアルかどうか
+	bool isTutorial_ = false;
 };
 

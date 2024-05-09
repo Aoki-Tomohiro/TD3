@@ -21,6 +21,14 @@ IScene* SceneFactory::CreateScene(const std::string& sceneName)
 	{
 		newScene = new GameOverScene();
 	}
+	else if (sceneName == "TutorialScene1")
+	{
+		newScene = new TutorialScene1();
+	}
+	else if (sceneName == "TutorialScene2")
+	{
+		newScene = new TutorialScene2();
+	}
 
 	return newScene;
 }

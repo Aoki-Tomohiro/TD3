@@ -42,37 +42,40 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 
 void Enemy::Update()
 {
-	DistanceFunction();
-	FindPath();
-
-	//Behaviorの遷移処理
-	if (behaviorRequest_)
+	if (!isTutorial_)
 	{
-		//振る舞いを変更する
-		behavior_ = behaviorRequest_.value();
-		//各振る舞いごとの初期化を実行
-		switch (behavior_) {
+		DistanceFunction();
+		FindPath();
+
+		//Behaviorの遷移処理
+		if (behaviorRequest_)
+		{
+			//振る舞いを変更する
+			behavior_ = behaviorRequest_.value();
+			//各振る舞いごとの初期化を実行
+			switch (behavior_) {
+			case Behavior::kRoot:
+			default:
+				BehaviorRootInitialize();
+				break;
+			case Behavior::kJump:
+				BehaviorJumpInitialize();
+				break;
+			}
+			behaviorRequest_ = std::nullopt;
+		}
+
+		//Behaviorの実行
+		switch (behavior_)
+		{
 		case Behavior::kRoot:
 		default:
-			BehaviorRootInitialize();
+			BehaviorRootUpdate();
 			break;
 		case Behavior::kJump:
-			BehaviorJumpInitialize();
+			BehaviorJumpUpdate();
 			break;
 		}
-		behaviorRequest_ = std::nullopt;
-	}
-
-	//Behaviorの実行
-	switch (behavior_)
-	{
-	case Behavior::kRoot:
-	default:
-		BehaviorRootUpdate();
-		break;
-	case Behavior::kJump:
-		BehaviorJumpUpdate();
-		break;
 	}
 
 
