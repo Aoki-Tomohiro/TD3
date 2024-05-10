@@ -57,11 +57,17 @@ void Weapon::Update()
 	}
 	model_->SetColor(color);
 
+	if (prePlayerPosition_ != playerPosition_)
+	{
+		prePlayerPosition_ = playerPosition_;
+		worldTransform_.translation_ = playerPosition_;
+	}
+
 	//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
 
 	//環境変数の適応
-	ApplyGlobalVariables();
+	//ApplyGlobalVariables();
 }
 
 void Weapon::Draw(const Camera& camera)
@@ -80,7 +86,7 @@ void Weapon::DrawUI(const Camera& camera)
 		Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
 		//スクリーン座標に変換
 		Vector3 offset = { 0.0f,4.0f,0.0f };
-		Vector3 spritePosition = { worldTransform_.parent_->matWorld_.m[3][0],worldTransform_.parent_->matWorld_.m[3][1],worldTransform_.parent_->matWorld_.m[3][2] };
+		Vector3 spritePosition = { playerPosition_.x,playerPosition_.y,playerPosition_.z };
 		spritePosition += offset;
 		spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
 		//スプライトに座標を設定

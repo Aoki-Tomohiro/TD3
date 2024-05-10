@@ -18,7 +18,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//武器の生成
 	weapon_ = std::make_unique<Weapon>();
 	weapon_->Initialize(models_[1]);
-	weapon_->SetParent(worldTransform_);
+	//weapon_->SetParent(worldTransform_);
 
 	//制限時間のスプライトの生成
 	movementRestrictionSprite_.reset(Sprite::Create("white.png", { 0.0f,0.0f }));
@@ -109,6 +109,7 @@ void Player::Update()
 	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//武器の更新
+	weapon_->SetPlayerPosition(GetWorldPosition());
 	weapon_->Update();
 
 	//環境変数の適用
