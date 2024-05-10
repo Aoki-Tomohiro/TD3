@@ -9,7 +9,9 @@ void Weapon::Initialize(Model* model)
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 0.0f,2.0f,5.0f };
-	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
+	worldTransform_.scale_ = { 0.1f,3.0f,3.0f };
+	worldTransformCollision_.Initialize();
+	worldTransformCollision_.scale_ = { 3.0f,3.0f,0.1f };
 
 	//スプライトの生成
 	TextureManager::Load("x.png");
@@ -35,9 +37,10 @@ void Weapon::Update()
 	xButtonSpriteVisible_ = false;
 
 	//AABBのサイズを設定
+	worldTransformCollision_.scale_ = { worldTransform_.scale_.z,worldTransform_.scale_.y,worldTransform_.scale_.x };
 	AABB aabb = {
-	.min{-worldTransform_.scale_.x, -worldTransform_.scale_.y, -worldTransform_.scale_.z},
-	.max{worldTransform_.scale_.x, worldTransform_.scale_.y,worldTransform_.scale_.z}
+	.min{-worldTransformCollision_.scale_.x, -worldTransformCollision_.scale_.y, -worldTransformCollision_.scale_.z},
+	.max{worldTransformCollision_.scale_.x, worldTransformCollision_.scale_.y,worldTransformCollision_.scale_.z}
 	};
 	SetAABB(aabb);
 
@@ -57,23 +60,24 @@ void Weapon::Update()
 	}
 	model_->SetColor(color);
 
-	if (prePlayerPosition_ != playerPosition_)
-	{
-		prePlayerPosition_ = playerPosition_;
-		worldTransform_.translation_ = playerPosition_;
-	}
+	//当たり判定の位置を決める
+	Vector3 offset{ 0.0f,2.0f,5.0f };
+	offset = Mathf::TransformNormal(offset, worldTransform_.parent_->matWorld_);
+	worldTransformCollision_.translation_ = worldTransform_.parent_->translation_;
+	worldTransformCollision_.translation_ += offset;
 
 	//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
+	worldTransformCollision_.UpdateMatrixFromEuler();
 
 	//環境変数の適応
-	//ApplyGlobalVariables();
+	ApplyGlobalVariables();
 }
 
 void Weapon::Draw(const Camera& camera)
 {
 	//モデルの描画
-	model_->Draw(worldTransform_, camera);
+	model_->Draw(worldTransformCollision_, camera);
 }
 
 void Weapon::DrawUI(const Camera& camera)
@@ -86,7 +90,7 @@ void Weapon::DrawUI(const Camera& camera)
 		Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
 		//スクリーン座標に変換
 		Vector3 offset = { 0.0f,4.0f,0.0f };
-		Vector3 spritePosition = { playerPosition_.x,playerPosition_.y,playerPosition_.z };
+		Vector3 spritePosition = { worldTransform_.parent_->translation_.x,worldTransform_.parent_->translation_.y,worldTransform_.parent_->translation_.z };
 		spritePosition += offset;
 		spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
 		//スプライトに座標を設定
@@ -107,9 +111,9 @@ void Weapon::OnCollision(Collider* collider)
 const Vector3 Weapon::GetWorldPosition() const
 {
 	Vector3 pos{};
-	pos.x = worldTransform_.matWorld_.m[3][0];
-	pos.y = worldTransform_.matWorld_.m[3][1];
-	pos.z = worldTransform_.matWorld_.m[3][2];
+	pos.x = worldTransformCollision_.matWorld_.m[3][0];
+	pos.y = worldTransformCollision_.matWorld_.m[3][1];
+	pos.z = worldTransformCollision_.matWorld_.m[3][2];
 	return pos;
 }
 

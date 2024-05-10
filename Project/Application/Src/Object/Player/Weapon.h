@@ -18,8 +18,6 @@ public:
 
 	void DrawUI(const Camera& camera);
 
-	void SetPlayerPosition(const Vector3& position) { playerPosition_ = position; };
-
 	void SetParent(const WorldTransform& parent) { worldTransform_.SetParent(&parent); };
 
 	void OnCollision(Collider* collider) override;
@@ -40,9 +38,7 @@ private:
 
 	WorldTransform worldTransform_{};
 
-	Vector3 playerPosition_{};
-
-	Vector3 prePlayerPosition_{};
+	WorldTransform worldTransformCollision_{};
 
 	bool isAttack_ = false;
 
