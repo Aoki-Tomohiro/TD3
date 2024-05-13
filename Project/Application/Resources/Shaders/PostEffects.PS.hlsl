@@ -18,12 +18,37 @@ struct Vignette
     float intensity;
 };
 
+struct GlitchNoise
+{
+    int32_t isEnable;
+    float32_t blockSize;
+    float32_t time;
+    float32_t noiseSpeed;
+    float32_t glitchIntensity;
+};
+
 Texture2D<float32_t4> gTexture : register(t0);
 Texture2D<float32_t4> gRenderedEffectsTexture : register(t1);
 SamplerState gSampler : register(s0);
 
 ConstantBuffer<LensDistortion> gLensDistortionParameter : register(b0);
 ConstantBuffer<Vignette> gVignetteParameter : register(b1);
+ConstantBuffer<GlitchNoise> gGlitchNoiseParameter : register(b2);
+
+float32_t random(float32_t2 seeds)
+{
+    return frac(sin(dot(seeds, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+float32_t blockNoise(float32_t2 seeds)
+{
+    return random(floor(seeds));
+}
+
+float32_t noiseRandom(float32_t2 seeds)
+{
+    return -1.0f + 2.0f * blockNoise(seeds);
+}
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
@@ -80,6 +105,21 @@ PixelShaderOutput main(VertexShaderOutput input)
         float2 uv = input.texcoord;
         uv = gVignetteParameter.intensity * uv - gVignetteParameter.intensity / 2;
         output.color *= 1.0 - dot(uv, uv);
+    }
+    
+    //float rand = frac(sin(dot(input.texcoord, float2(12.9898, 78.233))) * 43758.5453);
+    //output.color.rgb = lerp(output.color.rgb, output.color.rgb * rand, gVignetteParameter.intensity);
+    
+    if(gGlitchNoiseParameter.isEnable)
+    {
+        float32_t2 gv = input.texcoord;
+        float32_t noise = blockNoise(input.texcoord.y * gGlitchNoiseParameter.blockSize);
+        noise += random(input.texcoord.x) * 0.3f;
+        float32_t2 randomValue = noiseRandom(float32_t2(input.texcoord.y, gGlitchNoiseParameter.time * gGlitchNoiseParameter.noiseSpeed));
+        gv += randomValue * sin(sin(gGlitchNoiseParameter.glitchIntensity) * 0.5f) * sin(-sin(noise) * 0.2f) * frac(gGlitchNoiseParameter.time);
+        output.color.r = gTexture.Sample(gSampler, gv + float32_t2(0.002f, 0.0f)).r;
+        output.color.g = gTexture.Sample(gSampler, gv).g;
+        output.color.b = gTexture.Sample(gSampler, gv - float32_t2(0.004f, 0.0f)).b;
     }
     
     return output;

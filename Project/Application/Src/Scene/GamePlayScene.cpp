@@ -1,6 +1,7 @@
 #include "GamePlayScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Base/ImGuiManager.h"
+#include "Engine/Components/PostEffects/PostEffects.h"
 #include "Application/Src/Scene/GameClearScene.h"
 
 void GamePlayScene::Initialize()
@@ -168,6 +169,9 @@ void GamePlayScene::Update()
 		//コントローラーのUIの座標とサイズを設定
 		contSprite_->SetPosition(spritePosition_);
 		contSprite_->SetSize(spriteScale_);
+
+		//ノイズエフェクトを無効化
+		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 	}
 	else
 	{
@@ -187,6 +191,9 @@ void GamePlayScene::Update()
 
 			//コピーを逆再生
 			copyManager_->Reverse();
+
+			//ノイズエフェクトを有効化
+			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 		}
 		else
 		{

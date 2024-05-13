@@ -126,3 +126,12 @@ struct ConstBuffDataVignette
 	bool isEnable;
 	float intensity;
 };
+
+struct ConstBuffDataGlitchNoise
+{
+	bool isEnable;
+	float blockSize;
+	float time;
+	float noiseSpeed;
+	float glitchIntensity;
+};

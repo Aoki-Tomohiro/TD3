@@ -1,5 +1,6 @@
 #include "TutorialScene2.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include "Engine/Components/PostEffects/PostEffects.h"
 
 void TutorialScene2::Initialize()
 {
@@ -142,6 +143,9 @@ void TutorialScene2::Update()
 		//コントローラーのUIの座標とサイズを設定
 		contSprite_->SetPosition(spritePosition_);
 		contSprite_->SetSize(spriteScale_);
+
+		//ノイズエフェクトを無効化
+		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 	}
 	else
 	{
@@ -161,6 +165,9 @@ void TutorialScene2::Update()
 
 			//コピーを逆再生
 			copyManager_->Reverse();
+
+			//ノイズエフェクトを有効化
+			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 		}
 		else
 		{

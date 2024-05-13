@@ -4,6 +4,7 @@
 #include "Fog.h"
 #include "LensDistortion.h"
 #include "Vignette.h"
+#include "GlitchNoise.h"
 
 class PostEffects
 {
@@ -33,6 +34,8 @@ public:
 	LensDistortion* GetLensDistortion() const { return lensDistortion_.get(); };
 
 	Vignette* GetVignette() const { return vignette_.get(); };
+
+	GlitchNoise* GetGlitchNoise() const { return glitchNoise_.get(); };
 
 private:
 	PostEffects() = default;
@@ -66,6 +69,8 @@ private:
 	std::unique_ptr<LensDistortion> lensDistortion_ = nullptr;
 
 	std::unique_ptr<Vignette> vignette_ = nullptr;
+
+	std::unique_ptr<GlitchNoise> glitchNoise_ = nullptr;
 
 	bool isEnable_ = false;
 };
