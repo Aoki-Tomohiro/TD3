@@ -13,6 +13,7 @@ void Player::Initialzie(std::vector<Model*> models)
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
+	worldTransform_.translation_.y = -10.0f;
 	worldTransform_.quaternion_ = destinationQuaternion_;
 
 	//武器の生成
