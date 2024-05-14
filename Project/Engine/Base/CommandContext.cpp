@@ -80,6 +80,16 @@ void CommandContext::SetVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& vertexBuffe
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView);
 }
 
+void CommandContext::SetVertexBuffers(UINT startSlot, UINT count, const D3D12_VERTEX_BUFFER_VIEW vertexBufferViews[])
+{
+	commandList_->IASetVertexBuffers(startSlot, count, vertexBufferViews);
+}
+
+void CommandContext::SetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& indexBufferView)
+{
+	commandList_->IASetIndexBuffer(&indexBufferView);
+}
+
 void CommandContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY primitiveTopology)
 {
 	commandList_->IASetPrimitiveTopology(primitiveTopology);
@@ -116,6 +126,11 @@ void CommandContext::SetPipelineState(const PipelineState& pipelineState)
 void CommandContext::DrawInstanced(UINT vertexCount, UINT instanceCount)
 {
 	commandList_->DrawInstanced(vertexCount, instanceCount, 0, 0);
+}
+
+void CommandContext::DrawIndexedInstanced(UINT indexCount, UINT instanceCount)
+{
+	commandList_->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
 }
 
 void CommandContext::Close()

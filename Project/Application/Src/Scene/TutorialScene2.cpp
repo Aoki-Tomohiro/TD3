@@ -19,8 +19,8 @@ void TutorialScene2::Initialize()
 
 	//プレイヤーを生成
 	playerModel_.reset(ModelManager::Create());
-	playerModel_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
-	weaponModel_.reset(ModelManager::CreateFromOBJ("Cube", Transparent));
+	playerModel_->GetMaterial()->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
@@ -28,7 +28,7 @@ void TutorialScene2::Initialize()
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
-	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	enemyModel_->GetMaterial()->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	AddEnemy({ 12.0f,-10.0f,0.0f });
 	AddEnemy({ 12.0f,-3.0f,0.0f });
 
@@ -41,7 +41,7 @@ void TutorialScene2::Initialize()
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::Create());
-	copyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	copyModel_->GetMaterial()->SetColor({ 0.0f,1.0f,0.0f,1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize(copyModel_.get());
 

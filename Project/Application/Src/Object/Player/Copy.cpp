@@ -13,7 +13,7 @@ void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quater
 	playerPositions_ = playerPositions;
 
 	//武器の生成
-	weaponModel_.reset(ModelManager::CreateFromOBJ("Cube", Transparent));
+	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	weapon_ = std::make_unique<Weapon>();
 	weapon_->Initialize(weaponModel_.get());
 	weapon_->SetParent(worldTransform_);

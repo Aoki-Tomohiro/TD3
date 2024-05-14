@@ -27,8 +27,8 @@ void Player::Initialzie(std::vector<Model*> models)
 	movementRestrictionSprite_->SetSize(movementRestrictionSpriteSize_);
 
 	//音声データの読み込み
-	moveAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Move.wav");
-	attackAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Attack.wav");
+	moveAudioHandle_ = audio_->LoadAudioFile("Move.wav");
+	attackAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Attack.wav");
 
 	//衝突判定の初期化
 	AABB aabb = {
@@ -161,7 +161,7 @@ void Player::Reset()
 	isMove_ = true;
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };
-	models_[0]->SetColor(color);
+	models_[0]->GetMaterial()->SetColor(color);
 }
 
 void Player::OnCollision(Collider* collider)
@@ -272,7 +272,7 @@ void Player::BehaviorRootUpdate()
 		//移動中に音声を再生する
 		if (++moveAudioTimer_ > moveAudioWaitTime_)
 		{
-			audio_->SoundPlayWave(moveAudioHandle_, false, 0.4f);
+			audio_->PlayAudio(moveAudioHandle_, false, 0.4f);
 			moveAudioTimer_ = 0;
 		}
 	}
@@ -425,7 +425,7 @@ void Player::BehaviorAttackUpdate()
 {
 	//通常状態に戻る
 	behaviorRequest_ = Behavior::kRoot;
-	audio_->SoundPlayWave(attackAudioHandle_, false, 0.4f);
+	audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
 }
 
 void Player::UpdateMovementRestriction()
@@ -446,7 +446,7 @@ void Player::UpdateMovementRestriction()
 	{
 		//モデルの色を変更
 		Vector4 color = { 1.0f,0.25f,0.0f,1.0f };
-		models_[0]->SetColor(color);
+		models_[0]->GetMaterial()->SetColor(color);
 	}
 }
 

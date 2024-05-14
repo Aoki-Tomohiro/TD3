@@ -18,12 +18,12 @@ void GameTitleScene::Initialize()
 	titleSprite_.reset(Sprite::Create("Title.png", titleSpritePosition_));
 
 	//音声データの読み込み
-	bgmHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/BGM.wav");
-	decisionHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Decision.wav");
+	bgmHandle_ = audio_->LoadAudioFile("BGM.wav");
+	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	//BGMの再生
 	audio_->StopAudio(bgmHandle_);
-	audio_->SoundPlayWave(bgmHandle_, true, 0.1f);
+	audio_->PlayAudio(bgmHandle_, true, 0.1f);
 }
 
 void GameTitleScene::Finalize()
@@ -38,14 +38,14 @@ void GameTitleScene::Update()
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
 			sceneManager_->ChangeScene("TutorialScene1");
-			audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
 		sceneManager_->ChangeScene("TutorialScene1");
-		audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
 
 	//スプライトの座標を設定

@@ -30,7 +30,7 @@ public:
 
 	void SetModel(Model* model) { model_ = model; };
 
-	void SetTexture(const std::string& name) { model_ ? model_->SetTexture(name) : defaultModel_->SetTexture(name); };
+	void SetTexture(const std::string& name) { model_ ? model_->GetMaterial()->SetTexture(name) : defaultModel_->GetMaterial()->SetTexture(name); };
 
 private:
 	void CreateInstancingResource();

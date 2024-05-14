@@ -34,7 +34,7 @@ void GameClearScene::Initialize()
 	copyCountSprites_[1].reset(Sprite::Create("Numbers/0.png", copyCountSpritePositions_[1]));
 
 	//音声データの読み込み
-	decisionHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Decision.wav");
+	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 }
 
 void GameClearScene::Finalize() 
@@ -91,7 +91,7 @@ void GameClearScene::Update()
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
 			sceneManager_->ChangeScene("GameTitleScene");
-			audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			copyCount_ = 0;
 		}
 	}
@@ -99,7 +99,7 @@ void GameClearScene::Update()
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
 		sceneManager_->ChangeScene("GameTitleScene");
-		audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		copyCount_ = 0;
 	}
 

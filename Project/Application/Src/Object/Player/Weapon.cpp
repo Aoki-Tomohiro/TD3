@@ -58,7 +58,7 @@ void Weapon::Update()
 		SetCollisionAttribute(kCollisionAttributeNoWeapon);
 		SetCollisionMask(kCollisionMaskNoWeapon);
 	}
-	model_->SetColor(color);
+	model_->GetMaterial()->SetColor(color);
 
 	//当たり判定の位置を決める
 	Vector3 offset{ 0.0f,2.0f,5.0f };

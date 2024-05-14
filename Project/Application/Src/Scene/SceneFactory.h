@@ -4,6 +4,7 @@
 #include "GamePlayScene.h"
 #include "GameClearScene.h"
 #include "GameOverScene.h"
+#include "LoadScene.h"
 #include "TutorialScene1.h"
 #include "TutorialScene2.h"
 
