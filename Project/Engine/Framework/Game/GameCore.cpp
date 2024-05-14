@@ -128,6 +128,21 @@ void GameCore::Update()
 
 void GameCore::Draw()
 {
+	//ロードが短い場合はロード画面を表示しない
+	if (sceneManager_->GetLoadingScreenVisible() || isLoading_)
+	{
+		//ロードタイマーを進める
+		loadTimer_++;
+		if (loadTimer_ < 300)
+		{
+			return;
+		}
+	}
+	else
+	{
+		loadTimer_ = 0;
+	}
+
 	//描画前処理
 	renderer_->PreDraw();
 
@@ -181,7 +196,6 @@ void GameCore::Run()
 			}
 		}
 		});
-
 
 	//ゲームループ
 	while (true)

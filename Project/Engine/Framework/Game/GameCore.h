@@ -69,5 +69,7 @@ protected:
 	std::condition_variable condition2;
 
 	bool isLoading_ = false;
+
+	int loadTimer_ = 0;
 };
 
