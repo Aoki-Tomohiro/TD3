@@ -9,8 +9,12 @@ void Model::Create(const ModelData& modelData, const std::vector<Animation::Anim
 	modelData_ = modelData;
 
 	//メッシュの作成
-	mesh_ = std::make_unique<Mesh>();
-	mesh_->Initialize(modelData_.vertices, modelData_.indices);
+	for (uint32_t i = 0; i < modelData.vertices.size(); ++i)
+	{
+		Mesh* mesh = new Mesh();
+		mesh->Initialize(modelData_.vertices[i], modelData_.indices[i]);
+		meshes_.push_back(std::unique_ptr<Mesh>(mesh));
+	}
 
 	//マテリアルの作成
 	material_ = std::make_unique<Material>();
@@ -71,9 +75,12 @@ void Model::Draw(WorldTransform& worldTransform, const Camera& camera)
 	//レンダラーのインスタンスを取得
 	Renderer* renderer_ = Renderer::GetInstance();
 	//SortObjectの追加
-	renderer_->AddObject(mesh_->GetVertexBufferView(), skinCluster_.influenceBufferView, mesh_->GetIndexBufferView(), material_->GetConstantBuffer()->GetGpuVirtualAddress(),
-		worldTransform.GetConstantBuffer()->GetGpuVirtualAddress(), camera.GetConstantBuffer()->GetGpuVirtualAddress(),
-		material_->GetTexture()->GetSRVHandle(), skinCluster_.paletteResource->GetSRVHandle(), UINT(mesh_->GetIndicesSize()), drawPass_);
+	for (uint32_t i = 0; i < meshes_.size(); ++i)
+	{
+		renderer_->AddObject(meshes_[i]->GetVertexBufferView(), skinCluster_.influenceBufferView, meshes_[i]->GetIndexBufferView(), material_->GetConstantBuffer()->GetGpuVirtualAddress(),
+			worldTransform.GetConstantBuffer()->GetGpuVirtualAddress(), camera.GetConstantBuffer()->GetGpuVirtualAddress(),
+			material_->GetTexture()->GetSRVHandle(), skinCluster_.paletteResource->GetSRVHandle(), UINT(meshes_[i]->GetIndicesSize()), drawPass_);
+	}
 
 	//DebugObjectの追加
 	if (isDebug_ && !modelData_.skinClusterData.empty())

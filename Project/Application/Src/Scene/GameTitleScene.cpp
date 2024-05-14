@@ -24,6 +24,11 @@ void GameTitleScene::Initialize()
 	//BGMの再生
 	audio_->StopAudio(bgmHandle_);
 	audio_->PlayAudio(bgmHandle_, true, 0.1f);
+
+	//原稿
+	genkoModel_.reset(ModelManager::CreateFromModelFile("genko.obj", Opaque));
+	genkoWorldTransform_.Initialize();
+	camera_.Initialize();
 }
 
 void GameTitleScene::Finalize()
@@ -53,11 +58,19 @@ void GameTitleScene::Update()
 	titleSprite_->SetPosition(titleSpritePosition_);
 	titleSprite_->SetSize(titleSpriteSize_);
 
+	//ワールド行列の更新
+	genkoWorldTransform_.UpdateMatrixFromEuler();
+	//カメラの更新
+	camera_.UpdateMatrix();
+
 	ImGui::Begin("GameTitleScene");
 	ImGui::Text("A or SPACE : GamePlayScene");
 	ImGui::DragFloat2("PushASpritePosition", &pushASpritePosition_.x);
 	ImGui::DragFloat2("TitleSpritePosition", &titleSpritePosition_.x);
 	ImGui::DragFloat2("TitleSpriteSize", &titleSpriteSize_.x);
+	ImGui::DragFloat3("GenkoTranslate", &genkoWorldTransform_.translation_.x, 0.1f);
+	ImGui::DragFloat3("GenkoRotate", &genkoWorldTransform_.rotation_.x, 0.01f);
+	ImGui::DragFloat3("GenkoScale", &genkoWorldTransform_.scale_.x, 0.01f);
 	ImGui::End();
 }
 
@@ -75,6 +88,9 @@ void GameTitleScene::Draw()
 	renderer_->ClearDepthBuffer();
 
 #pragma region 3Dオブジェクト描画
+	//原稿の描画
+	genkoModel_->Draw(genkoWorldTransform_, camera_);
+
 	//3Dオブジェクト描画
 	renderer_->Render();
 #pragma endregion
@@ -94,14 +110,14 @@ void GameTitleScene::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//背景のスプライトの描画
-	backGroundSprite_->Draw();
+	////背景のスプライトの描画
+	//backGroundSprite_->Draw();
 
-	//タイトルのスプライトの描画
-	titleSprite_->Draw();
+	////タイトルのスプライトの描画
+	//titleSprite_->Draw();
 
-	//PushAのスプライトの描画
-	pushASprite_->Draw();
+	////PushAのスプライトの描画
+	//pushASprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

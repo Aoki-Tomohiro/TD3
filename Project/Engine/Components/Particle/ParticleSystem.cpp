@@ -39,7 +39,7 @@ void ParticleSystem::Draw(const Camera& camera)
 	UpdateInstancingResource(camera);
 	CommandContext* commandContext = GraphicsCore::GetInstance()->GetCommandContext();
 	Model* model = model_ ? model_ : defaultModel_.get();
-	commandContext->SetVertexBuffer(model->GetMesh()->GetVertexBufferView());
+	commandContext->SetVertexBuffer(model->GetMesh(0)->GetVertexBufferView());
 	commandContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandContext->SetConstantBuffer(0, model->GetMaterial()->GetConstantBuffer()->GetGpuVirtualAddress());
 	commandContext->SetDescriptorTable(1, instancingResource_->GetSRVHandle());

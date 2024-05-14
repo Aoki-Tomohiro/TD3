@@ -45,5 +45,9 @@ private:
 
 	//Vector2 titleSpriteSize_ = { 441.0f,251.0f };
 	Vector2 titleSpriteSize_ = { 661.0f,376.0f };
+
+	std::unique_ptr<Model> genkoModel_ = nullptr;
+	WorldTransform genkoWorldTransform_{};
+	Camera camera_{};
 };
 

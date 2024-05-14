@@ -26,8 +26,8 @@ public:
 	//モデルデータ構造体
 	struct ModelData {
 		std::map<std::string, JointWeightData> skinClusterData;
-		std::vector<VertexDataPosUVNormal> vertices;
-		std::vector<uint32_t> indices;
+		std::vector<std::vector<VertexDataPosUVNormal>> vertices;
+		std::vector<std::vector<uint32_t>> indices;
 		Material::MaterialData material;
 		Animation::Node rootNode;
 	};
@@ -68,7 +68,7 @@ public:
 
 	void SetIsDebug(const bool isDebug) { isDebug_ = isDebug; };
 
-	Mesh* GetMesh() { return mesh_.get(); };
+	Mesh* GetMesh(uint32_t index) { return meshes_[index].get(); };
 
 	Material* GetMaterial() { return material_.get(); };
 
@@ -88,7 +88,7 @@ private:
 
 	SkinCluster skinCluster_{};
 
-	std::unique_ptr<Mesh> mesh_ = nullptr;
+	std::vector<std::unique_ptr<Mesh>> meshes_{};
 
 	std::unique_ptr<Material> material_ = nullptr;
 
