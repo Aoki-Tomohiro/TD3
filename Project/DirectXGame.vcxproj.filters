@@ -162,7 +162,7 @@
     </Filter>
     <Filter Include="ヘッダー ファイル\Application\Object\Enemy">
       <UniqueIdentifier>{92b60e07-82b0-4ca3-8b45-a95413f3499e}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="ヘッダー ファイル\Application\Object\Player">
       <UniqueIdentifier>{393bb982-0ed7-445e-80cd-605cd2c7e209}</UniqueIdentifier>
     </Filter>
@@ -377,7 +377,7 @@
     </ClCompile>
     <ClCompile Include="Application\Src\Object\Enemy\Astar.cpp">
       <Filter>ソース ファイル</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Application\Src\Object\Player\Player.cpp">
       <Filter>ソース ファイル\Application\Object\Player</Filter>
     </ClCompile>
@@ -395,6 +395,15 @@
     </ClCompile>
     <ClCompile Include="Application\Src\Object\Player\CopyManager.cpp">
       <Filter>ソース ファイル\Application\Object\Copy</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Scene\TutorialScene1.cpp">
+      <Filter>ソース ファイル\Application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Scene\TutorialScene2.cpp">
+      <Filter>ソース ファイル\Application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\PostEffects\GlitchNoise.cpp">
+      <Filter>ソース ファイル\Engine\Components\PostEffects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -649,7 +658,7 @@
     </ClInclude>
     <ClInclude Include="Application\Src\Object\Enemy\Astar.h">
       <Filter>ヘッダー ファイル</Filter>
-	</ClInclude>	
+    </ClInclude>
     <ClInclude Include="Application\Src\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\Application\Object\Player</Filter>
     </ClInclude>
@@ -668,6 +677,15 @@
     <ClInclude Include="Application\Src\Object\Player\CopyManager.h">
       <Filter>ヘッダー ファイル\Application\Object\Copy</Filter>
     </ClInclude>
+    <ClInclude Include="Application\Src\Scene\TutorialScene1.h">
+      <Filter>ヘッダー ファイル\Application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Scene\TutorialScene2.h">
+      <Filter>ヘッダー ファイル\Application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\PostEffects\GlitchNoise.h">
+      <Filter>ヘッダー ファイル\Engine\Components\PostEffects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Engine\Externals\imgui\LICENSE.txt">
@@ -675,96 +693,96 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Project\Resources\Shaders\Bloom.hlsli">
+    <None Include="Application\Resources\Shaders\Bloom.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\DepthOfField.hlsli">
+    <None Include="Application\Resources\Shaders\DepthOfField.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\Fog.hlsli">
+    <None Include="Application\Resources\Shaders\Fog.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\HighLum.hlsli">
+    <None Include="Application\Resources\Shaders\HighLum.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\HorizontalBlur.hlsli">
+    <None Include="Application\Resources\Shaders\HorizontalBlur.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\Object3d.hlsli">
+    <None Include="Application\Resources\Shaders\Object3d.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\Particle.hlsli">
+    <None Include="Application\Resources\Shaders\Particle.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\PostEffects.hlsli">
+    <None Include="Application\Resources\Shaders\PostEffects.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\Sprite.hlsli">
+    <None Include="Application\Resources\Shaders\Sprite.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Project\Resources\Shaders\VerticalBlur.hlsli">
+    <None Include="Application\Resources\Shaders\VerticalBlur.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Project\Resources\Shaders\Bloom.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Bloom.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Bloom.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Bloom.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\DepthOfField.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\DepthOfField.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\DepthOfField.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\DepthOfField.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Fog.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Fog.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Fog.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Fog.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\HighLum.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\HighLum.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\HighLum.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\HighLum.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\HorizontalBlur.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\HorizontalBlur.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\HorizontalBlur.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\HorizontalBlur.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Object3d.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Object3d.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Object3d.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Object3d.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Particle.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Particle.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Particle.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Particle.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\PostEffects.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\PostEffects.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\PostEffects.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\PostEffects.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Sprite.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Sprite.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\Sprite.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\Sprite.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\VerticalBlur.PS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\VerticalBlur.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Project\Resources\Shaders\VerticalBlur.VS.hlsl">
+    <FxCompile Include="Application\Resources\Shaders\VerticalBlur.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

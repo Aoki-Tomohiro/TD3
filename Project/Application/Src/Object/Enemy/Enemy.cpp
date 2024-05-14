@@ -42,42 +42,48 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 
 void Enemy::Update()
 {
-	DistanceFunction();
-	FindPath();
-
-	//Behaviorの遷移処理
-	if (behaviorRequest_)
+	if (!isTutorial_)
 	{
-		//振る舞いを変更する
-		behavior_ = behaviorRequest_.value();
-		//各振る舞いごとの初期化を実行
-		switch (behavior_) {
+		DistanceFunction();
+		FindPath();
+
+		//Behaviorの遷移処理
+		if (behaviorRequest_)
+		{
+			//振る舞いを変更する
+			behavior_ = behaviorRequest_.value();
+			//各振る舞いごとの初期化を実行
+			switch (behavior_) {
+			case Behavior::kRoot:
+			default:
+				BehaviorRootInitialize();
+				break;
+			case Behavior::kJump:
+				BehaviorJumpInitialize();
+				break;
+			}
+			behaviorRequest_ = std::nullopt;
+		}
+
+		//Behaviorの実行
+		switch (behavior_)
+		{
 		case Behavior::kRoot:
 		default:
-			BehaviorRootInitialize();
+			BehaviorRootUpdate();
 			break;
 		case Behavior::kJump:
-			BehaviorJumpInitialize();
+			BehaviorJumpUpdate();
 			break;
 		}
-		behaviorRequest_ = std::nullopt;
-	}
-
-	//Behaviorの実行
-	switch (behavior_)
-	{
-	case Behavior::kRoot:
-	default:
-		BehaviorRootUpdate();
-		break;
-	case Behavior::kJump:
-		BehaviorJumpUpdate();
-		break;
 	}
 
 
 
 	worldTransform_.UpdateMatrixFromEuler();
+
+	//座標を保存
+	positions_.push_back(worldTransform_.translation_);
 
 
 	ImGui::Begin("Enemy");
@@ -117,7 +123,7 @@ void Enemy::Draw(const Camera& camera)
 void Enemy::Reset()
 {
 	isActive_ = true;
-	worldTransform_.translation_ = startPosition_;
+	//worldTransform_.translation_ = startPosition_;
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -586,6 +592,15 @@ void Enemy::FindPath() {
 	}
 
 }
+void Enemy::Reverse()
+{
+	if (!positions_.empty())
+	{
+		worldTransform_.translation_ = positions_.back();
+		positions_.pop_back();
+		worldTransform_.UpdateMatrixFromEuler();
+	}
+}
 void Enemy::OnCollision(Collider* collider)
 {
 	if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)
@@ -639,6 +654,11 @@ void Enemy::OnCollision(Collider* collider)
 
 		worldTransform_.translation_ += overlapAxis * directionAxis;
 		worldTransform_.UpdateMatrixFromEuler();
+		if (!positions_.empty())
+		{
+			Vector3& position = positions_.back();
+			position = worldTransform_.translation_;
+		}
 	}
 
 	if (collider->GetCollisionAttribute() == kCollisionAttributeWeapon)

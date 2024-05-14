@@ -1,10 +1,8 @@
-#include "GamePlayScene.h"
+#include "TutorialScene2.h"
 #include "Engine/Framework/Scene/SceneManager.h"
-#include "Engine/Base/ImGuiManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
-#include "Application/Src/Scene/GameClearScene.h"
 
-void GamePlayScene::Initialize()
+void TutorialScene2::Initialize()
 {
 	renderer_ = Renderer::GetInstance();
 
@@ -16,15 +14,6 @@ void GamePlayScene::Initialize()
 	camera_.Initialize();
 	camera_.fov_ = 45.0f * 3.141592654f / 180.0f;
 
-
-
-	//敵の生成
-	enemyModel_.reset(ModelManager::Create());
-	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	AddEnemy({ 0.0f,2.0f,0.0f });
-	AddEnemy({ 10.0f,-10.0f,0.0f });
-	AddEnemy({ -10.0f,-10.0f,0.0f });
-
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -35,15 +24,20 @@ void GamePlayScene::Initialize()
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
+	player_->SetIsTutorial(true);
+
+	//敵の生成
+	enemyModel_.reset(ModelManager::Create());
+	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	AddEnemy({ 12.0f,-10.0f,0.0f });
+	AddEnemy({ 12.0f,-3.0f,0.0f });
 
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
 	blockManager_ = std::make_unique<BlockManager>();
 	blockManager_->Initialize(blockModel_.get());
-	blockManager_->AddBlock({ -10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 0.0f,0.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
 	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+	blockManager_->AddBlock({ 12.0f,-5.0f,0.0f }, { 5.0f,1.0f,1.0f });
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::Create());
@@ -60,12 +54,11 @@ void GamePlayScene::Initialize()
 	particleManager_->Clear();
 }
 
-void GamePlayScene::Finalize()
+void TutorialScene2::Finalize()
 {
-
 }
 
-void GamePlayScene::Update()
+void TutorialScene2::Update()
 {
 	if (!isReversed_)
 	{
@@ -74,18 +67,6 @@ void GamePlayScene::Update()
 
 		//ブロックの更新
 		blockManager_->Update();
-		const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
-		for (const std::unique_ptr<Block>& block : blocks)
-		{
-			for (const std::unique_ptr<Enemy>& enemy : enemies_)
-			{
-				if (enemy->GetIsActive())
-				{
-					enemy->SetBlockPosition(block.get()->GetWorldPosition());
-					enemy->SetBlockSize(block.get()->GetSize());
-				}
-			}
-		}
 
 		//コピーの更新
 		copyManager_->Update();
@@ -95,13 +76,6 @@ void GamePlayScene::Update()
 		{
 			if (enemy->GetIsActive())
 			{
-				enemy->SetPlayerPosition(player_->GetWorldPosition());
-				enemy->ClearCopy();
-				for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
-				{
-					enemy->SetCopy(copy.get());
-				}
-
 				enemy->Update();
 			}
 		}
@@ -123,6 +97,7 @@ void GamePlayScene::Update()
 		//武器
 		collisionManager_->SetColliderList(player_->GetWeapon());
 		//ブロック
+		const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 		for (const std::unique_ptr<Block>& block : blocks)
 		{
 			collisionManager_->SetColliderList(block.get());
@@ -154,8 +129,7 @@ void GamePlayScene::Update()
 		}
 		if (isClear)
 		{
-			sceneManager_->ChangeScene("GameClearScene");
-			GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
+			sceneManager_->ChangeScene("GamePlayScene");
 		}
 
 		//リセット処理
@@ -201,18 +175,9 @@ void GamePlayScene::Update()
 			copyManager_->AddCopy();
 		}
 	}
-
-	//パーティクルの更新
-	particleManager_->Update();
-
-	//ImGui
-	ImGui::Begin("GamePlayScene");
-	ImGui::DragFloat2("SpritePosition", &spritePosition_.x, 0.1f);
-	ImGui::DragFloat2("SpriteScale", &spriteScale_.x, 0.01f);
-	ImGui::End();
 }
 
-void GamePlayScene::Draw()
+void TutorialScene2::Draw()
 {
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
@@ -260,7 +225,7 @@ void GamePlayScene::Draw()
 #pragma endregion
 }
 
-void GamePlayScene::DrawUI()
+void TutorialScene2::DrawUI()
 {
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
@@ -277,12 +242,11 @@ void GamePlayScene::DrawUI()
 #pragma endregion
 }
 
-
-void GamePlayScene::Reset()
+void TutorialScene2::Reset()
 {
 	//プレイヤーをリセット
 	player_->Reset();
-	
+
 	//コピーをリセット
 	copyManager_->Reset();
 
@@ -293,9 +257,10 @@ void GamePlayScene::Reset()
 	}
 }
 
-void GamePlayScene::AddEnemy(const Vector3& position)
+void TutorialScene2::AddEnemy(const Vector3& position)
 {
 	Enemy* enemy = new Enemy();
 	enemy->Initialize(enemyModel_.get(), position);
+	enemy->SetIsTutorial(true);
 	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
 }

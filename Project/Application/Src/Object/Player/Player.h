@@ -36,6 +36,15 @@ public:
 
 	const bool GetIsStop() const { return isStop_; };
 
+	void SetPosition(const Vector3& position, const Quaternion& quaternion, const bool isAttack) { 
+		worldTransform_.translation_ = position;
+		worldTransform_.quaternion_ = quaternion; 
+		weapon_->SetIsAttack(isAttack);
+		worldTransform_.UpdateMatrixFromQuaternion();
+	}
+
+	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
+
 private:
 	enum class Behavior
 	{
@@ -125,5 +134,8 @@ private:
 	uint32_t attackAudioHandle_ = 0;
 	int moveAudioTimer_ = 0;
 	int moveAudioWaitTime_ = 20;
+
+	//チュートリアルかどうか
+	bool isTutorial_ = false;
 };
 

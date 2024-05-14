@@ -52,6 +52,10 @@ public:
 
 	void Reset();
 
+	void Reverse();
+
+	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -131,5 +135,11 @@ private:
 
 	//パーティクル
 	ParticleSystem* particleSystem_ = nullptr;
+
+	//逆再生時の座標
+	std::vector<Vector3> positions_{};
+
+	//チュートリアルか
+	bool isTutorial_ = false;
 };
 

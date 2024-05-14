@@ -37,14 +37,14 @@ void GameTitleScene::Update()
 	{
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
-			sceneManager_->ChangeScene("GamePlayScene");
+			sceneManager_->ChangeScene("TutorialScene1");
 			audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
 		}
 	}
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
-		sceneManager_->ChangeScene("GamePlayScene");
+		sceneManager_->ChangeScene("TutorialScene1");
 		audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
 	}
 

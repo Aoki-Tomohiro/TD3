@@ -51,11 +51,14 @@ void Player::Initialzie(std::vector<Model*> models)
 
 void Player::Update()
 {
-	//動けない状態かつ着地している状態の時にストップフラグを立てる
-	isStop_ = !isMove_ && isLanded_;
+	if (!isTutorial_)
+	{
+		//動けない状態かつ着地している状態の時にストップフラグを立てる
+		isStop_ = !isMove_ && isLanded_;
 
-	//移動制限の処理
-	UpdateMovementRestriction();
+		//移動制限の処理
+		UpdateMovementRestriction();
+	}
 
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
@@ -134,18 +137,26 @@ void Player::Draw(const Camera& camera)
 
 void Player::DrawUI(const Camera& camera)
 {
-	//移動制限のスプライトの座標を設定
-	UpdateMovementRestrictionSprite(camera);
+	if (!isTutorial_)
+	{
+		//移動制限のスプライトの座標を設定
+		UpdateMovementRestrictionSprite(camera);
 
-	//移動制限のスプライトを描画
-	movementRestrictionSprite_->Draw();
+		//移動制限のスプライトを描画
+		movementRestrictionSprite_->Draw();
+	}
+	else
+	{
+		//武器のUIの描画
+		weapon_->DrawUI(camera);
+	}
 }
 
 void Player::Reset()
 {
-	destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
-	worldTransform_.quaternion_ = destinationQuaternion_;
-	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
+	//destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+	//worldTransform_.quaternion_ = destinationQuaternion_;
+	//worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	isMove_ = true;
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };
