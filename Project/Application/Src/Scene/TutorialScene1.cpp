@@ -18,7 +18,7 @@ void TutorialScene1::Initialize()
 
 	//プレイヤーを生成
 	playerModel_.reset(ModelManager::Create());
-	playerModel_->GetMaterial()->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+	playerModel_->GetMaterial(0)->SetColor({ 0.0f,0.0f,1.0f,1.0f });
 	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
@@ -27,7 +27,7 @@ void TutorialScene1::Initialize()
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
-	enemyModel_->GetMaterial()->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	Enemy* enemy = new Enemy();
 	enemy->Initialize(enemyModel_.get(), { 10.0f,-10.0f,0.0f });
 	enemy->SetIsTutorial(true);

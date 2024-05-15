@@ -25,10 +25,9 @@ public:
 
 	//モデルデータ構造体
 	struct ModelData {
-		std::map<std::string, JointWeightData> skinClusterData;
-		std::vector<std::vector<VertexDataPosUVNormal>> vertices;
-		std::vector<std::vector<uint32_t>> indices;
-		Material::MaterialData material;
+		std::vector<std::map<std::string, JointWeightData>> skinClusterData;
+		std::vector<Mesh::MeshData> meshData;
+		std::vector<Material::MaterialData> materialData;
 		Animation::Node rootNode;
 	};
 
@@ -68,14 +67,16 @@ public:
 
 	void SetIsDebug(const bool isDebug) { isDebug_ = isDebug; };
 
-	Mesh* GetMesh(uint32_t index) { return meshes_[index].get(); };
+	const size_t GetMeshCount() const { return meshes_.size(); };
 
-	Material* GetMaterial() { return material_.get(); };
+	Mesh* GetMesh(size_t index) { return meshes_[index].get(); };
+
+	Material* GetMaterial(size_t index) { return materials_[index].get(); };
 
 	Animation* GetAnimation() { return animation_.get(); };
 
 private:
-	SkinCluster CreateSkinCluster(const Animation::Skeleton& skeleton, const ModelData& modelData);
+	std::vector<Model::SkinCluster> CreateSkinCluster(const Animation::Skeleton& skeleton, const ModelData& modelData);
 
 	void CreateBoneLineVertices(const Animation::Skeleton& skeleton, int32_t parentIndex, std::vector<Vector4>& vertices);
 
@@ -86,11 +87,11 @@ private:
 private:
 	ModelData modelData_{};
 
-	SkinCluster skinCluster_{};
+	std::vector<Model::SkinCluster> skinClusters_{};
 
 	std::vector<std::unique_ptr<Mesh>> meshes_{};
 
-	std::unique_ptr<Material> material_ = nullptr;
+	std::vector<std::unique_ptr<Material>> materials_{};
 
 	std::unique_ptr<Animation> animation_ = nullptr;
 

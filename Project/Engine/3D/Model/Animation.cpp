@@ -33,9 +33,9 @@ void Animation::Update()
 
 void Animation::ApplyAnimation(const std::string& name, const uint32_t animationNumber)
 {
-	assert(animationNumber < animationData_.size());
 	if (animationData_.size() != 0)
 	{
+		assert(animationNumber < animationData_.size());
 		//アニメーションがある場合かつ再生中の場合
 		if (isPlay_)
 		{

@@ -62,6 +62,18 @@ void GameTitleScene::Update()
 	genkoWorldTransform_.UpdateMatrixFromEuler();
 	//カメラの更新
 	camera_.UpdateMatrix();
+	//モデルの更新
+	genkoModel_->Update(genkoWorldTransform_, 0);
+
+	//アニメーション
+	if (input_->IsPushKeyEnter(DIK_1))
+	{
+		genkoModel_->GetAnimation()->PlayAnimation();
+	}
+	else if (input_->IsPushKeyEnter(DIK_2))
+	{
+		genkoModel_->GetAnimation()->StopAnimation();
+	}
 
 	ImGui::Begin("GameTitleScene");
 	ImGui::Text("A or SPACE : GamePlayScene");

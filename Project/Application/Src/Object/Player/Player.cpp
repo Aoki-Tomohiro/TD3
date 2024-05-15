@@ -161,7 +161,7 @@ void Player::Reset()
 	isMove_ = true;
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };
-	models_[0]->GetMaterial()->SetColor(color);
+	models_[0]->GetMaterial(0)->SetColor(color);
 }
 
 void Player::OnCollision(Collider* collider)
@@ -446,7 +446,7 @@ void Player::UpdateMovementRestriction()
 	{
 		//モデルの色を変更
 		Vector4 color = { 1.0f,0.25f,0.0f,1.0f };
-		models_[0]->GetMaterial()->SetColor(color);
+		models_[0]->GetMaterial(0)->SetColor(color);
 	}
 }
 

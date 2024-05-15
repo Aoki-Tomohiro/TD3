@@ -20,7 +20,7 @@ void GamePlayScene::Initialize()
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::Create());
-	enemyModel_->GetMaterial()->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	AddEnemy({ 0.0f,2.0f,0.0f });
 	AddEnemy({ 10.0f,-10.0f,0.0f });
 	AddEnemy({ -10.0f,-10.0f,0.0f });
@@ -30,7 +30,7 @@ void GamePlayScene::Initialize()
 
 	//プレイヤーを生成
 	playerModel_.reset(ModelManager::Create());
-	playerModel_->GetMaterial()->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+	playerModel_->GetMaterial(0)->SetColor({ 0.0f,0.0f,1.0f,1.0f });
 	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
@@ -47,7 +47,7 @@ void GamePlayScene::Initialize()
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::Create());
-	copyModel_->GetMaterial()->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	copyModel_->GetMaterial(0)->SetColor({ 0.0f,1.0f,0.0f,1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize(copyModel_.get());
 

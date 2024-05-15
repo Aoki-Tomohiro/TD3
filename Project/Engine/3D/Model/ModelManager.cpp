@@ -86,14 +86,15 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 	assert(scene->HasMeshes());//メッシュがないのは対応しない
 
 	//Meshの解析
-	modelData.vertices.resize(scene->mNumMeshes);
-	modelData.indices.resize(scene->mNumMeshes);
+	modelData.meshData.resize(scene->mNumMeshes);
+	modelData.skinClusterData.resize(scene->mNumMeshes);
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
 	{
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());//法線がないMeshは今回は非対応
 		assert(mesh->HasTextureCoords(0));//TexcoordがないMeshは今回は非対応
-		modelData.vertices[meshIndex].resize(mesh->mNumVertices);//最初に頂点数分のメモリを確保しておく
+		modelData.meshData[meshIndex].vertices.resize(mesh->mNumVertices);//最初に頂点数分のメモリを確保しておく
+		modelData.meshData[meshIndex].materialIndex = mesh->mMaterialIndex;//マテリアルの番号を取得
 		//頂点を解析
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
 		{
@@ -101,9 +102,9 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
 			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 			//右手系->左手系への変換を忘れずに
-			modelData.vertices[meshIndex][vertexIndex].position = { -position.x,position.y,position.z,1.0f };
-			modelData.vertices[meshIndex][vertexIndex].normal = { -normal.x,normal.y,normal.z };
-			modelData.vertices[meshIndex][vertexIndex].texcoord = { texcoord.x,texcoord.y };
+			modelData.meshData[meshIndex].vertices[vertexIndex].position = { -position.x,position.y,position.z,1.0f };
+			modelData.meshData[meshIndex].vertices[vertexIndex].normal = { -normal.x,normal.y,normal.z };
+			modelData.meshData[meshIndex].vertices[vertexIndex].texcoord = { texcoord.x,texcoord.y };
 		}
 		//Indexを解析する
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex)
@@ -114,7 +115,7 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 			for (uint32_t element = 0; element < face.mNumIndices; ++element)
 			{
 				uint32_t vertexIndex = face.mIndices[element];
-				modelData.indices[meshIndex].push_back(vertexIndex);
+				modelData.meshData[meshIndex].indices.push_back(vertexIndex);
 			}
 		}
 		//SkinCluster構築用のデータを取得
@@ -123,7 +124,7 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 			//Jointごとに格納領域を作る
 			aiBone* bone = mesh->mBones[boneIndex];
 			std::string jointName = bone->mName.C_Str();
-			Model::JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
+			Model::JointWeightData& jointWeightData = modelData.skinClusterData[meshIndex][jointName];
 
 			//InverseBindPoseMatrixの抽出
 			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();//BindPoseMatrixに戻す
@@ -146,6 +147,7 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 	}
 
 	//Materialの解析
+	modelData.materialData.resize(scene->mNumMaterials);
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex)
 	{
 		aiMaterial* material = scene->mMaterials[materialIndex];
@@ -153,7 +155,7 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 		{
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.material.textureFilePath = directoryPath + "/" + textureFilePath.C_Str();
+			modelData.materialData[materialIndex].textureFilePath = directoryPath + "/" + textureFilePath.C_Str();
 		}
 	}
 
