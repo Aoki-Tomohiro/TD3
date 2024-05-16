@@ -83,6 +83,7 @@ private:
 
 	void ApplyGlobalVariables();
 
+	void Landing();
 private:
 	//インプット
 	Input* input_ = nullptr;
@@ -155,5 +156,17 @@ private:
 
 	//アニメーションタイム
 	float animationTime_ = 0.0f;
+
+	
+	//パーティクル
+	Vector3 prePos_;
+	ParticleSystem* particleSystem_;
+	Vector2 azimuth_ = {0,0};
+	Vector2 PopLifeTime = { 0.1f, 0.6f };
+	int PopCount = 1;
+	float PopFrequency = 4.0f;
+	float DeleteTime = 1.0f;
+	std::unique_ptr <Model> particleModel_;
+	bool landing_;
 };
 
