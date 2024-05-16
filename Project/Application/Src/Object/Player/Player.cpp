@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <Engine/Components/Particle/ParticleManager.h>
 
 void Player::Initialzie(std::vector<Model*> models)
 {
@@ -29,6 +30,11 @@ void Player::Initialzie(std::vector<Model*> models)
 	//音声データの読み込み
 	moveAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Move.wav");
 	attackAudioHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Attack.wav");
+
+	//パーティルの作成
+	particleSystem_ = ParticleManager::Create("Move");
+	//particleModel_.reset(ModelManager::CreateFromOBJ("BoxParticle", Opaque));
+	//particleSystem_->SetModel(particleModel_.get());
 
 	//衝突判定の初期化
 	AABB aabb = {
@@ -112,8 +118,28 @@ void Player::Update()
 	//武器の更新
 	weapon_->Update();
 
+	//着地のパーティクル
+	Landing();
+
 	//環境変数の適用
 	ApplyGlobalVariables();
+	
+	ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
+		.SetEmitterName("Move")
+		.SetTranslation({ 5.0f, 10.0f, 0.0f})
+		.SetPopArea({ -2.0f,0.0f,0.0f }, { 2.0f,0.0f,0.0f })
+		.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+		.SetPopScale({ 0.1f, 0.1f,0.1f }, { 0.3f ,0.3f ,0.3f })
+		.SetPopAzimuth(azimuth_.x,azimuth_.y)
+		.SetPopElevation(00.0f, 00.0f)
+		.SetPopVelocity({ 0.03f ,0.03f ,0.03f }, { 0.06f ,0.06f ,0.06f })
+		.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
+		.SetPopLifeTime(PopLifeTime.x, PopLifeTime.y)
+		.SetPopCount(PopCount)
+		.SetPopFrequency(PopFrequency)
+		.SetDeleteTime(DeleteTime)
+		.Build();
+	particleSystem_->AddParticleEmitter(newParticleEmitter);
 
 	//ImGui
 	ImGui::Begin("Player");
@@ -124,6 +150,14 @@ void Player::Update()
 	ImGui::Checkbox("isLanded", &isLanded_);
 	ImGui::Text("MovementRestrictionTimer : %d", movementRestrictionTimer_);
 	ImGui::DragInt("MoveSEWaitTime", &moveAudioWaitTime_);
+	if (ImGui::TreeNode("Particle")) {
+		ImGui::DragFloat2("Azimuth", &azimuth_.x, 1.0f, 0.0f, 360.0f);
+		ImGui::DragFloat2("PopLifeTime", &PopLifeTime.x,0.1f,0.1f,1.0f);
+		ImGui::DragInt("PopCount", &PopCount, 1,1, 20);
+		ImGui::DragFloat("PopFrequency", &PopFrequency,0.1f, 0.1f, 10.0f);
+		ImGui::DragFloat("DeleteTime", &DeleteTime,0.1f, 0.1f, 10.0f);
+		ImGui::TreePop();
+	}
 	ImGui::End();
 }
 
@@ -197,6 +231,7 @@ void Player::OnCollision(Collider* collider)
 		}
 		if (directionAxis.y == 1.0f)
 		{
+
 			velocity_.y = 0.0f;
 			isLanded_ = true;
 		}
@@ -275,6 +310,46 @@ void Player::BehaviorRootUpdate()
 			audio_->SoundPlayWave(moveAudioHandle_, false, 0.4f);
 			moveAudioTimer_ = 0;
 		}
+		
+		if (cross.y == 1)
+		{
+			
+			ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
+				.SetTranslation({ worldTransform_.translation_.x - 1.0f, worldTransform_.translation_.y-1.0f, worldTransform_.translation_.z})
+				.SetPopArea({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+				.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+				.SetPopScale({ 0.1f, 0.1f,0.1f }, { 0.3f ,0.3f ,0.3f })
+				.SetPopAzimuth(90.0f, 135.0f)
+				.SetPopElevation(0.0f, 0.0f)
+				.SetPopVelocity({ 0.03f ,0.03f ,0.03f }, { 0.06f ,0.06f ,0.06f })
+				.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
+				.SetPopLifeTime(0.1f, 0.6f)
+				.SetPopCount(1)
+				.SetPopFrequency(4.0f)
+				.SetDeleteTime(1.0f)
+				.Build();
+			particleSystem_->AddParticleEmitter(newParticleEmitter);
+		}
+		else if (cross.y == -1)
+		{
+			ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
+				.SetEmitterName("Move")
+				.SetTranslation({ worldTransform_.translation_.x + 1.0f, worldTransform_.translation_.y-1.0f, worldTransform_.translation_.z})
+				.SetPopArea({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+				.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+				.SetPopScale({ 0.1f, 0.1f,0.1f }, { 0.3f ,0.3f ,0.3f })
+				.SetPopAzimuth(0.0f, 0.0f)
+				.SetPopElevation(0.0f, 0.0f)
+				.SetPopVelocity({ 0.03f ,0.03f ,0.03f }, { 0.06f ,0.06f ,0.06f })
+				.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
+				.SetPopLifeTime(0.1f, 0.6f)
+				.SetPopCount(1)
+				.SetPopFrequency(4.0f)
+				.SetDeleteTime(1.0f)
+				.Build();
+ 			particleSystem_->AddParticleEmitter(newParticleEmitter);
+		}
+
 	}
 	else
 	{
@@ -297,6 +372,7 @@ void Player::BehaviorRootUpdate()
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;
 		isLanded_ = true;
+
 	}
 
 	//コントローラーが接続されているとき
@@ -392,6 +468,7 @@ void Player::BehaviorJumpUpdate()
 	//地面についたら通常状態に戻す
 	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
 	{
+	
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;
@@ -467,6 +544,66 @@ void Player::UpdateMovementRestrictionSprite(const Camera& camera)
 	Vector2 currentSize = { movementRestrictionSpriteSize_.x * float(movementRestrictionTimer_) / float(movementRestrictionTime_) ,movementRestrictionSpriteSize_.y };
 	currentSize.x = currentSize.x < 0 ? 0.0f : currentSize.x;
 	movementRestrictionSprite_->SetSize(currentSize);
+}
+
+void Player::Landing() {
+	if (velocity_.y == 0) {
+
+		if (prePos_.y != worldTransform_.translation_.y) {
+			prePos_.y = worldTransform_.translation_.y;
+			landing_ = true;
+			ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
+				.SetTranslation({ worldTransform_.translation_.x, worldTransform_.translation_.y - 1.5f, worldTransform_.translation_.z })
+				.SetPopArea({ -1.0f,0.0f,0.0f }, { 1.0f,0.0f,0.0f })
+				.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+				.SetPopScale({ 0.2f, 0.2f,0.2f }, { 0.4f ,0.4f ,0.4f })
+				.SetPopAzimuth(45.0f, 135.0f)
+				.SetPopElevation(0.0f, 0.0f)
+				.SetPopVelocity({ -0.05f ,0.05f ,0.05f }, { 0.05f ,0.08f ,0.08f })
+				.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
+				.SetPopLifeTime(0.1f, 1.0f)
+				.SetPopCount(30)
+				.SetPopFrequency(4.0f)
+				.SetDeleteTime(1.0f)
+				.Build();
+			particleSystem_->AddParticleEmitter(newParticleEmitter);
+		}
+		else {
+			landing_ = false;
+		}
+
+	}
+	else {
+
+		if (prePos_.y != worldTransform_.translation_.y) {
+			prePos_.y = worldTransform_.translation_.y;
+			if (!landing_ && velocity_.y == -0.05f) {
+				landing_ = true;
+
+				ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
+					.SetTranslation({ worldTransform_.translation_.x, worldTransform_.translation_.y - 1.5f, worldTransform_.translation_.z })
+					.SetPopArea({ -1.0f,0.0f,0.0f }, { 1.0f,0.0f,0.0f })
+					.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+					.SetPopScale({ 0.2f, 0.2f,0.2f }, { 0.4f ,0.4f ,0.4f })
+					.SetPopAzimuth(45.0f, 135.0f)
+					.SetPopElevation(0.0f, 0.0f)
+					.SetPopVelocity({ -0.05f ,0.05f ,0.05f }, { 0.05f ,0.08f ,0.08f })
+					.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
+					.SetPopLifeTime(0.1f, 1.0f)
+					.SetPopCount(30)
+					.SetPopFrequency(4.0f)
+					.SetDeleteTime(1.0f)
+					.Build();
+				particleSystem_->AddParticleEmitter(newParticleEmitter);
+			}
+
+		}
+		else
+		{
+			landing_ = false;
+		}
+
+	}
 }
 
 void Player::ApplyGlobalVariables()

@@ -175,6 +175,9 @@ void TutorialScene2::Update()
 			copyManager_->AddCopy();
 		}
 	}
+
+	//パーティクルの更新
+	particleManager_->Update();
 }
 
 void TutorialScene2::Draw()
