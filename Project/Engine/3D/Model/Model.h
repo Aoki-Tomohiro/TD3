@@ -103,7 +103,7 @@ private:
 
 	std::vector<Vector4> debugVertices_{};
 
-	bool isDebug_ = true;
+	bool isDebug_ = false;
 
 	friend class ParticleSystem;
 };
