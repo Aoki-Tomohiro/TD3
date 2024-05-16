@@ -191,7 +191,7 @@ private:
 	float speed_ = 60.0f;
 
 	//ループ再生中か
-	bool isLoop_ = false;
+	bool isLoop_ = true;
 
 	//再生中か
 	bool isPlay_ = false;

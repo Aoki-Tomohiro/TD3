@@ -22,7 +22,7 @@ void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quater
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,1.0f,1.0f}
+	.max{1.0f,2.0f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);

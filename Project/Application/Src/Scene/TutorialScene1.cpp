@@ -18,7 +18,7 @@ void TutorialScene1::Initialize()
 
 	//プレイヤーを生成
 	playerModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
-	playerModel_->GetMaterial(0)->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+	playerModel_->GetMaterial(0)->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();

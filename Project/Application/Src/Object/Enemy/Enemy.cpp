@@ -5,17 +5,21 @@
 void Enemy::Initialize(Model* model, const Vector3& position)
 {
 	assert(model);
-	model_ = model;
+	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	model_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	model_->GetAnimation()->PlayAnimation();
 
 	worldTransform_.Initialize();
 	//worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_ = position;
+	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 	startPosition_ = position;
 
+	//衝突判定の初期化
 	AABB aabb = {
 	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,1.0f,1.0f}
+	.max{1.0f,2.0f,1.0f}
 	};
 	//衝突属性を設定
 	SetAABB(aabb);
@@ -79,7 +83,9 @@ void Enemy::Update()
 		}
 	}
 
-	worldTransform_.UpdateMatrixFromEuler();
+	//ワールドトランスフォームの更新
+	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//モデルの更新
 	model_->Update(worldTransform_, animationNumber_);
@@ -134,6 +140,7 @@ void Enemy::Reset()
 void Enemy::BehaviorRootInitialize() {
 	moveCount_ = 0;
 	blockHit_ = true;
+	model_->GetAnimation()->SetLoop(true);
 }
 
 void Enemy::BehaviorRootUpdate() {
@@ -233,6 +240,19 @@ void Enemy::BehaviorRootUpdate() {
 
 		}
 
+		if (velocity_.x != 0.0f)
+		{
+			animationNumber_ = 3;
+			if (velocity_.x == 0.3f)
+			{
+				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+			}
+			else
+			{
+				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+			}
+		}
+
 		worldTransform_.translation_ += velocity_;
 
 		
@@ -249,7 +269,10 @@ void Enemy::BehaviorRootUpdate() {
 
 		moveCount_ = 10;
 	}
-
+	else
+	{
+		animationNumber_ = 1;
+	}
 
 	
 
@@ -274,6 +297,9 @@ void Enemy::BehaviorJumpInitialize()
 {
 	const float kJumpFirstSpeed = 0.8f;
 	velocity_.y = kJumpFirstSpeed;
+	model_->GetAnimation()->SetAnimationTime(0.0f);
+	model_->GetAnimation()->SetLoop(false);
+	animationNumber_ = 2;
 
 	/*
 	if (playerPosition_.y <= enemyPosition_.y) {
@@ -603,7 +629,7 @@ void Enemy::Reverse()
 	{
 		worldTransform_.translation_ = positions_.back();
 		positions_.pop_back();
-		worldTransform_.UpdateMatrixFromEuler();
+		worldTransform_.UpdateMatrixFromQuaternion();
 	}
 }
 void Enemy::OnCollision(Collider* collider)
@@ -658,7 +684,7 @@ void Enemy::OnCollision(Collider* collider)
 
 
 		worldTransform_.translation_ += overlapAxis * directionAxis;
-		worldTransform_.UpdateMatrixFromEuler();
+		worldTransform_.UpdateMatrixFromQuaternion();
 		if (!positions_.empty())
 		{
 			Vector3& position = positions_.back();

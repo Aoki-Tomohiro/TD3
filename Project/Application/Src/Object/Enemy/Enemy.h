@@ -81,7 +81,7 @@ private:
 
 
 private:
-	Model* model_ = nullptr;
+	std::unique_ptr<Model> model_ = nullptr;
 
 
 	WorldTransform worldTransform_{};
@@ -142,7 +142,7 @@ private:
 	//チュートリアルか
 	bool isTutorial_ = false;
 
-	uint32_t animationNumber_ = 0;
+	uint32_t animationNumber_ = 1;
 
 	float animationTime_ = 0.0f;
 

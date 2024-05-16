@@ -41,7 +41,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,1.0f,1.0f}
+	.max{1.0f,2.0f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);
@@ -154,22 +154,22 @@ void Player::Update()
 	//環境変数の適用
 	ApplyGlobalVariables();
 	
-	ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
-		.SetEmitterName("Move")
-		.SetTranslation({ 5.0f, 10.0f, 0.0f})
-		.SetPopArea({ -2.0f,0.0f,0.0f }, { 2.0f,0.0f,0.0f })
-		.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
-		.SetPopScale({ 0.1f, 0.1f,0.1f }, { 0.3f ,0.3f ,0.3f })
-		.SetPopAzimuth(azimuth_.x,azimuth_.y)
-		.SetPopElevation(00.0f, 00.0f)
-		.SetPopVelocity({ 0.03f ,0.03f ,0.03f }, { 0.06f ,0.06f ,0.06f })
-		.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
-		.SetPopLifeTime(PopLifeTime.x, PopLifeTime.y)
-		.SetPopCount(PopCount)
-		.SetPopFrequency(PopFrequency)
-		.SetDeleteTime(DeleteTime)
-		.Build();
-	particleSystem_->AddParticleEmitter(newParticleEmitter);
+	//ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
+	//	.SetEmitterName("Move")
+	//	.SetTranslation({ 5.0f, 10.0f, 0.0f})
+	//	.SetPopArea({ -2.0f,0.0f,0.0f }, { 2.0f,0.0f,0.0f })
+	//	.SetPopRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+	//	.SetPopScale({ 0.1f, 0.1f,0.1f }, { 0.3f ,0.3f ,0.3f })
+	//	.SetPopAzimuth(azimuth_.x,azimuth_.y)
+	//	.SetPopElevation(00.0f, 00.0f)
+	//	.SetPopVelocity({ 0.03f ,0.03f ,0.03f }, { 0.06f ,0.06f ,0.06f })
+	//	.SetPopColor({ 1.0f ,1.0f ,1.0f ,0.3f }, { 1.0f ,1.0f ,1.0f ,0.6f })
+	//	.SetPopLifeTime(PopLifeTime.x, PopLifeTime.y)
+	//	.SetPopCount(PopCount)
+	//	.SetPopFrequency(PopFrequency)
+	//	.SetDeleteTime(DeleteTime)
+	//	.Build();
+	//particleSystem_->AddParticleEmitter(newParticleEmitter);
 
 	//ImGui
 	ImGui::Begin("Player");
@@ -226,7 +226,7 @@ void Player::Reset()
 	//worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	isMove_ = true;
 	movementRestrictionTimer_ = movementRestrictionTime_;
-	Vector4 color = { 0.0f,0.0f,1.0f,1.0f };
+	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 	models_[0]->GetMaterial(0)->SetColor(color);
 }
 
@@ -577,7 +577,7 @@ void Player::UpdateMovementRestrictionSprite(const Camera& camera)
 	//ビュー行列とプロジェクション行列とビューポート行列を合成
 	Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
 	//スクリーン座標に変換
-	Vector3 offset = { 0.0f,3.0f,0.0f };
+	Vector3 offset = { 0.0f,4.0f,0.0f };
 	Vector3 spritePosition = GetWorldPosition() + offset;
 	spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
 	//スプライトに座標を設定
