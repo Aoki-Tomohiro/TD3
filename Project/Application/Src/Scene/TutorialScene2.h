@@ -6,6 +6,7 @@
 #include "Application/Src/Object/Enemy/Enemy.h"
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
+#include "Application/Src/Object/BackGround/BackGround.h"
 
 class TutorialScene2 : public IScene
 {
@@ -55,6 +56,10 @@ private:
 	std::unique_ptr<Model> copyModel_ = nullptr;
 	std::unique_ptr<CopyManager> copyManager_ = nullptr;
 
+	//背景
+	std::unique_ptr<Model> backGroundModel_ = nullptr;
+	std::unique_ptr<BackGround> backGround_ = nullptr;
+
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;
 
@@ -65,6 +70,6 @@ private:
 
 	//逆再生中か
 	bool isReversed_ = false;
-	std::vector<std::tuple<Vector3, Quaternion, bool>> reversePlayerPositions{};
+	std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>> reversePlayerPositions{};
 };
 

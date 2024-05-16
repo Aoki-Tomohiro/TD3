@@ -4,7 +4,7 @@
 
 Input* Input::instance_ = nullptr;
 
-Input* Input::GetInstance() 
+Input* Input::GetInstance()
 {
 	if (instance_ == nullptr) {
 		instance_ = new Input();
@@ -61,7 +61,7 @@ void Input::Initialize()
 	ZeroMemory(&preState_, sizeof(XINPUT_STATE));
 }
 
-void Input::Update() 
+void Input::Update()
 {
 	//前のフレームのキーボード入力を取得する
 	std::memcpy(preKey_, key_, 256);
@@ -79,6 +79,13 @@ void Input::Update()
 	keyboardDevice_->GetDeviceState(sizeof(key_), key_);
 	//マウスの入力状態を取得する
 	mouseDevice_->GetDeviceState(sizeof(DIMOUSESTATE), &mouse_);
+
+	//コントローラーの状態を取得
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		ZeroMemory(&state_, sizeof(XINPUT_STATE));
+	}
 }
 
 bool Input::IsPushKey(uint8_t keyNum)
@@ -97,7 +104,7 @@ bool Input::IsPushKeyEnter(uint8_t keyNum)
 	return false;
 }
 
-bool Input::IsPushKeyExit(uint8_t keyNum) 
+bool Input::IsPushKeyExit(uint8_t keyNum)
 {
 	if (key_[keyNum] == 0x00 && preKey_[keyNum] == 0x80) {
 		return true;
@@ -129,7 +136,7 @@ bool Input::IsPressMouseExit(int32_t mouseNum)
 	return false;
 }
 
-int32_t Input::GetWheel() 
+int32_t Input::GetWheel()
 {
 	return mouse_.lZ;
 }
@@ -143,50 +150,82 @@ bool Input::IsControllerConnected()
 	return false;
 }
 
-bool Input::IsPressButton(WORD button) 
+bool Input::IsPressButton(WORD button)
 {
-	if (state_.Gamepad.wButtons & button) {
-		return true;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		if (state_.Gamepad.wButtons & button) {
+			return true;
+		}
 	}
 	return false;
 }
 
-bool Input::IsPressButtonEnter(WORD button) 
+bool Input::IsPressButtonEnter(WORD button)
 {
-	if ((state_.Gamepad.wButtons & button) && !(preState_.Gamepad.wButtons & button)) {
-		return true;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		if ((state_.Gamepad.wButtons & button) && !(preState_.Gamepad.wButtons & button)) {
+			return true;
+		}
 	}
 	return false;
 }
 
-bool Input::IsPressButtonExit(WORD button) 
+bool Input::IsPressButtonExit(WORD button)
 {
-	if (!(state_.Gamepad.wButtons & button) && (preState_.Gamepad.wButtons & button)) {
-		return true;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		if (!(state_.Gamepad.wButtons & button) && (preState_.Gamepad.wButtons & button)) {
+			return true;
+		}
 	}
 	return false;
 }
 
 float Input::GetLeftStickX()
 {
-	float leftStickXValue = static_cast<float>(state_.Gamepad.sThumbLX) / SHRT_MAX;
-	return leftStickXValue;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		float leftStickXValue = static_cast<float>(state_.Gamepad.sThumbLX) / SHRT_MAX;
+		return leftStickXValue;
+	}
+	return 0;
 }
 
 float Input::GetLeftStickY()
 {
-	float leftStickYValue = static_cast<float>(state_.Gamepad.sThumbLY) / SHRT_MAX;
-	return leftStickYValue;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		float leftStickYValue = static_cast<float>(state_.Gamepad.sThumbLY) / SHRT_MAX;
+		return leftStickYValue;
+	}
+	return 0;
 }
 
 float Input::GetRightStickX()
 {
-	float rightStickXValue = static_cast<float>(state_.Gamepad.sThumbRX) / SHRT_MAX;
-	return rightStickXValue;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		float rightStickXValue = static_cast<float>(state_.Gamepad.sThumbRX) / SHRT_MAX;
+		return rightStickXValue;
+	}
+	return 0;
 }
 
 float Input::GetRightStickY()
 {
-	float rightStickYValue = static_cast<float>(state_.Gamepad.sThumbRY) / SHRT_MAX;
-	return rightStickYValue;
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS)
+	{
+		float rightStickYValue = static_cast<float>(state_.Gamepad.sThumbRY) / SHRT_MAX;
+		return rightStickYValue;
+	}
+	return 0;
 }

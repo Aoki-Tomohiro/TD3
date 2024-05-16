@@ -46,25 +46,44 @@ void Renderer::Initialize()
 	//モデル用のPSOの作成
 	CreateModelPipelineState();
 
+	//スキニングモデル用のPSOを作成
+	CreateSkinningModelPipelineState();
+
 	//スプライト用のPSOの作成
 	CreateSpritePipelineState();
 
 	//パーティクル用のPSOの作成
 	CreateParticlePipelineState();
+
+	//DebugObject用のPSOの作成
+	CreateDebugPipelineState();
 }
 
-void Renderer::AddObject(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, D3D12_GPU_VIRTUAL_ADDRESS materialCBV, D3D12_GPU_VIRTUAL_ADDRESS worldTransformCBV,
-	D3D12_GPU_VIRTUAL_ADDRESS cameraCBV, D3D12_GPU_DESCRIPTOR_HANDLE textureSRV, UINT vertexCount, DrawPass drawPass)
+void Renderer::AddObject(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, D3D12_VERTEX_BUFFER_VIEW influenceBufferView, D3D12_INDEX_BUFFER_VIEW indexBufferView, D3D12_GPU_VIRTUAL_ADDRESS materialCBV, D3D12_GPU_VIRTUAL_ADDRESS worldTransformCBV,
+	D3D12_GPU_VIRTUAL_ADDRESS cameraCBV, D3D12_GPU_DESCRIPTOR_HANDLE textureSRV, D3D12_GPU_DESCRIPTOR_HANDLE matrixPaletteSRV, UINT indexCount, DrawPass drawPass)
 {
 	SortObject sortObject{};
 	sortObject.vertexBufferView = vertexBufferView;
+	sortObject.influenceBufferView = influenceBufferView;
+	sortObject.indexBufferView = indexBufferView;
 	sortObject.materialCBV = materialCBV;
 	sortObject.worldTransformCBV = worldTransformCBV;
 	sortObject.cameraCBV = cameraCBV;
 	sortObject.textureSRV = textureSRV;
-	sortObject.vertexCount = vertexCount;
+	sortObject.matrixPaletteSRV = matrixPaletteSRV;
+	sortObject.indexCount = indexCount;
 	sortObject.type = drawPass;
 	sortObjects_.push_back(sortObject);
+}
+
+void Renderer::AddDebugObject(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, D3D12_GPU_VIRTUAL_ADDRESS worldTransformCBV, D3D12_GPU_VIRTUAL_ADDRESS cameraCBV, UINT vertexCount)
+{
+	DebugObject debugObject{};
+	debugObject.vertexBufferView = vertexBufferView;
+	debugObject.worldTransformCBV = worldTransformCBV;
+	debugObject.cameraCBV = cameraCBV;
+	debugObject.vertexCount = vertexCount;
+	debugObjects_.push_back(debugObject);
 }
 
 void Renderer::Render()
@@ -79,10 +98,10 @@ void Renderer::Render()
 	CommandContext* commandContext = GraphicsCore::GetInstance()->GetCommandContext();
 
 	//RootSignatureを設定
-	commandContext->SetRootSignature(modelRootSignature_);
+	commandContext->SetRootSignature(skinningModelRootSignature_);
 
 	//PipelineStateを設定
-	commandContext->SetPipelineState(modelPipelineStates_[currentRenderingType]);
+	commandContext->SetPipelineState(skinningModelPipelineStates_[currentRenderingType]);
 
 	//DirectionalLightを設定
 	commandContext->SetConstantBuffer(kDirectionalLight, lightManager_->GetConstantBuffer()->GetGpuVirtualAddress());
@@ -91,13 +110,19 @@ void Renderer::Render()
 		//不透明オブジェクトに切り替わったらPSOも変える
 		if (currentRenderingType != sortObject.type) {
 			currentRenderingType = sortObject.type;
-			commandContext->SetPipelineState(modelPipelineStates_[currentRenderingType]);
+			commandContext->SetPipelineState(skinningModelPipelineStates_[currentRenderingType]);
 		}
 
 		//VertexBufferViewを設定
-		commandContext->SetVertexBuffer(sortObject.vertexBufferView);
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferViews[2] = {
+			sortObject.vertexBufferView,//VertexDataのVBV
+			sortObject.influenceBufferView,//InfluenceのVBV
+		};
+		commandContext->SetVertexBuffers(0, 2, vertexBufferViews);
 		//形状を設定。PSOに設定しているものとは別。同じものを設定すると考えておけば良い
 		commandContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//IndexBufferViewを設定
+		commandContext->SetIndexBuffer(sortObject.indexBufferView);
 		//マテリアルを設定
 		commandContext->SetConstantBuffer(kMaterial, sortObject.materialCBV);
 		//WorldTransformを設定
@@ -106,12 +131,37 @@ void Renderer::Render()
 		commandContext->SetConstantBuffer(kCamera, sortObject.cameraCBV);
 		//Textureを設定
 		commandContext->SetDescriptorTable(kTexture, sortObject.textureSRV);
+		//MatrixPaletteを設定
+		commandContext->SetDescriptorTable(kMatrixPalette, sortObject.matrixPaletteSRV);
 		//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-		commandContext->DrawInstanced(sortObject.vertexCount, 1);
+		commandContext->DrawIndexedInstanced(sortObject.indexCount, 1);
 	}
 
 	//オブジェクトをリセット
 	sortObjects_.clear();
+
+	//RootSignatureを設定
+	commandContext->SetRootSignature(debugRootSignature_);
+
+	//PipelineStateを設定
+	commandContext->SetPipelineState(debugPipelineStates_[0]);
+
+	//DebugObjectの描画
+	for (const DebugObject& debugObject : debugObjects_) 
+	{
+		//VertexBufferViewを設定
+		commandContext->SetVertexBuffer(debugObject.vertexBufferView);
+		//形状を設定。PSOに設定しているものとは別。同じものを設定すると考えておけば良い
+		commandContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+		//WorldTransformを設定
+		commandContext->SetConstantBuffer(0, debugObject.worldTransformCBV);
+		//Cameraを設定
+		commandContext->SetConstantBuffer(1, debugObject.cameraCBV);
+		//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+		commandContext->DrawInstanced(debugObject.vertexCount, 1);
+	}
+
+	debugObjects_.clear();
 }
 
 void Renderer::PreDraw()
@@ -299,6 +349,120 @@ void Renderer::CreateModelPipelineState()
 		newPipelineState.SetDepthStencilState(depthStencilDesc);
 		newPipelineState.Finalize();
 		modelPipelineStates_.push_back(newPipelineState);
+	}
+}
+
+void Renderer::CreateSkinningModelPipelineState()
+{
+	//RootSignatureの作成
+	skinningModelRootSignature_.Create(6, 1);
+
+	//RootParameterを設定
+	skinningModelRootSignature_[0].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_PIXEL);
+	skinningModelRootSignature_[1].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_VERTEX);
+	skinningModelRootSignature_[2].InitAsConstantBuffer(1, D3D12_SHADER_VISIBILITY_VERTEX);
+	skinningModelRootSignature_[3].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+	skinningModelRootSignature_[4].InitAsConstantBuffer(1, D3D12_SHADER_VISIBILITY_PIXEL);
+	skinningModelRootSignature_[5].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1, D3D12_SHADER_VISIBILITY_VERTEX);
+
+	//StaticSamplerを設定
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[1]{};
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//バイリニアフィルタ
+	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//0~1の範囲外をリピート
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//比較しない
+	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipmapを使う
+	skinningModelRootSignature_.InitStaticSampler(0, staticSamplers[0], D3D12_SHADER_VISIBILITY_PIXEL);
+	skinningModelRootSignature_.Finalize();
+
+	//InputLayout
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[5]{};
+	inputElementDescs[0].SemanticName = "POSITION";
+	inputElementDescs[0].SemanticIndex = 0;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[1].SemanticName = "TEXCOORD";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[2].SemanticName = "NORMAL";
+	inputElementDescs[2].SemanticIndex = 0;
+	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[3].SemanticName = "WEIGHT";
+	inputElementDescs[3].SemanticIndex = 0;
+	inputElementDescs[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;//float32_t4
+	inputElementDescs[3].InputSlot = 1;//1番目のslotのVBVのことだと伝える
+	inputElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[4].SemanticName = "INDEX";
+	inputElementDescs[4].SemanticIndex = 0;
+	inputElementDescs[4].Format = DXGI_FORMAT_R32G32B32A32_SINT;//int32_t4
+	inputElementDescs[4].InputSlot = 1;//1番目のslotのVBVのことだと伝える
+	inputElementDescs[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	//Shaderをコンパイルする
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ShaderCompiler::CompileShader(L"SkinningObject3d.VS.hlsl", L"vs_6_0");
+	assert(vertexShaderBlob != nullptr);
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = ShaderCompiler::CompileShader(L"Object3d.PS.hlsl", L"ps_6_0");
+	assert(pixelShaderBlob != nullptr);
+
+	//BlendStateの設定
+	D3D12_BLEND_DESC blendDesc[2]{};
+	//すべての色要素を書き込む
+	blendDesc[0].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//透明オブジェクトのBlendStateの設定
+	blendDesc[1].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//共通設定
+	blendDesc[1].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[1].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[1].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[1].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	//半透明合成
+	blendDesc[1].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[1].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
+	blendDesc[1].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
+
+	//RasterizerStateの設定
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
+	//裏面(時計回り)を表示しない
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//三角形の中を塗りつぶす
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+	//DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//Depthの機能を有効化する
+	depthStencilDesc.DepthEnable = true;
+	//書き込みします
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	//比較関数はLessEqual。つまり、近ければ描画される
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	//書き込むRTVの情報
+	DXGI_FORMAT rtvFormats[2];
+	rtvFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	rtvFormats[1] = DXGI_FORMAT_R32_FLOAT;
+
+	//PSOを作成する
+	for (uint32_t i = 0; i < 2; i++) {
+		PipelineState newPipelineState;
+		newPipelineState.SetRootSignature(&skinningModelRootSignature_);
+		newPipelineState.SetInputLayout(5, inputElementDescs);
+		newPipelineState.SetVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize());
+		newPipelineState.SetPixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize());
+		newPipelineState.SetBlendState(blendDesc[i]);
+		newPipelineState.SetRasterizerState(rasterizerDesc);
+		newPipelineState.SetRenderTargetFormats(2, rtvFormats, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		newPipelineState.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+		newPipelineState.SetSampleMask(D3D12_DEFAULT_SAMPLE_MASK);
+		newPipelineState.SetDepthStencilState(depthStencilDesc);
+		newPipelineState.Finalize();
+		skinningModelPipelineStates_.push_back(newPipelineState);
 	}
 }
 
@@ -517,6 +681,75 @@ void Renderer::CreateParticlePipelineState()
 	newPipelineState.SetDepthStencilState(depthStencilDesc);
 	newPipelineState.Finalize();
 	particlePipelineStates_.push_back(newPipelineState);
+}
+
+void Renderer::CreateDebugPipelineState()
+{
+	debugRootSignature_.Create(2, 0);
+	debugRootSignature_[0].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_VERTEX);
+	debugRootSignature_[1].InitAsConstantBuffer(1, D3D12_SHADER_VISIBILITY_VERTEX);
+	debugRootSignature_.Finalize();
+
+	//InputLayout
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
+	inputElementDescs[0].SemanticName = "POSITION";
+	inputElementDescs[0].SemanticIndex = 0;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	//BlendStateの設定
+	D3D12_BLEND_DESC blendDesc{};
+	//すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//共通設定
+	blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	//加算合成
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの値を100%使う
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの値を100%使う
+
+	//RasterizerStateの設定
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
+	//裏面(時計回り)を表示しない
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//三角形の中を塗りつぶす
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+	//Shaderをコンパイルする
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = ShaderCompiler::CompileShader(L"DebugObject3d.VS.hlsl", L"vs_6_0");
+	assert(vertexShaderBlob != nullptr);
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = ShaderCompiler::CompileShader(L"DebugObject3d.PS.hlsl", L"ps_6_0");
+	assert(pixelShaderBlob != nullptr);
+
+	//DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//Depthの機能を無効化する
+	depthStencilDesc.DepthEnable = false;
+	//書き込みしない
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//比較関数はLessEqual。つまり、近ければ描画される
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	//書き込むRTVの情報
+	DXGI_FORMAT rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+	//PSOの作成
+	PipelineState newPipelineState;
+	newPipelineState.SetRootSignature(&debugRootSignature_);
+	newPipelineState.SetInputLayout(1, inputElementDescs);
+	newPipelineState.SetVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize());
+	newPipelineState.SetPixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize());
+	newPipelineState.SetBlendState(blendDesc);
+	newPipelineState.SetRasterizerState(rasterizerDesc);
+	newPipelineState.SetRenderTargetFormats(1, &rtvFormat, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	newPipelineState.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	newPipelineState.SetSampleMask(D3D12_DEFAULT_SAMPLE_MASK);
+	newPipelineState.SetDepthStencilState(depthStencilDesc);
+	newPipelineState.Finalize();
+	debugPipelineStates_.push_back(newPipelineState);
 }
 
 void Renderer::Sort()

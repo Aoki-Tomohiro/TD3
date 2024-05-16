@@ -16,6 +16,10 @@ public:
 
 	void SetIsEnable(const bool isEnable) { isEnable_ = isEnable; };
 
+	const float GetScale() const { return scale_; };
+
+	void SetScale(const float scale) { scale_ = scale; };
+
 	const float GetIntensity() const { return intensity_; };
 
 	void SetIntensity(const float intensity) { intensity_ = intensity; };
@@ -25,6 +29,8 @@ private:
 
 	bool isEnable_ = false;
 
-	float intensity_ = 1.0f;
+	float scale_ = 16.0f;
+
+	float intensity_ = 0.8f;
 };
 

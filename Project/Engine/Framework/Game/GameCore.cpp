@@ -104,6 +104,12 @@ void GameCore::Update()
 	//ImGui受け付け開始
 	imguiManager_->Begin();
 
+	//ロードシーンに切り替え
+	if (sceneManager_->GetLoadingScreenVisible())
+	{
+		isLoading_ = true;
+	}
+
 	//SceneManagerの更新
 	sceneManager_->Update();
 
@@ -122,6 +128,21 @@ void GameCore::Update()
 
 void GameCore::Draw()
 {
+	//ロードが短い場合はロード画面を表示しない
+	if (sceneManager_->GetLoadingScreenVisible() || isLoading_)
+	{
+		//ロードタイマーを進める
+		loadTimer_++;
+		if (loadTimer_ < 300)
+		{
+			return;
+		}
+	}
+	else
+	{
+		loadTimer_ = 0;
+	}
+
 	//描画前処理
 	renderer_->PreDraw();
 
@@ -161,6 +182,21 @@ void GameCore::Run()
 	//初期化
 	Initialize();
 
+	bool exit = false;
+	//バックグラウンドループ
+	std::thread th([&]() {
+		while (!exit)
+		{
+			std::unique_lock<std::mutex> uniqueLock(mutex);
+			condition.wait(uniqueLock, [&]() {return true; });
+			if (isLoading_)
+			{
+				sceneManager_->Load();
+				isLoading_ = false;
+			}
+		}
+		});
+
 	//ゲームループ
 	while (true)
 	{
@@ -178,5 +214,7 @@ void GameCore::Run()
 	}
 
 	//終了
+	exit = true;
+	th.join();
 	Finalize();
 }

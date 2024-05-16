@@ -11,6 +11,7 @@ void Vignette::Update()
 {
 	ConstBuffDataVignette* vignetteData = static_cast<ConstBuffDataVignette*>(constBuff_->Map());
 	vignetteData->isEnable = isEnable_;
+	vignetteData->scale = scale_;
 	vignetteData->intensity = intensity_;
 	constBuff_->Unmap();
 }

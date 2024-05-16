@@ -56,6 +56,10 @@ void PostEffects::Initialize()
 	fog_ = std::make_unique<Fog>();
 	fog_->Initialize();
 
+	//GrayScaleの初期化
+	grayScale_ = std::make_unique<GrayScale>();
+	grayScale_->Initialize();
+
 	//GlitchNoiseの初期化
 	glitchNoise_ = std::make_unique<GlitchNoise>();
 	glitchNoise_->Initialize();
@@ -77,6 +81,9 @@ void PostEffects::Update()
 
 	//Vignetteの更新
 	vignette_->Update();
+
+	//GrayScaleの更新
+	grayScale_->Update();
 
 	//GlitchNoiseの更新
 	glitchNoise_->Update();
@@ -127,7 +134,8 @@ void PostEffects::Draw()
 	//CBVを設定
 	commandContext->SetConstantBuffer(2, lensDistortion_->GetConstBuffer()->GetGpuVirtualAddress());
 	commandContext->SetConstantBuffer(3, vignette_->GetConstBuffer()->GetGpuVirtualAddress());
-	commandContext->SetConstantBuffer(4, glitchNoise_->GetConstBuffer()->GetGpuVirtualAddress());
+	commandContext->SetConstantBuffer(4, grayScale_->GetConstBuffer()->GetGpuVirtualAddress());
+	commandContext->SetConstantBuffer(5, glitchNoise_->GetConstBuffer()->GetGpuVirtualAddress());
 
 	//DrawCall
 	commandContext->DrawInstanced(6, 1);
@@ -162,7 +170,7 @@ void PostEffects::CreateVertexBuffer()
 void PostEffects::CreatePipelineState()
 {
 	//RootSignatureの作成
-	rootSignature_.Create(5, 1);
+	rootSignature_.Create(6, 1);
 
 	//RootParameterの設定
 	rootSignature_[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
@@ -170,6 +178,7 @@ void PostEffects::CreatePipelineState()
 	rootSignature_[2].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSignature_[3].InitAsConstantBuffer(1, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSignature_[4].InitAsConstantBuffer(2, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSignature_[5].InitAsConstantBuffer(3, D3D12_SHADER_VISIBILITY_PIXEL);
 
 	//StaticSamplerを設定
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1]{};

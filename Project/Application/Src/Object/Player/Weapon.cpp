@@ -58,10 +58,10 @@ void Weapon::Update()
 		SetCollisionAttribute(kCollisionAttributeNoWeapon);
 		SetCollisionMask(kCollisionMaskNoWeapon);
 	}
-	model_->SetColor(color);
+	model_->GetMaterial(1)->SetColor(color);
 
 	//当たり判定の位置を決める
-	Vector3 offset{ 0.0f,2.0f,5.0f };
+	Vector3 offset{ 0.0f,1.0f,3.0f };
 	offset = Mathf::TransformNormal(offset, worldTransform_.parent_->matWorld_);
 	worldTransformCollision_.translation_ = worldTransform_.parent_->translation_;
 	worldTransformCollision_.translation_ += offset;

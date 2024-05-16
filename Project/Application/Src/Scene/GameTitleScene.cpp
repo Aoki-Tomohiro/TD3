@@ -18,12 +18,12 @@ void GameTitleScene::Initialize()
 	titleSprite_.reset(Sprite::Create("Title.png", titleSpritePosition_));
 
 	//音声データの読み込み
-	bgmHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/BGM.wav");
-	decisionHandle_ = audio_->SoundLoadWave("Application/Resources/Sounds/Decision.wav");
+	bgmHandle_ = audio_->LoadAudioFile("BGM.wav");
+	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	//BGMの再生
 	audio_->StopAudio(bgmHandle_);
-	audio_->SoundPlayWave(bgmHandle_, true, 0.1f);
+	audio_->PlayAudio(bgmHandle_, true, 0.1f);
 }
 
 void GameTitleScene::Finalize()
@@ -38,20 +38,20 @@ void GameTitleScene::Update()
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
 			sceneManager_->ChangeScene("TutorialScene1");
-			audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
 		sceneManager_->ChangeScene("TutorialScene1");
-		audio_->SoundPlayWave(decisionHandle_, false, 0.4f);
+		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
 
 	//スプライトの座標を設定
 	pushASprite_->SetPosition(pushASpritePosition_);
-	titleSprite_->SetPosition(titleSpritePosition_);
-	titleSprite_->SetSize(titleSpriteSize_);
+	//titleSprite_->SetPosition(titleSpritePosition_);
+	//titleSprite_->SetSize(titleSpriteSize_);
 
 	ImGui::Begin("GameTitleScene");
 	ImGui::Text("A or SPACE : GamePlayScene");
@@ -86,10 +86,7 @@ void GameTitleScene::Draw()
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
 #pragma endregion
-}
 
-void GameTitleScene::DrawUI() 
-{
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
@@ -101,7 +98,27 @@ void GameTitleScene::DrawUI()
 	titleSprite_->Draw();
 
 	//PushAのスプライトの描画
-	pushASprite_->Draw();
+	//pushASprite_->Draw();
+
+	//前景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+}
+
+void GameTitleScene::DrawUI() 
+{
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	////背景のスプライトの描画
+	//backGroundSprite_->Draw();
+
+	////タイトルのスプライトの描画
+	//titleSprite_->Draw();
+
+	////PushAのスプライトの描画
+	//pushASprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

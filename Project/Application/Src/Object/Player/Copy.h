@@ -6,7 +6,7 @@
 class Copy : public Collider
 {
 public:
-	void Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions);
+	void Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions);
 
 	void Update();
 
@@ -33,7 +33,7 @@ private:
 
 	float gravity_ = 0.05f;
 
-	std::vector<std::tuple<Vector3, Quaternion, bool>> playerPositions_{};
+	std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>> playerPositions_{};
 
 	int currentIndex_ = 0;
 

@@ -19,7 +19,7 @@ public:
 
 	void UnsetParent();
 
-	UploadBuffer* GetConstantBuffer() const { return constBuff_.get(); };
+	const UploadBuffer* GetConstantBuffer() const { return constBuff_.get(); };
 
 	WorldTransform& operator=(const WorldTransform& rhs)
 	{

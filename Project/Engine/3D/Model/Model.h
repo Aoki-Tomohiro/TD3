@@ -1,129 +1,109 @@
 #pragma once
-#include "Engine/Base/Renderer.h"
-#include "Engine/Base/Texture.h"
-#include "Engine/3D/Camera/Camera.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Animation.h"
 #include "WorldTransform.h"
-#include <memory>
-#include <string>
-#include <vector>
-//#include <assimp/Importer.hpp>
-//#include <assimp/scene.h>
-//#include <assimp/postprocess.h>
+#include "Engine/Base/Renderer.h"
+#include "Engine/Base/StructuredBuffer.h"
+#include "Engine/3D/Camera/Camera.h"
+#include <span>
 
 class Model
 {
 public:
-	enum DiffuseReflectionType
+	struct VertexWeightData
 	{
-		LambertianReflectance,
-		HalfLambert,
+		float weight;
+		uint32_t vertexIndex;
 	};
 
-	enum SpecularReflectionType
+	struct JointWeightData
 	{
-		PhongReflectionModel,
-		BlinnPhongReflectionModel,
-		NoSpecularReflection,
-	};
-
-	//ノード構造体
-	struct Node {
-		Matrix4x4 localMatrix{};
-		std::string name;
-		std::vector<Node> children;
-	};
-
-	//マテリアルデータ構造体
-	struct MaterialData {
-		std::string textureFilePath;
+		Matrix4x4 inverseBindPoseMatrix;
+		std::vector<VertexWeightData> vertexWeights;
 	};
 
 	//モデルデータ構造体
 	struct ModelData {
-		std::vector<VertexDataPosUVNormal> vertices;
-		MaterialData material;
-		Node rootNode;
+		std::vector<std::map<std::string, JointWeightData>> skinClusterData;
+		std::vector<Mesh::MeshData> meshData;
+		std::vector<Material::MaterialData> materialData;
+		Animation::Node rootNode;
 	};
 
-	void Create(const ModelData& modelData, DrawPass drawPass);
+	//Influence構造体
+	static const uint32_t kNumMaxInfluence = 4;
+	struct VertexInfluence
+	{
+		std::array<float, kNumMaxInfluence> weights;
+		std::array<int32_t, kNumMaxInfluence> jointIndices;
+	};
 
-	void Draw(const WorldTransform& worldTransform, const Camera& camera);
+	//Well構造体
+	struct WellForGPU
+	{
+		Matrix4x4 skeletonSpaceMatrix;//位置用
+		Matrix4x4 skeletonSpaceInverseTransposeMatrix;//法線用
+	};
 
-	const Vector4& GetColor() const { return color_; };
+	//SkinCluster構造体
+	struct SkinCluster
+	{
+		std::vector<Matrix4x4> inverseBindPoseMatrices;
+		//Influence
+		std::unique_ptr<UploadBuffer> influenceResource;
+		D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
+		std::span<VertexInfluence> mappedInfluence;
+		//MatrixPalette
+		std::unique_ptr<StructuredBuffer> paletteResource;
+		std::span<WellForGPU> mappedPalette;
+	};
 
-	void SetColor(const Vector4& color) { color_ = color; };
+	void Create(const ModelData& modelData, const std::vector<Animation::AnimationData>& animationData, DrawPass drawPass);
 
-	const Vector2& GetUVScale() const { return uvScale_; };
+	void Update(WorldTransform& worldTransform, const uint32_t animationNumber);
 
-	void SetUVScale(const Vector2& uvScale) { uvScale_ = uvScale; };
+	void Draw(WorldTransform& worldTransform, const Camera& camera);
 
-	const float GetUVRotation() const { return uvRotation_; };
+	void SetIsDebug(const bool isDebug) { isDebug_ = isDebug; };
 
-	void SetUVRotation(const float uvRotation) { uvRotation_ = uvRotation; };
+	const size_t GetMeshCount() const { return meshes_.size(); };
 
-	const Vector2& GetUVTranslation() const { return uvTranslation_; };
+	Mesh* GetMesh(size_t index) { return meshes_[index].get(); };
 
-	void SetUVTranslation(const Vector2& uvTranslation) { uvTranslation_ = uvTranslation; };
+	Material* GetMaterial(size_t index) { return materials_[index].get(); };
 
-	const int32_t& GetEnableLighting() const { return enableLighting_; };
-
-	void SetEnableLighting(const int32_t enableLighting) { enableLighting_ = enableLighting; };
-
-	const int32_t& GetDiffuseReflectionType() const { return int32_t(diffuseReflectionType_); };
-
-	void SetDiffuseReflectionType(const int32_t diffuseReflectionType) { diffuseReflectionType_ = DiffuseReflectionType(diffuseReflectionType); };
-
-	const int32_t& GetSpecularReflectionType() const { return int32_t(specularReflectionType_); };
-
-	void SetSpecularReflectionType(const int32_t specularReflectionType) { specularReflectionType_ = SpecularReflectionType(specularReflectionType); };
-
-	const float& GetShininess() const { return shininess_; };
-
-	void SetShininess(const float shininess) { shininess_ = shininess; };
-
-	const Vector3& GetSpecularColor() const { return specularColor_; };
-
-	void SetSpecularColor(const Vector3& specularColor) { specularColor_ = specularColor; };
-
-	void SetTexture(const std::string& textureName);
+	Animation* GetAnimation() { return animation_.get(); };
 
 private:
-	void CreateVertexBuffer();
+	std::vector<Model::SkinCluster> CreateSkinCluster(const Animation::Skeleton& skeleton, const ModelData& modelData);
 
-	void CreateMaterialConstBuffer();
+	void CreateBoneLineVertices(const Animation::Skeleton& skeleton, int32_t parentIndex, std::vector<Vector4>& vertices);
 
-	void UpdateMaterailConstBuffer();
+	void UpdateVertexData(const Animation::Skeleton& skeleton, int32_t parentIndex, std::vector<Vector4>& vertices);
+
+	void CreateDebugVertexBuffer();
 
 private:
 	ModelData modelData_{};
 
-	std::unique_ptr<UploadBuffer> vertexBuffer_ = nullptr;
+	std::vector<Model::SkinCluster> skinClusters_{};
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+	std::vector<std::unique_ptr<Mesh>> meshes_{};
 
-	std::unique_ptr<UploadBuffer> materialConstBuffer_ = nullptr;
+	std::vector<std::unique_ptr<Material>> materials_{};
 
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
-
-	Vector2 uvScale_ = { 1.0f,1.0f };
-
-	float uvRotation_ = 0.0f;
-
-	Vector2 uvTranslation_ = { 0.0f,0.0f };
-
-	int32_t enableLighting_ = true;
-
-	DiffuseReflectionType diffuseReflectionType_ = DiffuseReflectionType::HalfLambert;
-
-	SpecularReflectionType specularReflectionType_ = SpecularReflectionType::BlinnPhongReflectionModel;
-
-	float shininess_ = 40.0f;
-
-	Vector3 specularColor_ = { 1.0f,1.0f,1.0f };
+	std::unique_ptr<Animation> animation_ = nullptr;
 
 	DrawPass drawPass_ = Opaque;
 
-	const Texture* texture_ = nullptr;
+	std::unique_ptr<UploadBuffer> debugVertexBuffer_ = nullptr;
+
+	D3D12_VERTEX_BUFFER_VIEW debugVertexBufferView_{};
+
+	std::vector<Vector4> debugVertices_{};
+
+	bool isDebug_ = false;
 
 	friend class ParticleSystem;
 };

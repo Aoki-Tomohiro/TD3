@@ -141,5 +141,12 @@ private:
 
 	//チュートリアルか
 	bool isTutorial_ = false;
+
+	uint32_t animationNumber_ = 0;
+
+	float animationTime_ = 0.0f;
+
+	//クォータニオン
+	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 };
 

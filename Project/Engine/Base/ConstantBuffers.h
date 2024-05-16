@@ -124,7 +124,14 @@ struct ConstBuffDataLensDistortion
 struct ConstBuffDataVignette
 {
 	bool isEnable;
+	float scale;
 	float intensity;
+};
+
+struct ConstBuffDataGrayScale
+{
+	int32_t isEnable;
+	int32_t isSepiaEnabled;
 };
 
 struct ConstBuffDataGlitchNoise

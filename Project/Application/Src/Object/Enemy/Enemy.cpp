@@ -10,11 +10,12 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 	worldTransform_.Initialize();
 	//worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_ = position;
+	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 	startPosition_ = position;
 
 	AABB aabb = {
-	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
-	.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z}
+	.min{-1.0f,-1.0f,-1.0f},
+	.max{1.0f,1.0f,1.0f}
 	};
 	//衝突属性を設定
 	SetAABB(aabb);
@@ -78,9 +79,13 @@ void Enemy::Update()
 		}
 	}
 
-
-
 	worldTransform_.UpdateMatrixFromEuler();
+
+	//モデルの更新
+	model_->Update(worldTransform_, animationNumber_);
+
+	//アニメーションタイムを記録
+	animationTime_ = model_->GetAnimation()->GetAnimationTime();
 
 	//座標を保存
 	positions_.push_back(worldTransform_.translation_);

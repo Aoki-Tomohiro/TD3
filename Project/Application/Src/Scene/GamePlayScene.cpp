@@ -19,8 +19,8 @@ void GamePlayScene::Initialize()
 
 
 	//敵の生成
-	enemyModel_.reset(ModelManager::Create());
-	enemyModel_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	AddEnemy({ 0.0f,2.0f,0.0f });
 	AddEnemy({ 10.0f,-10.0f,0.0f });
 	AddEnemy({ -10.0f,-10.0f,0.0f });
@@ -29,9 +29,9 @@ void GamePlayScene::Initialize()
 	collisionManager_ = std::make_unique<CollisionManager>();
 
 	//プレイヤーを生成
-	playerModel_.reset(ModelManager::Create());
-	playerModel_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
-	weaponModel_.reset(ModelManager::CreateFromOBJ("Cube", Transparent));
+	playerModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	playerModel_->GetMaterial(0)->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
@@ -46,10 +46,15 @@ void GamePlayScene::Initialize()
 	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
 
 	//コピーを生成
-	copyModel_.reset(ModelManager::Create());
-	copyModel_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	copyModel_->GetMaterial(0)->SetColor({ 0.0f,1.0f,0.0f,1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize(copyModel_.get());
+
+	//背景の生成
+	backGroundModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
+	backGround_ = std::make_unique<BackGround>();
+	backGround_->Initialize(backGroundModel_.get());
 
 	//スプライトの生成
 	TextureManager::Load("cont.png");
@@ -106,6 +111,9 @@ void GamePlayScene::Update()
 			}
 		}
 
+		//背景の更新
+		backGround_->Update();
+
 		//カメラの更新
 		camera_.UpdateMatrix();
 
@@ -140,7 +148,7 @@ void GamePlayScene::Update()
 		if (!player_->GetIsStop())
 		{
 			//プレイヤーの座標を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack());
+			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 		}
 
 		//ゲームクリア
@@ -163,6 +171,7 @@ void GamePlayScene::Update()
 		{
 			reversePlayerPositions = copyManager_->GetPlayerPositions();
 			isReversed_ = true;
+			player_->StopAnimation();
 			Reset();
 		}
 
@@ -180,7 +189,7 @@ void GamePlayScene::Update()
 			//プレイヤーを逆再生
 			auto it = reversePlayerPositions.back();
 			reversePlayerPositions.pop_back();
-			player_->SetPosition(std::get<0>(it), std::get<1>(it), std::get<2>(it));
+			player_->SetPosition(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it), std::get<4>(it));
 			player_->GetWeapon()->Update();
 
 			//敵を逆再生
@@ -199,6 +208,7 @@ void GamePlayScene::Update()
 		{
 			isReversed_ = false;
 			copyManager_->AddCopy();
+			player_->PlayAnimation();
 		}
 	}
 
@@ -243,6 +253,9 @@ void GamePlayScene::Draw()
 
 	//コピーの描画
 	copyManager_->Draw(camera_);
+
+	//背景の描画
+	backGround_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();
