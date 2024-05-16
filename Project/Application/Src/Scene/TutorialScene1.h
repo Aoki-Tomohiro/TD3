@@ -6,6 +6,7 @@
 #include "Application/Src/Object/Enemy/Enemy.h"
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
+#include "Application/Src/Object/BackGround/BackGround.h"
 
 class TutorialScene1 : public IScene
 {
@@ -53,5 +54,9 @@ private:
 	std::unique_ptr<Sprite> contSprite_ = nullptr;
 	Vector2 spritePosition_ = { 0.0f,540.0f };
 	Vector2 spriteScale_ = { 360.0f,220.0f };
+
+	//背景
+	std::unique_ptr<Model> backGroundModel_ = nullptr;
+	std::unique_ptr<BackGround> backGround_ = nullptr;
 };
 

@@ -50,8 +50,8 @@ void GameTitleScene::Update()
 
 	//スプライトの座標を設定
 	pushASprite_->SetPosition(pushASpritePosition_);
-	titleSprite_->SetPosition(titleSpritePosition_);
-	titleSprite_->SetSize(titleSpriteSize_);
+	//titleSprite_->SetPosition(titleSpritePosition_);
+	//titleSprite_->SetSize(titleSpriteSize_);
 
 	ImGui::Begin("GameTitleScene");
 	ImGui::Text("A or SPACE : GamePlayScene");
@@ -86,10 +86,7 @@ void GameTitleScene::Draw()
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
 #pragma endregion
-}
 
-void GameTitleScene::DrawUI() 
-{
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
@@ -101,7 +98,27 @@ void GameTitleScene::DrawUI()
 	titleSprite_->Draw();
 
 	//PushAのスプライトの描画
-	pushASprite_->Draw();
+	//pushASprite_->Draw();
+
+	//前景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+}
+
+void GameTitleScene::DrawUI() 
+{
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	////背景のスプライトの描画
+	//backGroundSprite_->Draw();
+
+	////タイトルのスプライトの描画
+	//titleSprite_->Draw();
+
+	////PushAのスプライトの描画
+	//pushASprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

@@ -41,7 +41,7 @@ private:
 	std::unique_ptr<Sprite> titleSprite_ = nullptr;
 
 	//Vector2 titleSpritePosition_ = { 400.0f,120.0f };
-	Vector2 titleSpritePosition_ = { 300.0f,50.0f };
+	Vector2 titleSpritePosition_ = { 0.0f,0.0f };
 
 	//Vector2 titleSpriteSize_ = { 441.0f,251.0f };
 	Vector2 titleSpriteSize_ = { 661.0f,376.0f };

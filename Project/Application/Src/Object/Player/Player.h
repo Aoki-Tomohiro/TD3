@@ -36,14 +36,26 @@ public:
 
 	const bool GetIsStop() const { return isStop_; };
 
-	void SetPosition(const Vector3& position, const Quaternion& quaternion, const bool isAttack) { 
+	void SetPosition(const Vector3& position, const Quaternion& quaternion, const bool isAttack, const uint32_t animationNumber, const float animationTime) {
 		worldTransform_.translation_ = position;
 		worldTransform_.quaternion_ = quaternion; 
 		weapon_->SetIsAttack(isAttack);
+		animationNumber_ = animationNumber;
+		animationTime_ = animationTime;
 		worldTransform_.UpdateMatrixFromQuaternion();
+		models_[0]->GetAnimation()->SetAnimationTime(animationTime_);
+		models_[0]->Update(worldTransform_, animationNumber_);
 	}
 
 	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
+
+	const uint32_t GetAnimationNumber() const { return animationNumber_; };
+
+	const float GetAnimationTime() const { return animationTime_; };
+
+	void StopAnimation() { models_[0]->GetAnimation()->StopAnimation(); };
+
+	void PlayAnimation() { models_[0]->GetAnimation()->PlayAnimation(); };
 
 private:
 	enum class Behavior
@@ -137,5 +149,11 @@ private:
 
 	//チュートリアルかどうか
 	bool isTutorial_ = false;
+
+	//アニメーションの番号
+	uint32_t animationNumber_ = 0;
+
+	//アニメーションタイム
+	float animationTime_ = 0.0f;
 };
 

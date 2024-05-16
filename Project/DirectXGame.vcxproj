@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\Src\Game\GameManager.cpp" />
+    <ClCompile Include="Application\Src\Object\BackGround\BackGround.cpp" />
     <ClCompile Include="Application\Src\Object\Block\Block.cpp" />
     <ClCompile Include="Application\Src\Object\Enemy\Astar.cpp" />
     <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp" />
@@ -115,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Src\Game\GameManager.h" />
+    <ClInclude Include="Application\Src\Object\BackGround\BackGround.h" />
     <ClInclude Include="Application\Src\Object\Block\Block.h" />
     <ClInclude Include="Application\Src\Object\Enemy\Astar.h" />
     <ClInclude Include="Application\Src\Object\Enemy\Enemy.h" />

@@ -87,9 +87,10 @@ void Model::Draw(WorldTransform& worldTransform, const Camera& camera)
 	//SortObjectの追加
 	for (uint32_t i = 0; i < meshes_.size(); ++i)
 	{
-		renderer_->AddObject(meshes_[i]->GetVertexBufferView(), skinClusters_[i].influenceBufferView, meshes_[i]->GetIndexBufferView(), materials_[meshes_[i]->GetMaterialIndex()]->GetConstantBuffer()->GetGpuVirtualAddress(),
+		uint32_t materialIndex = meshes_[i]->GetMaterialIndex();
+		renderer_->AddObject(meshes_[i]->GetVertexBufferView(), skinClusters_[i].influenceBufferView, meshes_[i]->GetIndexBufferView(), materials_[materialIndex]->GetConstantBuffer()->GetGpuVirtualAddress(),
 			worldTransform.GetConstantBuffer()->GetGpuVirtualAddress(), camera.GetConstantBuffer()->GetGpuVirtualAddress(),
-			materials_[i]->GetTexture()->GetSRVHandle(), skinClusters_[i].paletteResource->GetSRVHandle(), UINT(meshes_[i]->GetIndicesSize()), drawPass_);
+			materials_[materialIndex]->GetTexture()->GetSRVHandle(), skinClusters_[i].paletteResource->GetSRVHandle(), UINT(meshes_[i]->GetIndicesSize()), drawPass_);
 	}
 
 	//DebugObjectの追加

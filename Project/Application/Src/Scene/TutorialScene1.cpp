@@ -17,7 +17,7 @@ void TutorialScene1::Initialize()
 	collisionManager_ = std::make_unique<CollisionManager>();
 
 	//プレイヤーを生成
-	playerModel_.reset(ModelManager::Create());
+	playerModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	playerModel_->GetMaterial(0)->SetColor({ 0.0f,0.0f,1.0f,1.0f });
 	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
@@ -26,7 +26,7 @@ void TutorialScene1::Initialize()
 	player_->SetIsTutorial(true);
 
 	//敵の生成
-	enemyModel_.reset(ModelManager::Create());
+	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	Enemy* enemy = new Enemy();
 	enemy->Initialize(enemyModel_.get(), { 10.0f,-10.0f,0.0f });
@@ -38,6 +38,11 @@ void TutorialScene1::Initialize()
 	blockManager_ = std::make_unique<BlockManager>();
 	blockManager_->Initialize(blockModel_.get());
 	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+
+	//背景の生成
+	backGroundModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
+	backGround_ = std::make_unique<BackGround>();
+	backGround_->Initialize(backGroundModel_.get());
 
 	//スプライトの生成
 	TextureManager::Load("cont.png");
@@ -68,6 +73,9 @@ void TutorialScene1::Update()
 			enemy->Update();
 		}
 	}
+
+	//背景の更新
+	backGround_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();
@@ -143,6 +151,9 @@ void TutorialScene1::Draw()
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
+
+	//背景の描画
+	backGround_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();

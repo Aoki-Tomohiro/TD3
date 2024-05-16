@@ -1,6 +1,6 @@
 #include "Copy.h"
 
-void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool>>& playerPositions)
+void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions)
 {
 	//モデルの初期化
 	assert(model);
@@ -8,6 +8,7 @@ void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quater
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
+	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 
 	//キューの初期化
 	playerPositions_ = playerPositions;
@@ -20,8 +21,8 @@ void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quater
 
 	//衝突判定の初期化
 	AABB aabb = {
-	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
-	.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z}
+	.min{-1.0f,-1.0f,-1.0f},
+	.max{1.0f,1.0f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);
@@ -31,13 +32,15 @@ void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quater
 
 void Copy::Update()
 {
+	uint32_t animationNumber = 0;
+	float animationTime = 0;
 	//座標を設定
 	if (currentIndex_ < playerPositions_.size())
 	{
 		Vector3 playerPosition{};
 		Quaternion quaternion{};
 		bool isAttack{};
-		std::tie(playerPosition, quaternion, isAttack) = playerPositions_[currentIndex_];
+		std::tie(playerPosition, quaternion, isAttack,animationNumber,animationTime) = playerPositions_[currentIndex_];
 		worldTransform_.translation_ = playerPosition;
 		worldTransform_.quaternion_ = quaternion;
 		weapon_->SetIsAttack(isAttack);
@@ -63,6 +66,10 @@ void Copy::Update()
 
 	//ワールドトランスフォームの行進
 	worldTransform_.UpdateMatrixFromQuaternion();
+
+	//モデルの更新
+	model_->GetAnimation()->SetAnimationTime(animationTime);
+	model_->Update(worldTransform_, animationNumber);
 
 	//武器の更新
 	weapon_->Update();
@@ -140,13 +147,15 @@ const Vector3 Copy::GetWorldPosition() const
 
 void Copy::Reverse()
 {
+	uint32_t animationNumber = 0;
+	float animationTime = 0.0f;
 	if (currentIndex_ > 0)
 	{
 		currentIndex_--;
 		Vector3 playerPosition{};
 		Quaternion quaternion{};
 		bool isAttack{};
-		std::tie(playerPosition, quaternion, isAttack) = playerPositions_[currentIndex_];
+		std::tie(playerPosition, quaternion, isAttack, animationNumber, animationTime) = playerPositions_[currentIndex_];
 		worldTransform_.translation_ = playerPosition;
 		worldTransform_.quaternion_ = quaternion;
 		weapon_->SetIsAttack(isAttack);
@@ -154,6 +163,10 @@ void Copy::Reverse()
 
 	//ワールドトランスフォームの行進
 	worldTransform_.UpdateMatrixFromQuaternion();
+
+	//モデルの更新
+	model_->GetAnimation()->SetAnimationTime(animationTime);
+	model_->Update(worldTransform_, animationNumber);
 
 	//武器の更新
 	weapon_->Update();

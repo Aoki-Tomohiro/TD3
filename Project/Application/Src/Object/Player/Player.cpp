@@ -4,6 +4,7 @@ void Player::Initialzie(std::vector<Model*> models)
 {
 	//モデルの初期化
 	models_ = models;
+	models_[0]->GetAnimation()->PlayAnimation();
 
 	//Inputクラスのインスタンスを取得
 	input_ = Input::GetInstance();
@@ -14,6 +15,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = -10.0f;
+	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 
 	//武器の生成
@@ -32,8 +34,8 @@ void Player::Initialzie(std::vector<Model*> models)
 
 	//衝突判定の初期化
 	AABB aabb = {
-	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
-	.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z}
+	.min{-1.0f,-1.0f,-1.0f},
+	.max{1.0f,1.0f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);
@@ -109,6 +111,34 @@ void Player::Update()
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	worldTransform_.UpdateMatrixFromQuaternion();
 
+	//アニメーションの番号の変更
+	switch (behavior_)
+	{
+	case Behavior::kRoot:
+	default:
+		if (velocity_.x != 0.0f)
+		{
+			animationNumber_ = 3;
+		}
+		else
+		{
+			animationNumber_ = 1;
+		}
+		break;
+	case Behavior::kJump:
+		animationNumber_ = 2;
+		break;
+	case Behavior::kAttack:
+		animationNumber_ = 0;
+		break;
+	}
+
+	//モデルの更新
+	models_[0]->Update(worldTransform_, animationNumber_);
+
+	//アニメーションタイムを記録
+	animationTime_ = models_[0]->GetAnimation()->GetAnimationTime();
+
 	//武器の更新
 	weapon_->Update();
 
@@ -124,6 +154,8 @@ void Player::Update()
 	ImGui::Checkbox("isLanded", &isLanded_);
 	ImGui::Text("MovementRestrictionTimer : %d", movementRestrictionTimer_);
 	ImGui::DragInt("MoveSEWaitTime", &moveAudioWaitTime_);
+	ImGui::Text("AnimationTime : %f", models_[0]->GetAnimation()->GetAnimationTime());
+	ImGui::Text("IsPlay : %d", models_[0]->GetAnimation()->IsPlaying());
 	ImGui::End();
 }
 
@@ -191,7 +223,7 @@ void Player::OnCollision(Collider* collider)
 		//Y軸方向で最小の重なりが発生している場合
 		directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
 		directionAxis.x = 0.0f;
-		if (behaviorRequest_ != Behavior::kAttack)
+		if (behaviorRequest_ != Behavior::kAttack && behavior_ != Behavior::kAttack)
 		{
 			behaviorRequest_ = Behavior::kRoot;
 		}
@@ -226,6 +258,8 @@ void Player::BehaviorRootInitialize()
 {
 	//当たり判定をなくす
 	weapon_->SetIsAttack(false);
+	models_[0]->GetAnimation()->SetLoop(true);
+	models_[0]->GetAnimation()->SetSpeed(60.0f);
 }
 
 void Player::BehaviorRootUpdate()
@@ -333,6 +367,8 @@ void Player::BehaviorJumpInitialize()
 {
 	//ジャンプの初速度を設定
 	velocity_.y = jumpFirstSpeed_;
+	models_[0]->GetAnimation()->SetAnimationTime(0.0f);
+	models_[0]->GetAnimation()->SetLoop(false);
 }
 
 void Player::BehaviorJumpUpdate()
@@ -417,15 +453,22 @@ void Player::BehaviorJumpUpdate()
 
 void Player::BehaviorAttackInitialize()
 {
-	//当たり判定をつける
-	weapon_->SetIsAttack(true);
+	models_[0]->GetAnimation()->SetLoop(false);
+	models_[0]->GetAnimation()->SetAnimationTime(0.0f);
+	models_[0]->GetAnimation()->SetSpeed(20.0f);
 }
 
 void Player::BehaviorAttackUpdate()
 {
-	//通常状態に戻る
-	behaviorRequest_ = Behavior::kRoot;
-	audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
+	if (!models_[0]->GetAnimation()->IsPlaying())
+	{
+		//当たり判定をつける
+		weapon_->SetIsAttack(true);
+		//通常状態に戻る
+		behaviorRequest_ = Behavior::kRoot;
+		models_[0]->GetAnimation()->PlayAnimation();
+		audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
+	}
 }
 
 void Player::UpdateMovementRestriction()
@@ -457,7 +500,7 @@ void Player::UpdateMovementRestrictionSprite(const Camera& camera)
 	//ビュー行列とプロジェクション行列とビューポート行列を合成
 	Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
 	//スクリーン座標に変換
-	Vector3 offset = { 0.0f,2.0f,0.0f };
+	Vector3 offset = { 0.0f,3.0f,0.0f };
 	Vector3 spritePosition = GetWorldPosition() + offset;
 	spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
 	//スプライトに座標を設定

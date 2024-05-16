@@ -95,10 +95,6 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 		assert(mesh->HasTextureCoords(0));//TexcoordがないMeshは今回は非対応
 		modelData.meshData[meshIndex].vertices.resize(mesh->mNumVertices);//最初に頂点数分のメモリを確保しておく
 		modelData.meshData[meshIndex].materialIndex = mesh->mMaterialIndex;//マテリアルの番号を取得
-		if (filePath.find(".obj") != std::string::npos)
-		{
-			modelData.meshData[meshIndex].materialIndex -= 1;
-		}
 		//頂点を解析
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
 		{
@@ -151,8 +147,8 @@ Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, c
 	}
 
 	//Materialの解析
-	modelData.materialData.resize(scene->mNumMaterials - 1);
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials - 1; ++materialIndex)
+	modelData.materialData.resize(scene->mNumMaterials);
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex)
 	{
 		aiMaterial* material = scene->mMaterials[materialIndex];
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
