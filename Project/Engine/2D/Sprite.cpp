@@ -25,7 +25,12 @@ void Sprite::Draw()
 	commandContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandContext->SetConstantBuffer(0, materialConstBuffer_->GetGpuVirtualAddress());
 	commandContext->SetConstantBuffer(1, wvpResource_->GetGpuVirtualAddress());
-	commandContext->SetDescriptorTable(2, texture_->GetSRVHandle());
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = textureDescriptorHandle_;
+	if (srvHandle.ptr == 0)
+	{
+		srvHandle = texture_->GetSRVHandle();
+	}
+	commandContext->SetDescriptorTable(2, srvHandle);
 	commandContext->DrawInstanced(kMaxVertices, 1);
 }
 

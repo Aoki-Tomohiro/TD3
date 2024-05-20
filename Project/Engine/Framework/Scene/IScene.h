@@ -15,6 +15,8 @@ public:
 
 	virtual void DrawUI() = 0;
 
+	virtual void DrawBackGround() = 0;
+
 	virtual void Finalize() = 0;
 
 	virtual void SetSceneManager(SceneManager* sceneManager) { sceneManager_ = sceneManager; };

@@ -88,3 +88,8 @@ void LoadScene::DrawUI()
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
+
+void LoadScene::DrawBackGround()
+{
+
+}

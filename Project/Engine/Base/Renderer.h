@@ -89,9 +89,15 @@ public:
 
 	void PostDrawParticles();
 
+	void PreDrawBackGround();
+
+	void PostDrawBackGround();
+
 	const DescriptorHandle& GetSceneColorDescriptorHandle() const { return sceneColorBuffer_->GetSRVHandle(); };
 
 	const DescriptorHandle& GetLinearDepthDescriptorHandle() const { return linearDepthColorBuffer_->GetSRVHandle(); };
+
+	const DescriptorHandle& GetBackGroundColorDescriptorHandle() const { return backGroundColorBuffer_->GetSRVHandle(); };
 
 private:
 	Renderer() = default;
@@ -144,6 +150,10 @@ private:
 	std::unique_ptr<ColorBuffer> linearDepthColorBuffer_ = nullptr;
 
 	std::unique_ptr<DepthBuffer> sceneDepthBuffer_ = nullptr;
+
+	std::unique_ptr<ColorBuffer> backGroundColorBuffer_ = nullptr;
+
+	std::unique_ptr<DepthBuffer> backGroundDepthBuffer_ = nullptr;
 
 	LightManager* lightManager_ = nullptr;
 

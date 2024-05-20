@@ -143,6 +143,15 @@ void GameCore::Draw()
 		loadTimer_ = 0;
 	}
 
+	//背景描画前処理
+	renderer_->PreDrawBackGround();
+
+	//背景オブジェクトの描画
+	sceneManager_->DrawBackGround();
+
+	//背景描画後処理
+	renderer_->PostDrawBackGround();
+
 	//描画前処理
 	renderer_->PreDraw();
 

@@ -17,6 +17,8 @@ public:
 
 	void DrawUI() override;
 
+	void DrawBackGround() override;
+
 private:
 	Renderer* renderer_ = nullptr;
 

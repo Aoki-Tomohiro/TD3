@@ -40,6 +40,14 @@ void Renderer::Initialize()
 	sceneDepthBuffer_ = std::make_unique<DepthBuffer>();
 	sceneDepthBuffer_->Create(Application::kClientWidth, Application::kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
+	//背景のシーンを描画するリソースの作成
+	backGroundColorBuffer_ = std::make_unique<ColorBuffer>();
+	backGroundColorBuffer_->Create(Application::kClientWidth, Application::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+
+	//背景の深度バッファの作成
+	backGroundDepthBuffer_ = std::make_unique<DepthBuffer>();
+	backGroundDepthBuffer_->Create(Application::kClientWidth, Application::kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
+
 	//LightManagerを作成
 	lightManager_ = LightManager::GetInstance();
 
@@ -251,6 +259,52 @@ void Renderer::PreDrawParticles() {
 
 void Renderer::PostDrawParticles() {
 
+}
+
+void Renderer::PreDrawBackGround()
+{
+	//コマンドリストを取得
+	CommandContext* commandContext = GraphicsCore::GetInstance()->GetCommandContext();
+
+	//リソースの状態遷移
+	commandContext->TransitionResource(*backGroundColorBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	//レンダーターゲットとデプスバッファを設定
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = backGroundColorBuffer_->GetRTVHandle();
+	commandContext->SetRenderTargets(1, &rtvHandle, backGroundDepthBuffer_->GetDSVHandle());
+
+	//レンダーターゲットをクリア
+	commandContext->ClearColor(*backGroundColorBuffer_);
+
+	//デプスバッファをクリア
+	commandContext->ClearDepth(*backGroundDepthBuffer_);
+
+	//ビューポート
+	D3D12_VIEWPORT viewport{};
+	viewport.Width = Application::kClientWidth;
+	viewport.Height = Application::kClientHeight;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	commandContext->SetViewport(viewport);
+
+	//シザー矩形
+	D3D12_RECT scissorRect{};
+	scissorRect.left = 0;
+	scissorRect.right = Application::kClientWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = Application::kClientHeight;
+	commandContext->SetScissor(scissorRect);
+
+	//DescriptorHeapを設定
+	commandContext->SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, GraphicsCore::GetInstance()->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+}
+
+void Renderer::PostDrawBackGround()
+{
+	CommandContext* commandContext = GraphicsCore::GetInstance()->GetCommandContext();
+	commandContext->TransitionResource(*backGroundColorBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 void Renderer::CreateModelPipelineState()

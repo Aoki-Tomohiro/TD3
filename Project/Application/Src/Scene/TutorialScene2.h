@@ -21,6 +21,8 @@ public:
 
 	void DrawUI() override;
 
+	void DrawBackGround() override;
+
 private:
 	void AddEnemy(const Vector3& position);
 

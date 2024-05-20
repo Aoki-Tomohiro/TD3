@@ -124,3 +124,8 @@ void GameTitleScene::DrawUI()
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
+
+void GameTitleScene::DrawBackGround()
+{
+
+}

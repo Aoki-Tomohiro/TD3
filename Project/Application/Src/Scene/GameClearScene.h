@@ -21,6 +21,8 @@ public:
 
 	void DrawUI() override;
 
+	void DrawBackGround() override;
+
 	static void SetCopyCount(const int copyCount) { copyCount_ = copyCount; };
 
 private:

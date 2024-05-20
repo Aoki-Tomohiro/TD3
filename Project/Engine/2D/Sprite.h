@@ -69,6 +69,8 @@ public:
 
 	void SetTexture(const std::string& textureName);
 
+	void SetTexture(const DescriptorHandle& srvHandle) { textureDescriptorHandle_ = srvHandle; };
+
 private:
 	void Initialize(const std::string& textureName, Vector2 position);
 
@@ -128,5 +130,7 @@ private:
 	Vector2 uvScale_ = { 1.0f,1.0f };
 
 	const Texture* texture_ = nullptr;
+
+	DescriptorHandle textureDescriptorHandle_{};
 };
 

@@ -28,6 +28,8 @@ public:
 
 	void DrawUI() override;
 
+	void DrawBackGround() override;
+
 	void Reset();
 
 private:

@@ -187,3 +187,7 @@ void TutorialScene1::DrawUI()
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
+
+void TutorialScene1::DrawBackGround()
+{
+}

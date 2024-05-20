@@ -258,6 +258,11 @@ void TutorialScene2::DrawUI()
 #pragma endregion
 }
 
+void TutorialScene2::DrawBackGround()
+{
+
+}
+
 void TutorialScene2::Reset()
 {
 	//プレイヤーをリセット
