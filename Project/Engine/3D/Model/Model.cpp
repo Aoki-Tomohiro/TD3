@@ -32,7 +32,7 @@ void Model::Create(const ModelData& modelData, const std::vector<Animation::Anim
 	skinClusters_ = CreateSkinCluster(animation_->GetSkeleton(), modelData_);
 
 	//Debug用のVertexBufferの生成
-	if (!modelData_.skinClusterData.empty())
+	if (!modelData_.skinClusterData[0].empty())
 	{
 		Animation::Skeleton skeleton = animation_->GetSkeleton();
 		CreateBoneLineVertices(skeleton, skeleton.root, debugVertices_);
@@ -88,9 +88,14 @@ void Model::Draw(WorldTransform& worldTransform, const Camera& camera)
 	for (uint32_t i = 0; i < meshes_.size(); ++i)
 	{
 		uint32_t materialIndex = meshes_[i]->GetMaterialIndex();
+		D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = materials_[materialIndex]->GetTextureHandle();
+		if (srvHandle.ptr == 0)
+		{
+			srvHandle = materials_[materialIndex]->GetTexture()->GetSRVHandle();
+		}
 		renderer_->AddObject(meshes_[i]->GetVertexBufferView(), skinClusters_[i].influenceBufferView, meshes_[i]->GetIndexBufferView(), materials_[materialIndex]->GetConstantBuffer()->GetGpuVirtualAddress(),
 			worldTransform.GetConstantBuffer()->GetGpuVirtualAddress(), camera.GetConstantBuffer()->GetGpuVirtualAddress(),
-			materials_[materialIndex]->GetTexture()->GetSRVHandle(), skinClusters_[i].paletteResource->GetSRVHandle(), UINT(meshes_[i]->GetIndicesSize()), drawPass_);
+			srvHandle, skinClusters_[i].paletteResource->GetSRVHandle(), UINT(meshes_[i]->GetIndicesSize()), drawPass_);
 	}
 
 	//DebugObjectの追加

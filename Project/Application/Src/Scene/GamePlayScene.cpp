@@ -49,12 +49,15 @@ void GamePlayScene::Initialize()
 	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
-	copyManager_->Initialize(copyModel_.get());
+	copyManager_->Initialize();
 
 	//背景の生成
-	backGroundModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
+	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
+	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
+	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
+	std::vector<Model*> backGroundModels = { backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
-	backGround_->Initialize(backGroundModel_.get());
+	backGround_->Initialize(backGroundModels);
 
 	//スプライトの生成
 	TextureManager::Load("cont.png");
@@ -228,9 +231,6 @@ void GamePlayScene::Draw()
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//背景の描画
-	backGround_->DrawSprite();
-
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
@@ -239,6 +239,9 @@ void GamePlayScene::Draw()
 	renderer_->ClearDepthBuffer();
 
 #pragma region 3Dオブジェクト描画
+	//背景の描画
+	backGround_->Draw(camera_);
+
 	//プレイヤーの描画
 	player_->Draw(camera_);
 
@@ -256,9 +259,6 @@ void GamePlayScene::Draw()
 
 	//コピーの描画
 	copyManager_->Draw(camera_);
-
-	//背景の描画
-	//backGround_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();
@@ -321,9 +321,6 @@ void GamePlayScene::DrawBackGround()
 
 	//コピーの描画
 	copyManager_->Draw(camera_);
-
-	//背景の描画
-	backGround_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();

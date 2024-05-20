@@ -5,19 +5,22 @@
 class BackGround
 {
 public:
-	void Initialize(Model* model);
+	enum Parts
+	{
+		kFrame,
+		kMovie,
+		kCountOfParts
+	};
+
+	void Initialize(std::vector<Model*> models);
 
 	void Update();
 
 	void Draw(const Camera& camera);
 
-	void DrawSprite();
-
 private:
-	Model* model_ = nullptr;
+	std::vector<Model*> models_{};
 
-	WorldTransform worldTransform_{};
-
-	std::unique_ptr<Sprite> sprite_ = nullptr;
+	WorldTransform worldTransforms_[kCountOfParts]{};
 };
 

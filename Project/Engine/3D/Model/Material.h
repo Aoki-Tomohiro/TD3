@@ -70,7 +70,11 @@ public:
 
 	const Texture* GetTexture() const { return texture_; };
 
+	const DescriptorHandle& GetTextureHandle() const { return textureDescriptorHandle_; };
+
 	void SetTexture(const std::string& textureName);
+
+	void SetTexture(const DescriptorHandle& srvHandle) { textureDescriptorHandle_ = srvHandle; };
 
 	const UploadBuffer* GetConstantBuffer() const { return materialConstBuffer_.get(); };
 
@@ -96,5 +100,7 @@ private:
 	Vector3 specularColor_ = { 1.0f,1.0f,1.0f };
 
 	const Texture* texture_ = nullptr;
+
+	DescriptorHandle textureDescriptorHandle_{};
 };
 

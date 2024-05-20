@@ -23,6 +23,10 @@ public:
 
 	void SetRotation(float rotation) { rotation_ = rotation; };
 
+	const Vector2& GetScale() const { return scale_; };
+
+	void SetScale(const Vector2& scale) { scale_ = scale; };
+
 	const Vector4& GetColor() const { return color_; };
 
 	void SetColor(const Vector4& color) { color_ = color; };
@@ -68,8 +72,6 @@ public:
 	void SetUVScale(const Vector2& uvScale) { uvScale_ = uvScale; };
 
 	void SetTexture(const std::string& textureName);
-
-	void SetTexture(const DescriptorHandle& srvHandle) { textureDescriptorHandle_ = srvHandle; };
 
 private:
 	void Initialize(const std::string& textureName, Vector2 position);
@@ -130,7 +132,5 @@ private:
 	Vector2 uvScale_ = { 1.0f,1.0f };
 
 	const Texture* texture_ = nullptr;
-
-	DescriptorHandle textureDescriptorHandle_{};
 };
 

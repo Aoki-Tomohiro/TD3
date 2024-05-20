@@ -43,12 +43,15 @@ void TutorialScene2::Initialize()
 	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
-	copyManager_->Initialize(copyModel_.get());
+	copyManager_->Initialize();
 
 	//背景の生成
-	backGroundModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
+	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
+	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
+	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
+	std::vector<Model*> backGroundModels = { backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
-	backGround_->Initialize(backGroundModel_.get());
+	backGround_->Initialize(backGroundModels);
 
 	//スプライトの生成
 	TextureManager::Load("cont.png");
@@ -204,6 +207,9 @@ void TutorialScene2::Draw()
 	renderer_->ClearDepthBuffer();
 
 #pragma region 3Dオブジェクト描画
+	//背景の描画
+	backGround_->Draw(camera_);
+
 	//プレイヤーの描画
 	player_->Draw(camera_);
 
@@ -221,9 +227,6 @@ void TutorialScene2::Draw()
 
 	//コピーの描画
 	copyManager_->Draw(camera_);
-
-	//背景の描画
-	backGround_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();
@@ -260,7 +263,47 @@ void TutorialScene2::DrawUI()
 
 void TutorialScene2::DrawBackGround()
 {
+#pragma region 背景スプライト描画
+	//背景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
 
+	//背景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+
+#pragma region 3Dオブジェクト描画
+	//プレイヤーの描画
+	player_->Draw(camera_);
+
+	//敵の描画
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsActive())
+		{
+			enemy->Draw(camera_);
+		}
+	}
+
+	//ブロックの描画
+	blockManager_->Draw(camera_);
+
+	//コピーの描画
+	copyManager_->Draw(camera_);
+
+	//3Dオブジェクト描画
+	renderer_->Render();
+#pragma endregion
+
+#pragma region パーティクル描画
+	//パーティクル描画前処理
+	renderer_->PreDrawParticles();
+
+	//パーティクルの描画
+	particleManager_->Draw(camera_);
+
+	//パーティクル描画後処理
+	renderer_->PostDrawParticles();
+#pragma endregion
 }
 
 void TutorialScene2::Reset()

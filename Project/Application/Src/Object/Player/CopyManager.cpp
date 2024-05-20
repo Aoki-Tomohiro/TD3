@@ -1,10 +1,8 @@
 #include "CopyManager.h"
 
-void CopyManager::Initialize(Model* model)
+void CopyManager::Initialize()
 {
-	//モデルの初期化
-	assert(model);
-	model_ = model;
+
 }
 
 void CopyManager::Update()
@@ -52,7 +50,7 @@ void CopyManager::AddCopy()
 {
 	//新しいコピーの生成
 	Copy* copy = new Copy();
-	copy->Initialize(model_, playerPositions_);
+	copy->Initialize(playerPositions_);
 	copies_.push_back(std::unique_ptr<Copy>(copy));
 	playerPositions_.clear();
 }

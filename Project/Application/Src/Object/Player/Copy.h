@@ -6,7 +6,7 @@
 class Copy : public Collider
 {
 public:
-	void Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions);
+	void Initialize(const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions);
 
 	void Update();
 
@@ -25,7 +25,7 @@ public:
 	void Reverse();
 
 private:
-	Model* model_ = nullptr;
+	std::unique_ptr<Model> model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 
