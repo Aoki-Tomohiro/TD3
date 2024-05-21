@@ -7,6 +7,7 @@
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
+#include "Application/Src/Object/FollowCamera/FollowCamera.h"
 
 class TutorialScene1 : public IScene
 {
@@ -20,6 +21,8 @@ public:
 	void Draw() override;
 
 	void DrawUI() override;
+
+	void DrawBackGround() override;
 
 private:
 	Renderer* renderer_ = nullptr;
@@ -47,6 +50,9 @@ private:
 	std::unique_ptr<Model> blockModel_ = nullptr;
 	std::unique_ptr<BlockManager> blockManager_ = nullptr;
 
+	//FollowCamera
+	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
+
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;
 
@@ -56,7 +62,8 @@ private:
 	Vector2 spriteScale_ = { 360.0f,220.0f };
 
 	//背景
-	std::unique_ptr<Model> backGroundModel_ = nullptr;
+	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
+	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
 };
 

@@ -1,18 +1,26 @@
 #pragma once
 #include "Engine/3D/Model/Model.h"
+#include "Engine/2D/Sprite.h"
 
 class BackGround
 {
 public:
-	void Initialize(Model* model);
+	enum Parts
+	{
+		kFrame,
+		kMovie,
+		kCountOfParts
+	};
+
+	void Initialize(std::vector<Model*> models);
 
 	void Update();
 
 	void Draw(const Camera& camera);
 
 private:
-	Model* model_ = nullptr;
+	std::vector<Model*> models_{};
 
-	WorldTransform worldTransform_{};
+	WorldTransform worldTransforms_[kCountOfParts]{};
 };
 

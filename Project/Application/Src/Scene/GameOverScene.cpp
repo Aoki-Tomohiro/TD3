@@ -57,3 +57,8 @@ void GameOverScene::DrawUI()
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
+
+void GameOverScene::DrawBackGround()
+{
+
+}

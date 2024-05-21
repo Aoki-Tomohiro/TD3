@@ -4,7 +4,7 @@
 class CopyManager
 {
 public:
-	void Initialize(Model* model);
+	void Initialize();
 
 	void Update();
 

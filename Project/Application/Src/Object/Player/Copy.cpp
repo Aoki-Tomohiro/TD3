@@ -1,10 +1,10 @@
 #include "Copy.h"
 
-void Copy::Initialize(Model* model, const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions)
+void Copy::Initialize(const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions)
 {
 	//モデルの初期化
-	assert(model);
-	model_ = model;
+	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	model_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();

@@ -181,6 +181,18 @@
     <Filter Include="ヘッダー ファイル\Application\Object\Copy">
       <UniqueIdentifier>{166d6d23-480b-4f9c-80fb-ef07210ffb65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\BackGround">
+      <UniqueIdentifier>{34d77598-f3e2-4deb-8d68-f02ff743adee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\BackGround">
+      <UniqueIdentifier>{ca6821d7-6dc2-491f-916a-3f8e671620c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Application\Object\FollowCamera">
+      <UniqueIdentifier>{9b35ce9f-a442-406e-af57-9b15a546e6fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Application\Object\FollowCamera">
+      <UniqueIdentifier>{ad515faa-9ee1-40fb-b1e2-d10f57119685}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -421,7 +433,10 @@
       <Filter>ソース ファイル\Engine\Components\PostEffects</Filter>
     </ClCompile>
     <ClCompile Include="Application\Src\Object\BackGround\BackGround.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Application\Object\BackGround</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Src\Object\FollowCamera\FollowCamera.cpp">
+      <Filter>ソース ファイル\Application\Object\FollowCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -720,7 +735,10 @@
       <Filter>ヘッダー ファイル\Engine\Components\PostEffects</Filter>
     </ClInclude>
     <ClInclude Include="Application\Src\Object\BackGround\BackGround.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Application\Object\BackGround</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Src\Object\FollowCamera\FollowCamera.h">
+      <Filter>ヘッダー ファイル\Application\Object\FollowCamera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

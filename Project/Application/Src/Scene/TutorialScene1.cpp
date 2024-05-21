@@ -40,9 +40,18 @@ void TutorialScene1::Initialize()
 	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
 
 	//背景の生成
-	backGroundModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
+	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
+	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
+	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
+	backGroundMovieModel_->GetMaterial(1)->SetEnableLighting(false);
+	std::vector<Model*> backGroundModels = { backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
-	backGround_->Initialize(backGroundModel_.get());
+	backGround_->Initialize(backGroundModels);
+
+	//FollowCameraの生成
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetWorldTransform());
 
 	//スプライトの生成
 	TextureManager::Load("cont.png");
@@ -76,6 +85,9 @@ void TutorialScene1::Update()
 
 	//背景の更新
 	backGround_->Update();
+
+	//FollowCameraの更新
+	followCamera_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();
@@ -137,21 +149,6 @@ void TutorialScene1::Draw()
 	renderer_->ClearDepthBuffer();
 
 #pragma region 3Dオブジェクト描画
-	//プレイヤーの描画
-	player_->Draw(camera_);
-
-	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
-		{
-			enemy->Draw(camera_);
-		}
-	}
-
-	//ブロックの描画
-	blockManager_->Draw(camera_);
-
 	//背景の描画
 	backGround_->Draw(camera_);
 
@@ -162,9 +159,6 @@ void TutorialScene1::Draw()
 #pragma region パーティクル描画
 	//パーティクル描画前処理
 	renderer_->PreDrawParticles();
-
-	//パーティクルの描画
-	particleManager_->Draw(camera_);
 
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
@@ -180,10 +174,49 @@ void TutorialScene1::DrawUI()
 	//プレイヤーのUIの描画
 	player_->DrawUI(camera_);
 
-	//スプライトの描画
-	contSprite_->Draw();
-
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
+#pragma endregion
+}
+
+void TutorialScene1::DrawBackGround()
+{
+#pragma region 背景スプライト描画
+	//背景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//背景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+
+#pragma region 3Dオブジェクト描画
+	//プレイヤーの描画
+	player_->Draw(camera_);
+
+	//敵の描画
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsActive())
+		{
+			enemy->Draw(camera_);
+		}
+	}
+
+	//ブロックの描画
+	blockManager_->Draw(camera_);
+
+	//3Dオブジェクト描画
+	renderer_->Render();
+#pragma endregion
+
+#pragma region パーティクル描画
+	//パーティクル描画前処理
+	renderer_->PreDrawParticles();
+
+	//パーティクルの描画
+	particleManager_->Draw(camera_);
+
+	//パーティクル描画後処理
+	renderer_->PostDrawParticles();
 #pragma endregion
 }

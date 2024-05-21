@@ -23,6 +23,10 @@ public:
 
 	void SetRotation(float rotation) { rotation_ = rotation; };
 
+	const Vector2& GetScale() const { return scale_; };
+
+	void SetScale(const Vector2& scale) { scale_ = scale; };
+
 	const Vector4& GetColor() const { return color_; };
 
 	void SetColor(const Vector4& color) { color_ = color; };

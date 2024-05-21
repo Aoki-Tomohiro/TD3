@@ -27,7 +27,7 @@ void Weapon::Initialize(Model* model)
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Weapon";
 	globalVariables->CreateGroup(groupName);
-	globalVariables->AddItem(groupName, "Translation", worldTransform_.translation_);
+	globalVariables->AddItem(groupName, "Offset", offset_);
 	globalVariables->AddItem(groupName, "Scale", worldTransform_.scale_);
 }
 
@@ -61,7 +61,7 @@ void Weapon::Update()
 	model_->GetMaterial(1)->SetColor(color);
 
 	//当たり判定の位置を決める
-	Vector3 offset{ 0.0f,1.0f,3.0f };
+	Vector3 offset = offset_;
 	offset = Mathf::TransformNormal(offset, worldTransform_.parent_->matWorld_);
 	worldTransformCollision_.translation_ = worldTransform_.parent_->translation_;
 	worldTransformCollision_.translation_ += offset;
@@ -121,6 +121,6 @@ void Weapon::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Weapon";
-	worldTransform_.translation_ = globalVariables->GetVector3Value(groupName, "Translation");
+	offset_ = globalVariables->GetVector3Value(groupName, "Offset");
 	worldTransform_.scale_ = globalVariables->GetVector3Value(groupName, "Scale");
 }

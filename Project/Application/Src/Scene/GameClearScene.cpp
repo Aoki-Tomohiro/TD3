@@ -161,3 +161,8 @@ void GameClearScene::DrawUI()
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
+
+void GameClearScene::DrawBackGround()
+{
+
+}

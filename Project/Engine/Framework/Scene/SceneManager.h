@@ -15,6 +15,8 @@ public:
 
 	void DrawUI();
 
+	void DrawBackGround();
+
 	void Load();
 
 	void ChangeScene(const std::string& sceneName);

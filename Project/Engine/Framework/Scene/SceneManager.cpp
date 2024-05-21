@@ -36,6 +36,11 @@ void SceneManager::DrawUI()
 	loadingScreenVisible_ ? loadScene_->DrawUI() : currentScene_->DrawUI();
 }
 
+void SceneManager::DrawBackGround()
+{
+	loadingScreenVisible_ ? loadScene_->DrawBackGround() : currentScene_->DrawBackGround();
+}
+
 void SceneManager::Load()
 {
 	if (nextScene_)
