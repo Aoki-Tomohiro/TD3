@@ -43,9 +43,15 @@ void TutorialScene1::Initialize()
 	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
 	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
 	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
+	backGroundMovieModel_->GetMaterial(1)->SetEnableLighting(false);
 	std::vector<Model*> backGroundModels = { backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
 	backGround_->Initialize(backGroundModels);
+
+	//FollowCameraの生成
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetWorldTransform());
 
 	//スプライトの生成
 	TextureManager::Load("cont.png");
@@ -79,6 +85,9 @@ void TutorialScene1::Update()
 
 	//背景の更新
 	backGround_->Update();
+
+	//FollowCameraの更新
+	followCamera_->Update();
 
 	//カメラの更新
 	camera_.UpdateMatrix();
@@ -203,19 +212,19 @@ void TutorialScene1::DrawBackGround()
 
 #pragma region 3Dオブジェクト描画
 	//プレイヤーの描画
-	player_->Draw(camera_);
+	player_->Draw(followCamera_->GetCamera());
 
 	//敵の描画
 	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
 		if (enemy->GetIsActive())
 		{
-			enemy->Draw(camera_);
+			enemy->Draw(followCamera_->GetCamera());
 		}
 	}
 
 	//ブロックの描画
-	blockManager_->Draw(camera_);
+	blockManager_->Draw(followCamera_->GetCamera());
 
 	//3Dオブジェクト描画
 	renderer_->Render();
@@ -226,7 +235,7 @@ void TutorialScene1::DrawBackGround()
 	renderer_->PreDrawParticles();
 
 	//パーティクルの描画
-	particleManager_->Draw(camera_);
+	particleManager_->Draw(followCamera_->GetCamera());
 
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();

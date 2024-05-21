@@ -25,6 +25,7 @@
     <ClCompile Include="Application\Src\Object\Enemy\Astar.cpp" />
     <ClCompile Include="Application\Src\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Src\Object\Block\BlockManager.cpp" />
+    <ClCompile Include="Application\Src\Object\FollowCamera\FollowCamera.cpp" />
     <ClCompile Include="Application\Src\Object\Player\CopyManager.cpp" />
     <ClCompile Include="Application\Src\Object\Player\Player.cpp" />
     <ClCompile Include="Application\Src\Object\Player\Copy.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Application\Src\Object\Enemy\Astar.h" />
     <ClInclude Include="Application\Src\Object\Enemy\Enemy.h" />
     <ClInclude Include="Application\Src\Object\Block\BlockManager.h" />
+    <ClInclude Include="Application\Src\Object\FollowCamera\FollowCamera.h" />
     <ClInclude Include="Application\Src\Object\Player\CopyManager.h" />
     <ClInclude Include="Application\Src\Object\Player\Player.h" />
     <ClInclude Include="Application\Src\Object\Player\Copy.h" />

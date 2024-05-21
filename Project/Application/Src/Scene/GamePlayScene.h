@@ -14,6 +14,7 @@
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
+#include "Application/Src/Object/FollowCamera/FollowCamera.h"
 
 class GamePlayScene : public IScene
 {
@@ -85,6 +86,9 @@ private:
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
+
+	//FollowCamera
+	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
 
 	//コントローラーのUI
 	std::unique_ptr<Sprite> contSprite_ = nullptr;
