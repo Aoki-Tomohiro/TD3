@@ -9,7 +9,7 @@ void Weapon::Initialize(Model* model)
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 0.0f,2.0f,5.0f };
-	worldTransform_.scale_ = { 0.1f,3.0f,3.0f };
+	worldTransform_.scale_ = { 0.1f,1.5f,1.4f };
 	worldTransformCollision_.Initialize();
 	worldTransformCollision_.scale_ = { 3.0f,3.0f,0.1f };
 

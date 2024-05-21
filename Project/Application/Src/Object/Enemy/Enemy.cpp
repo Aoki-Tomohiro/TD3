@@ -100,8 +100,8 @@ void Enemy::Update()
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
 	ImGui::Text("MapPlayerPos %d", map[int(playerPosition_.x)][int(playerPosition_.y)]);
-	ImGui::Text("nextPos X%d,Y%d", int(nextPosition_.x), int(nextPosition_.y));
-	ImGui::Text("MapNextPos %d", map[int(nextPosition_.x)][int(nextPosition_.y)]);
+	ImGui::Text("enemyPos X%d,Y%d", int(enemyPosition_.x), int(enemyPosition_.y));
+	//ImGui::Text("MapNextPos %d", map[int(nextPosition_.x)][int(nextPosition_.y)]);
 	if(copy_.size() !=0){
 		ImGui::Text("CopyPos X%d,Y%d", int(copy_[0]->GetWorldPosition().x), int(copy_[0]->GetWorldPosition().y));
 	}
@@ -188,7 +188,9 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 
-		
+		if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 2 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 2) {
+			velocity_.x = 0.0f;
+		}
 
 		worldTransform_.translation_ += velocity_;
 	}
@@ -257,7 +259,9 @@ void Enemy::BehaviorRootUpdate() {
 
 		
 
-
+		if (map[int(enemyPosition_.x)+1][int(enemyPosition_.y)] >= 2 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 2) {
+			velocity_.x = 0.0f;
+		}
 		worldTransform_.translation_ += velocity_;
 
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
@@ -274,19 +278,20 @@ void Enemy::BehaviorRootUpdate() {
 	}
 
 	
-	if (map[int(enemyPosition_.x)][int(enemyPosition_.y - 1)] == 2 && velocity_.x == 0.0f) {
-		if (enemyPosition_.x < playerPosition_.x && worldTransform_.translation_.x > -32.0f) {
-			velocity_.x = -0.3f;
-			
-			worldTransform_.translation_ += velocity_;
-		}
+	if (int(enemyPosition_.y - 2) == int(playerPosition_.y) && velocity_.x == 0.0f) {
 		
-		if (enemyPosition_.x > playerPosition_.x && worldTransform_.translation_.x < 32.0f) {
-			velocity_.x = 0.3f;
-			worldTransform_.translation_ += velocity_;
+		if (int(playerPosition_.x) == int(enemyPosition_.x - 1) || int(playerPosition_.x) == int(enemyPosition_.x + 1) || int(playerPosition_.x) == int(enemyPosition_.x)) {
+			if (enemyPosition_.x < playerPosition_.x && worldTransform_.translation_.x > -32.0f) {
+				velocity_.x = -0.3f;
+
+				worldTransform_.translation_ += velocity_;
+			}
+
+			if (enemyPosition_.x > playerPosition_.x && worldTransform_.translation_.x < 32.0f) {
+				velocity_.x = 0.3f;
+				worldTransform_.translation_ += velocity_;
+			}
 		}
-		
-	
 	}
 	
 
@@ -387,7 +392,7 @@ void Enemy::DistanceFunction() {
 			if (differenceX < 0) { differenceX *= -1; }
 			if (differenceY < 0) { differenceY *= -1; }
 
-			//脅威度の設定 5が自分の位置
+			//脅威度の設定 3が自分の位置
 
 			if (differenceX < 3 && differenceY < 3) {
 				if (map[x][y] <= 1) {
@@ -554,7 +559,7 @@ void Enemy::DistanceFunction() {
 					for (int x = 1; x <= 3; x++) {
 						if (playerPosition_.y <= enemyPosition_.y) {
 							if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x < enemyPosition_.x) {
-								if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 3)] == 0) {
+								if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 3)] == 0 && velocity_.x != 0.0f) {
 									jump_ = true;
 								}
 								else {
@@ -563,7 +568,7 @@ void Enemy::DistanceFunction() {
 								break;
 							}
 							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x >= enemyPosition_.x) {
-								if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0) {
+								if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 &&velocity_.x != 0.0f) {
 									jump_ = true;
 								}
 								else {
@@ -577,7 +582,7 @@ void Enemy::DistanceFunction() {
 
 							if (copy_[i]->GetWorldPosition().y <= enemyPosition_.y) {
 								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 1][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x < enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) +2][int(enemyPosition_.y -3)] == 0 && (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 2)] == 10|| map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 2)] == 10)) {
+									if (map[int(enemyPosition_.x) +2][int(enemyPosition_.y -3)] == 0 && (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 2)] == 10|| map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 2)] == 10) && velocity_.x != 0.0f) {
 										jump_ = true;
 									}
 									else {
@@ -587,7 +592,7 @@ void Enemy::DistanceFunction() {
 									break;
 								}
 								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 1][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x >= enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 && (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 2)] == 10 || map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 2)] == 10)) {
+									if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 && (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 2)] == 10 || map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 2)] == 10) && velocity_.x != 0.0f) {
 										jump_ = true;
 									}
 									else {
