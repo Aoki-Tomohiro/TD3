@@ -171,9 +171,6 @@ void TutorialScene1::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//プレイヤーのUIの描画
-	player_->DrawUI(camera_);
-
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
@@ -218,5 +215,16 @@ void TutorialScene1::DrawBackGround()
 
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
+#pragma endregion
+
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//プレイヤーのUIの描画
+	player_->DrawUI(camera_);
+
+	//前景スプライト描画後処理
+	renderer_->PostDrawSprites();
 #pragma endregion
 }
