@@ -180,6 +180,9 @@ void GamePlayScene::Update()
 		contSprite_->SetPosition(spritePosition_);
 		contSprite_->SetSize(spriteScale_);
 
+		//評価の計算
+		CalculateRating();
+
 		//ノイズエフェクトを無効化
 		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 	}
@@ -213,8 +216,7 @@ void GamePlayScene::Update()
 		}
 	}
 
-	//評価の計算
-	CalculateRating();
+	
 	//パーティクルの更新
 	particleManager_->Update();
 
@@ -342,10 +344,10 @@ void GamePlayScene::CalculateRating() {
 			}
 
 			if (defeatedEnemyCount - num_ <= -2) {
-				likes_ += 100 * (num_ - defeatedEnemyCount);
+				likes_ += 50 * (num_ - defeatedEnemyCount);
 			}
 			else {
-				likes_ += 50;
+				likes_ += 25;
 			}
 
 			

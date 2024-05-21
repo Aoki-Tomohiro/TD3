@@ -107,7 +107,7 @@ void Enemy::Update()
 	}
 	
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
-	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1]);
+	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) - 1]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
 	ImGui::Text("%d", blockHit_);
@@ -160,6 +160,8 @@ void Enemy::BehaviorRootUpdate() {
 	if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10) {
 		velocity_.y = 0.00f;
 		velocity_.x = 0.00f;
+
+		
 	}
 	else {
 
@@ -186,7 +188,7 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 
-
+		
 
 		worldTransform_.translation_ += velocity_;
 	}
@@ -253,14 +255,11 @@ void Enemy::BehaviorRootUpdate() {
 			}
 		}
 
+		
+
+
 		worldTransform_.translation_ += velocity_;
 
-		
-
-
-		
-	
-		
 		//velocity_ = enemyPosition_ - worldTransform_.translation_;
 		if (worldTransform_.translation_ == velocity_) {
 			// パスを更新
@@ -275,13 +274,27 @@ void Enemy::BehaviorRootUpdate() {
 	}
 
 	
-
-
+	if (map[int(enemyPosition_.x)][int(enemyPosition_.y - 1)] == 2 && velocity_.x == 0.0f) {
+		if (enemyPosition_.x < playerPosition_.x && worldTransform_.translation_.x > -32.0f) {
+			velocity_.x = -0.3f;
+			
+			worldTransform_.translation_ += velocity_;
+		}
+		
+		if (enemyPosition_.x > playerPosition_.x && worldTransform_.translation_.x < 32.0f) {
+			velocity_.x = 0.3f;
+			worldTransform_.translation_ += velocity_;
+		}
+		
+	
+	}
+	
 
 	//地面より下に行かないようにする
 	if (worldTransform_.translation_.y <= -10.0f)
 	{
 		worldTransform_.translation_.y = -10.0f;
+
 	}
 
 
