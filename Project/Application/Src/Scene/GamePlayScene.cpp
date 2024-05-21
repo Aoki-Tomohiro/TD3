@@ -24,7 +24,7 @@ void GamePlayScene::Initialize()
 	AddEnemy({ 0.0f,2.0f,0.0f });
 	AddEnemy({ 10.0f,-10.0f,0.0f });
 	AddEnemy({ -10.0f,-10.0f,0.0f });
-
+	enemyNum_ = int(enemies_.size());
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -172,6 +172,7 @@ void GamePlayScene::Update()
 			reversePlayerPositions = copyManager_->GetPlayerPositions();
 			isReversed_ = true;
 			player_->StopAnimation();
+			CalculateRating();
 			Reset();
 		}
 
@@ -212,6 +213,8 @@ void GamePlayScene::Update()
 		}
 	}
 
+	//評価の計算
+	CalculateRating();
 	//パーティクルの更新
 	particleManager_->Update();
 
@@ -219,6 +222,14 @@ void GamePlayScene::Update()
 	ImGui::Begin("GamePlayScene");
 	ImGui::DragFloat2("SpritePosition", &spritePosition_.x, 0.1f);
 	ImGui::DragFloat2("SpriteScale", &spriteScale_.x, 0.01f);
+	if (ImGui::TreeNode("Rating")) {
+		ImGui::Text("EnemyNum %d", enemyNum_);
+		ImGui::Text("Likes%d", likes_);
+		ImGui::Text("disLikes %f", dislikes_);
+		ImGui::Text("totalScore %d", totaScore_);
+		ImGui::TreePop();
+	}
+
 	ImGui::End();
 }
 
@@ -311,4 +322,63 @@ void GamePlayScene::AddEnemy(const Vector3& position)
 	Enemy* enemy = new Enemy();
 	enemy->Initialize(enemyModel_.get(), position);
 	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+	
+}
+
+void GamePlayScene::CalculateRating() {
+	//毎秒今いる敵の数*1ずつ減っていく
+	dislikes_ += (1.0f / 60.0f) * float(enemyNum_);
+
+	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
+	{
+		if (copyManager_->GetCopies()[i]->GetWeapon()->GetIsAttack() && !player_->GetWeapon()->GetIsAttack()) {
+			num_ = 0;
+			
+			for (int i = 0; i < enemies_.size(); ++i)
+			{
+				if (!enemies_[i].get()->GetIsActive()) {
+					num_++;
+				}
+			}
+
+			if (defeatedEnemyCount - num_ <= -2) {
+				likes_ += 100 * (num_ - defeatedEnemyCount);
+			}
+			else {
+				likes_ += 50;
+			}
+
+			
+			defeatedEnemyCount = num_;
+
+			enemyNum_ = enemyNum_ - defeatedEnemyCount;
+		}
+
+	}
+
+
+	if (player_->GetWeapon()->GetIsAttack())
+	{
+		num_ = 0;
+		for (int i = 0; i < enemies_.size(); ++i)
+		{
+			if (!enemies_[i].get()->GetIsActive()) {
+				num_++;
+			}
+		}
+
+		if (defeatedEnemyCount - num_ <= -2) {
+			likes_ += 100 * (num_ - defeatedEnemyCount);
+		}
+
+		if (defeatedEnemyCount - num_ == -1) {
+			likes_ += 50;
+		}
+		
+
+
+		defeatedEnemyCount = 0;
+		enemyNum_ = int(enemies_.size());
+	}
+	totaScore_ = likes_ - int(dislikes_);
 }
