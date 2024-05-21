@@ -2,6 +2,7 @@
     "Player": {
         "Gravity": 0.05000000074505806,
         "JumpFirstSpeed": 0.800000011920929,
+        "MovementRestrictionTime": 600,
         "Speed": 0.30000001192092896
     }
 }

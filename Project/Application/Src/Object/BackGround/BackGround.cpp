@@ -13,11 +13,17 @@ void BackGround::Initialize(std::vector<Model*> models)
 	{
 		worldTransforms_[i].Initialize();
 	}
-	worldTransforms_[kFrame].translation_ = {21.6f,-9.0f,1.6f};
-	worldTransforms_[kFrame].scale_ = {2.92f,1.35f,1.0f};
+	//worldTransforms_[kFrame].translation_ = {21.6f,-9.0f,1.6f};
+	//worldTransforms_[kFrame].scale_ = {2.92f,1.35f,1.0f};
+	//worldTransforms_[kFrame].rotation_.y = std::numbers::pi_v<float>;
+	//worldTransforms_[kMovie].translation_ = { -0.2f,5.9f,2.0f };
+	//worldTransforms_[kMovie].scale_ = { 34.6f,12.98f,1.0f };
+	//worldTransforms_[kMovie].rotation_.y = std::numbers::pi_v<float>;
+	worldTransforms_[kFrame].translation_ = { 21.6f,-19.0f,1.6f };
+	worldTransforms_[kFrame].scale_ = { 2.92f,1.8f,1.0f };
 	worldTransforms_[kFrame].rotation_.y = std::numbers::pi_v<float>;
-	worldTransforms_[kMovie].translation_ = { -0.2f,5.9f,2.0f };
-	worldTransforms_[kMovie].scale_ = { 34.6f,12.98f,1.0f };
+	worldTransforms_[kMovie].translation_ = { -0.2f,0.9f,1.4f };
+	worldTransforms_[kMovie].scale_ = { 34.12f,17.05f,1.0f };
 	worldTransforms_[kMovie].rotation_.y = std::numbers::pi_v<float>;
 }
 

@@ -45,5 +45,7 @@ private:
 	std::unique_ptr<Sprite> xButtonSprite_ = nullptr;
 
 	bool xButtonSpriteVisible_ = false;
+
+	Vector3 offset_{ 0.0f,1.0f,3.0f };
 };
 
