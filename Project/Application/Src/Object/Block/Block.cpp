@@ -1,16 +1,14 @@
 #include "Block.h"
 
-void Block::Initialize(Model* model, const Vector3& position, const Vector3& scale)
+void Block::Initialize(const Vector3& position, const Vector3& scale)
 {
 	//モデルの初期化
-	assert(model);
-	model_ = model;
+	model_.reset(ModelManager::Create());
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.scale_ = scale;
-
 
 	//衝突判定の初期化
 	AABB aabb = {

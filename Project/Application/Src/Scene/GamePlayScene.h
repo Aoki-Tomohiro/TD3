@@ -19,6 +19,10 @@
 class GamePlayScene : public IScene
 {
 public:
+	static const uint32_t kMaxStageCount = 6;
+
+	static uint32_t currentStageNumber;
+
 	void Initialize() override;
 
 	void Finalize() override;

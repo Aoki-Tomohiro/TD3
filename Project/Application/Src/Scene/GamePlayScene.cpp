@@ -4,6 +4,8 @@
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include "Application/Src/Scene/GameClearScene.h"
 
+uint32_t GamePlayScene::currentStageNumber = 0;
+
 void GamePlayScene::Initialize()
 {
 	renderer_ = Renderer::GetInstance();

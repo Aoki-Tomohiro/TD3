@@ -16,6 +16,11 @@ public:
 	const std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; };
 
 private:
+	void SaveData();
+
+	void LoadFile();
+
+private:
 	Model* model_ = nullptr;
 
 	std::vector<std::unique_ptr<Block>> blocks_{};
