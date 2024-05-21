@@ -73,6 +73,7 @@ void Copy::Update()
 
 	//武器の更新
 	weapon_->Update();
+	
 }
 
 void Copy::Draw(const Camera& camera)

@@ -34,19 +34,8 @@ public:
 	void Reset();
 
 private:
-	void AddBlock(const Vector3& position, const Vector3& scale);
-
-	void Addcopy();
-	void Addcopy2();
-	void Addcopy3();
-	void Addcopy4();
-	void Addcopy5();
-
-	void Updatacopy1();
-	void Updatacopy2();
-	void Updatacopy3();
-	void Updatacopy4();
-	void Updatacopy5();
+	
+	void CalculateRating();
 
 	void AddEnemy(const Vector3& position);
 
@@ -60,11 +49,18 @@ private:
 	//カメラ
 	Camera camera_{};
 
+	//評価
+	int likes_;
+	float dislikes_;
+	int totaScore_;
+	//一回の攻撃で倒した敵の数
+	int num_;
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
 	std::vector<std::unique_ptr<Enemy>> enemies_{};
-
+	int enemyNum_;//今の敵の数
+	int defeatedEnemyCount;//今倒している敵の数
 
 	//衝突マネージャー
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

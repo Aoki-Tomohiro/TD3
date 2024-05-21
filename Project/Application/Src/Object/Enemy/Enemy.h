@@ -148,5 +148,7 @@ private:
 
 	//クォータニオン
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
+
+	
 };
 
