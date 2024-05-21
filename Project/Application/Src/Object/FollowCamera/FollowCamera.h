@@ -18,6 +18,6 @@ private:
 
 	const WorldTransform* target_ = nullptr;
 
-	Vector3 offset_{ 0.0f,0.0f,-20.0f };
+	Vector3 offset_{ 0.0f,1.2f,-7.4f };
 };
 
