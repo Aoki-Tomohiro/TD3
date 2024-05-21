@@ -27,8 +27,13 @@ void BlockManager::Update()
 
 	//ImGui
 	ImGui::Begin("BlockManager");
+
+	// 削除対象のブロックインデックス
+	int deleteIndex = -1;
+
 	//ID
 	int id = 0;
+
 	//各ブロックの調整
 	for (std::unique_ptr<Block>& block : blocks_)
 	{
@@ -47,6 +52,13 @@ void BlockManager::Update()
 			block->SetColor({ 1.0f,0.5f,0.0f,1.0f });
 			ImGui::DragFloat3("Position", &position.x, 0.1f);
 			ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+
+			// 削除ボタンを追加
+			if (ImGui::Button("Delete"))
+			{
+				deleteIndex = id; // 削除対象のインデックスを記録
+			}
+
 			ImGui::TreePop();
 		}
 		else
@@ -63,16 +75,25 @@ void BlockManager::Update()
 		//IDをインクリメント
 		id++;
 	}
+
+	// ブロックを削除
+	if (deleteIndex != -1)
+	{
+		blocks_.erase(blocks_.begin() + deleteIndex);
+	}
+
 	//ブロックの追加
 	if (ImGui::Button("AddBlock"))
 	{
 		AddBlock({ 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f });
 	}
+
 	//保存
 	if (ImGui::Button("Save"))
 	{
 		SaveData();
 	}
+
 	ImGui::End();
 }
 
@@ -157,61 +178,41 @@ void BlockManager::LoadFile()
 	const std::string groupName = "Stage" + std::to_string(GamePlayScene::currentStageNumber);
 	std::filesystem::path filePath = "Application/Resources/Editor/" + groupName + ".json";
 
-	//読み込み用ファイルストリーム
-	std::ifstream ifs;
-	//ファイルを読み込み用に開く
-	ifs.open(filePath);
+	// 読み込み用ファイルストリーム
+	std::ifstream ifs(filePath);
 
-	//ファイルオープン失敗
+	// ファイルオープン失敗
 	if (ifs.fail())
 	{
-		std::string message = "Failed open data file for read.";
+		std::string message = "Failed to open data file for read.";
 		MessageBoxA(nullptr, message.c_str(), groupName.c_str(), 0);
 		assert(0);
 		return;
 	}
 
 	nlohmann::json root;
-	//json文字列からjsonのデータ構造に展開
+	// json文字列からjsonのデータ構造に展開
 	ifs >> root;
-	//ファイルを閉じる
+	// ファイルを閉じる
 	ifs.close();
 
-	//グループを検索
+	// グループを検索
 	nlohmann::json::iterator itGroup = root.find(groupName);
-	//未登録チェック
+	// 未登録チェック
 	assert(itGroup != root.end());
 
-	for (nlohmann::json::iterator itItem = itGroup->begin(); itItem != itGroup->end(); ++itItem)
+	// 各ブロックデータの処理
+	for (auto& [blockName, blockData] : itGroup->items())
 	{
-		//読み込み
-		uint32_t id = 0;
-		while (true)
+		// ブロック名が"Block"で始まることを確認
+		if (blockName.find("Block") == 0)
 		{
-			const std::string ItemName = "Block" + std::to_string(id);
-			//グループを検索
-			nlohmann::json::iterator itGroup = root.find(ItemName);
-			//未登録チェック
-			if (itGroup == root.end())
-			{
-				break;
-			}
-
 			// ブロックの位置とスケールを取得
-			Vector3 position{};
-			Vector3 scale{};
-			auto& item = *itGroup;
-			if (item.contains(ItemName))
-			{
-				const auto& blockData = item[ItemName];
-				position = Vector3(blockData["Position"][0], blockData["Position"][1], blockData["Position"][2]);
-				scale = Vector3(blockData["Scale"][0], blockData["Scale"][1], blockData["Scale"][2]);
-				// ブロックの追加
-				AddBlock(position, scale);
-			}
+			Vector3 position = Vector3(blockData["Position"][0], blockData["Position"][1], blockData["Position"][2]);
+			Vector3 scale = Vector3(blockData["Scale"][0], blockData["Scale"][1], blockData["Scale"][2]);
 
-			// 次のブロックのIDに進む
-			++id;
+			// ブロックの追加
+			AddBlock(position, scale);
 		}
 	}
 }

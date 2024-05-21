@@ -37,7 +37,6 @@ void TutorialScene1::Initialize()
 	blockModel_.reset(ModelManager::Create());
 	blockManager_ = std::make_unique<BlockManager>();
 	blockManager_->Initialize(blockModel_.get());
-	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
 
 	//背景の生成
 	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
