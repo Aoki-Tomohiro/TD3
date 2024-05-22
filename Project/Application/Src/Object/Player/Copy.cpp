@@ -1,6 +1,6 @@
 #include "Copy.h"
 
-void Copy::Initialize(const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions)
+void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions)
 {
 	//モデルの初期化
 	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
@@ -37,12 +37,22 @@ void Copy::Update()
 	//座標を設定
 	if (currentIndex_ < playerPositions_.size())
 	{
+		Vector3 prePlayerPosition = GetWorldPosition();
 		Vector3 playerPosition{};
-		Quaternion quaternion{};
 		bool isAttack{};
-		std::tie(playerPosition, quaternion, isAttack,animationNumber,animationTime) = playerPositions_[currentIndex_];
+		std::tie(playerPosition, isAttack,animationNumber,animationTime) = playerPositions_[currentIndex_];
 		worldTransform_.translation_ = playerPosition;
-		worldTransform_.quaternion_ = quaternion;
+		if (prePlayerPosition.x != playerPosition.x)
+		{
+			if (prePlayerPosition.x > playerPosition.x)
+			{
+				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+			}
+			else
+			{
+				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+			}
+		}
 		weapon_->SetIsAttack(isAttack);
 		currentIndex_++;
 	}
@@ -64,7 +74,8 @@ void Copy::Update()
 		velocity_.y = 0.0f;
 	}
 
-	//ワールドトランスフォームの行進
+	//ワールドトランスフォームの更新
+	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//モデルの更新
@@ -153,16 +164,27 @@ void Copy::Reverse()
 	if (currentIndex_ > 0)
 	{
 		currentIndex_--;
+		Vector3 prePosition = GetWorldPosition();
 		Vector3 playerPosition{};
-		Quaternion quaternion{};
 		bool isAttack{};
-		std::tie(playerPosition, quaternion, isAttack, animationNumber, animationTime) = playerPositions_[currentIndex_];
+		std::tie(playerPosition, isAttack, animationNumber, animationTime) = playerPositions_[currentIndex_];
 		worldTransform_.translation_ = playerPosition;
-		worldTransform_.quaternion_ = quaternion;
+		if (prePosition.x != playerPosition.x)
+		{
+			if (prePosition.x > playerPosition.x)
+			{
+				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+			}
+			else
+			{
+				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+			}
+		}
 		weapon_->SetIsAttack(isAttack);
 	}
 
-	//ワールドトランスフォームの行進
+	//ワールドトランスフォームの更新
+	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//モデルの更新

@@ -3,7 +3,7 @@
 #include "Engine/Base/Renderer.h"
 #include "Engine/Components/Collision/CollisionManager.h"
 #include "Application/Src/Object/Player/Player.h"
-#include "Application/Src/Object/Enemy/Enemy.h"
+#include "Application/Src/Object/Enemy/EnemyManager.h"
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
@@ -25,8 +25,6 @@ public:
 	void DrawBackGround() override;
 
 private:
-	void AddEnemy(const Vector3& position);
-
 	void Reset();
 
 private:
@@ -49,7 +47,8 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies_{};
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
+	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;
@@ -77,6 +76,6 @@ private:
 
 	//逆再生中か
 	bool isReversed_ = false;
-	std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>> reversePlayerPositions{};
+	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 };
 

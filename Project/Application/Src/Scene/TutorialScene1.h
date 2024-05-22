@@ -3,7 +3,7 @@
 #include "Engine/Base/Renderer.h"
 #include "Engine/Components/Collision/CollisionManager.h"
 #include "Application/Src/Object/Player/Player.h"
-#include "Application/Src/Object/Enemy/Enemy.h"
+#include "Application/Src/Object/Enemy/EnemyManager.h"
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
@@ -44,7 +44,8 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies_{};
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
+	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;

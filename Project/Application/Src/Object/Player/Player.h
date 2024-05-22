@@ -36,16 +36,7 @@ public:
 
 	const bool GetIsStop() const { return isStop_; };
 
-	void SetPosition(const Vector3& position, const Quaternion& quaternion, const bool isAttack, const uint32_t animationNumber, const float animationTime) {
-		worldTransform_.translation_ = position;
-		worldTransform_.quaternion_ = quaternion; 
-		weapon_->SetIsAttack(isAttack);
-		animationNumber_ = animationNumber;
-		animationTime_ = animationTime;
-		worldTransform_.UpdateMatrixFromQuaternion();
-		models_[0]->GetAnimation()->SetAnimationTime(animationTime_);
-		models_[0]->Update(worldTransform_, animationNumber_);
-	}
+	void SetPositions(const Vector3& position, const bool isAttack, const uint32_t animationNumber, const float animationTime);
 
 	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
 

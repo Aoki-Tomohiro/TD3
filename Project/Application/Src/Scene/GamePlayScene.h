@@ -8,7 +8,7 @@
 #include "Engine/Components/Collision/CollisionManager.h"
 #include "Engine/3D/Model/ModelManager.h"
 #include "Engine/2D/Sprite.h"
-#include "Application/Src/Object/Enemy/Enemy.h"
+#include "Application/Src/Object/Enemy/EnemyManager.h"
 #include "Engine/Math/MathFunction.h"
 #include "Application/Src/Object/Player/Player.h"
 #include "Application/Src/Object/Block/BlockManager.h"
@@ -19,6 +19,10 @@
 class GamePlayScene : public IScene
 {
 public:
+	static const uint32_t kMaxStageCount = 6;
+
+	static uint32_t currentStageNumber;
+
 	void Initialize() override;
 
 	void Finalize() override;
@@ -36,8 +40,6 @@ public:
 private:
 	
 	void CalculateRating();
-
-	void AddEnemy(const Vector3& position);
 
 private:
 	Renderer* renderer_ = nullptr;
@@ -58,7 +60,8 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies_{};
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
+	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 	int enemyNum_;//今の敵の数
 	int defeatedEnemyCount;//今倒している敵の数
 
@@ -96,6 +99,6 @@ private:
 
 	//逆再生中か
 	bool isReversed_ = false;
-	std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>> reversePlayerPositions{};
+	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 };
 

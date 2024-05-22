@@ -289,6 +289,30 @@ const Vector3 Player::GetWorldPosition() const
 	return pos;
 }
 
+void Player::SetPositions(const Vector3& position, const bool isAttack, const uint32_t animationNumber, const float animationTime)
+{
+	Vector3 prePosition = worldTransform_.translation_;
+	worldTransform_.translation_ = position;
+	weapon_->SetIsAttack(isAttack);
+	if (prePosition.x != position.x)
+	{
+		if (prePosition.x > position.x)
+		{
+			destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+		}
+		else
+		{
+			destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+		}
+	}
+	animationNumber_ = animationNumber;
+	animationTime_ = animationTime;
+	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+	worldTransform_.UpdateMatrixFromQuaternion();
+	models_[0]->GetAnimation()->SetAnimationTime(animationTime_);
+	models_[0]->Update(worldTransform_, animationNumber_);
+}
+
 void Player::BehaviorRootInitialize()
 {
 	//当たり判定をなくす

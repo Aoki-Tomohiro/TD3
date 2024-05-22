@@ -1,4 +1,4 @@
-#include "BlockManager.h"
+#include "EnemyManager.h"
 #include <iostream>
 #include <fstream>
 #include <variant>
@@ -6,7 +6,7 @@
 #include <map>
 #include <Engine/Externals/nlohmann/json.hpp>
 
-void BlockManager::Initialize(Model* model, uint32_t stageNumber)
+void EnemyManager::Initialize(Model* model, uint32_t stageNumber)
 {
 	//モデルの初期化
 	assert(model);
@@ -15,23 +15,28 @@ void BlockManager::Initialize(Model* model, uint32_t stageNumber)
 	//ステージの設定
 	stageNumber_ = stageNumber;
 
-	//地面の追加
-	AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
-
 	//ファイル読み込み
 	LoadFile();
 }
 
-void BlockManager::Update()
+void EnemyManager::Update()
 {
-	//ブロックの更新
-	for (std::unique_ptr<Block>& block : blocks_)
+	//敵の更新
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		block->Update();
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->Update();
+		}
 	}
 
 	//ImGui
-	ImGui::Begin("BlockManager");
+	ImGui::Begin("EnemyManager");
 
 	//削除対象のブロックインデックス
 	int deleteIndex = -1;
@@ -40,32 +45,31 @@ void BlockManager::Update()
 	int id = 0;
 
 	//各ブロックの調整
-	for (std::unique_ptr<Block>& block : blocks_)
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
 		//名前を設定
-		std::string str = "Block" + std::to_string(id);
+		std::string str = "Enemy" + std::to_string(id);
 
 		//調整
 		if (ImGui::TreeNode(str.c_str()))
 		{
 			//座標を取得
-			Vector3 position = block->GetPosition();
+			Vector3 position = enemy->GetWorldPosition();
 
-			//スケールを取得
-			Vector3 scale = block->GetScale();
-
-			//座標とスケールを変更
+			//座標を変更
 			ImGui::DragFloat3("Position", &position.x, 0.1f);
-			ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+
+			//編集中にする
+			enemy->SetIsEdit(true);
 
 			//色を変更
-			block->SetColor({ 1.0f,0.5f,0.0f,1.0f });
+			enemy->SetColor({ 1.0f,0.5f,0.0f,1.0f });
 
 			//座標を設定
-			block->SetPosition(position);
+			enemy->SetPosition(position);
 
-			//スケールを設定
-			block->SetScale(scale);
+			//ワールド行列の更新
+			enemy->UpdateMatrix();
 
 			// 削除ボタンを追加
 			if (ImGui::Button("Delete"))
@@ -78,7 +82,10 @@ void BlockManager::Update()
 		else
 		{
 			//色を変更
-			block->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+			enemy->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+
+			//編集してない状態に戻す
+			enemy->SetIsEdit(false);
 		}
 
 		//IDをインクリメント
@@ -88,13 +95,13 @@ void BlockManager::Update()
 	// ブロックを削除
 	if (deleteIndex != -1)
 	{
-		blocks_.erase(blocks_.begin() + deleteIndex);
+		enemies_.erase(enemies_.begin() + deleteIndex);
 	}
 
 	//ブロックの追加
-	if (ImGui::Button("AddBlock"))
+	if (ImGui::Button("AddEnemy"))
 	{
-		AddBlock({ 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f });
+		AddEnemy({ 0.0f,0.0f,0.0f });
 	}
 
 	//保存
@@ -106,24 +113,33 @@ void BlockManager::Update()
 	ImGui::End();
 }
 
-void BlockManager::Draw(const Camera& camera)
+void EnemyManager::Draw(const Camera& camera)
 {
-	//ブロックの描画
-	for (std::unique_ptr<Block>& block : blocks_)
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		block->Draw(camera);
+		if (enemy->GetIsActive())
+		{
+			enemy->Draw(camera);
+		}
 	}
 }
 
-void BlockManager::AddBlock(const Vector3& position, const Vector3& scale)
+void EnemyManager::SetIsTutorial(const bool isTutorial)
 {
-	Block* block = new Block();
-	block->Initialize(position, scale);
-	blocks_.push_back(std::unique_ptr<Block>(block));
-	blockNum++;
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->SetIsTutorial(isTutorial);
+	}
 }
 
-void BlockManager::SaveData()
+void EnemyManager::AddEnemy(const Vector3& position)
+{
+	Enemy* enemy = new Enemy();
+	enemy->Initialize(model_, position);
+	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+}
+
+void EnemyManager::SaveData()
 {
 	nlohmann::json root;
 	//nlohmann::json型のデータコンテナにグループの全データをまとめる
@@ -134,33 +150,22 @@ void BlockManager::SaveData()
 
 	//全てのブロックについて
 	uint32_t id = 0;
-	for (std::unique_ptr<Block>& block : blocks_)
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		//最初のブロックは飛ばす
-		if (id == 0)
-		{
-			id++;
-			continue;
-		}
-
 		//jsonオブジェクトの登録
-		const std::string ItemName = "Block" + std::to_string(id);
+		const std::string ItemName = "Enemy" + std::to_string(id);
 		root[groupName][ItemName] = nlohmann::json::object();
 
 		//座標
-		Vector3 position = block->GetPosition();
+		Vector3 position = enemy->GetWorldPosition();
 		root[groupName][ItemName]["Position"] = nlohmann::json::array({ position.x, position.y, position.z });
-
-		//スケール
-		Vector3 scale = block->GetScale();
-		root[groupName][ItemName]["Scale"] = nlohmann::json::array({ scale.x, scale.y, scale.z });
 
 		//IDをインクリメント
 		id++;
 	}
 
 	//ディレクトリがなければ作成する
-	std::filesystem::path dir("Application/Resources/Editor/Blocks");
+	std::filesystem::path dir("Application/Resources/Editor/Enemies");
 	if (!std::filesystem::exists(dir))
 	{
 		std::filesystem::create_directory(dir);
@@ -188,11 +193,11 @@ void BlockManager::SaveData()
 	ofs.close();
 }
 
-void BlockManager::LoadFile()
+void EnemyManager::LoadFile()
 {
 	// 読み込むJSONファイルのパス
 	const std::string groupName = "Stage" + std::to_string(stageNumber_);
-	std::filesystem::path filePath = "Application/Resources/Editor/Blocks/" + groupName + ".json";
+	std::filesystem::path filePath = "Application/Resources/Editor/Enemies/" + groupName + ".json";
 
 	// 読み込み用ファイルストリーム
 	std::ifstream ifs(filePath);
@@ -240,17 +245,94 @@ void BlockManager::LoadFile()
 	assert(itGroup != root.end());
 
 	// 各ブロックデータの処理
-	for (auto& [blockName, blockData] : itGroup->items())
+	for (auto& [enemyName, enemyData] : itGroup->items())
 	{
 		// ブロック名が"Block"で始まることを確認
-		if (blockName.find("Block") == 0)
+		if (enemyName.find("Enemy") == 0)
 		{
 			// ブロックの位置とスケールを取得
-			Vector3 position = Vector3(blockData["Position"][0], blockData["Position"][1], blockData["Position"][2]);
-			Vector3 scale = Vector3(blockData["Scale"][0], blockData["Scale"][1], blockData["Scale"][2]);
+			Vector3 position = Vector3(enemyData["Position"][0], enemyData["Position"][1], enemyData["Position"][2]);
 
-			// ブロックの追加
-			AddBlock(position, scale);
+			// 敵の追加
+			AddEnemy(position);
 		}
+	}
+}
+
+void EnemyManager::Reverse()
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Reverse();
+	}
+}
+
+void EnemyManager::Reset()
+{
+	//敵をリセット
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Reset();
+	}
+}
+
+void EnemyManager::SetBlockData(const Vector3& position, const Vector3& size)
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->SetBlockPosition(position);
+			enemy->SetBlockSize(size);
+		}
+	}
+}
+
+void EnemyManager::SetPlayerPosition(const Vector3& position)
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->SetPlayerPosition(position);
+		}
+	}
+}
+
+void EnemyManager::SetCopy(const std::vector<std::unique_ptr<Copy>>& copies)
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->ClearCopy();
+			for (const std::unique_ptr<Copy>& copy : copies)
+			{
+				enemy->SetCopy(copy.get());
+			}
+		}
+	}
+}
+
+void EnemyManager::SaveEnemyPositions()
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->SavePositions();
 	}
 }

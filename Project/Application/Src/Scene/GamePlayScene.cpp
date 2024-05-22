@@ -4,6 +4,8 @@
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include "Application/Src/Scene/GameClearScene.h"
 
+uint32_t GamePlayScene::currentStageNumber = 2;
+
 void GamePlayScene::Initialize()
 {
 	renderer_ = Renderer::GetInstance();
@@ -21,10 +23,10 @@ void GamePlayScene::Initialize()
 	//敵の生成
 	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	AddEnemy({ 0.0f,2.0f,0.0f });
-	AddEnemy({ 10.0f,-10.0f,0.0f });
-	AddEnemy({ -10.0f,-10.0f,0.0f });
-	enemyNum_ = int(enemies_.size());
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize(enemyModel_.get(), currentStageNumber);
+	enemyNum_ = int(enemyManager_->GetEnemies().size());
+
 	//衝突マネージャーの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -39,11 +41,7 @@ void GamePlayScene::Initialize()
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get());
-	blockManager_->AddBlock({ -10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 0.0f,0.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+	blockManager_->Initialize(blockModel_.get(),currentStageNumber);
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
@@ -88,37 +86,21 @@ void GamePlayScene::Update()
 
 		//ブロックの更新
 		blockManager_->Update();
+
+		//敵にブロックの情報を渡す
 		const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 		for (const std::unique_ptr<Block>& block : blocks)
 		{
-			for (const std::unique_ptr<Enemy>& enemy : enemies_)
-			{
-				if (enemy->GetIsActive())
-				{
-					enemy->SetBlockPosition(block.get()->GetWorldPosition());
-					enemy->SetBlockSize(block.get()->GetSize());
-				}
-			}
+			enemyManager_->SetBlockData(block->GetWorldPosition(), block->GetSize());
 		}
 
 		//コピーの更新
 		copyManager_->Update();
 
 		//敵の更新
-		for (const std::unique_ptr<Enemy>& enemy : enemies_)
-		{
-			if (enemy->GetIsActive())
-			{
-				enemy->SetPlayerPosition(player_->GetWorldPosition());
-				enemy->ClearCopy();
-				for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
-				{
-					enemy->SetCopy(copy.get());
-				}
-
-				enemy->Update();
-			}
-		}
+		enemyManager_->SetPlayerPosition(player_->GetWorldPosition());
+		enemyManager_->SetCopy(copyManager_->GetCopies());
+		enemyManager_->Update();
 
 		//背景の更新
 		backGround_->Update();
@@ -133,8 +115,16 @@ void GamePlayScene::Update()
 		collisionManager_->ClearColliderList();
 		//プレイヤー
 		collisionManager_->SetColliderList(player_.get());
-		for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		//敵
+		for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 		{
+			//編集中なら飛ばす
+			if (enemy->GetIsEdit())
+			{
+				continue;
+			}
+			
+			//ColliderListに登録
 			if (enemy->GetIsActive())
 			{
 				collisionManager_->SetColliderList(enemy.get());
@@ -160,22 +150,29 @@ void GamePlayScene::Update()
 		if (!player_->GetIsStop())
 		{
 			//プレイヤーの座標を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 		}
+
+		//敵の逆再生時に必要なデータを保存
+		enemyManager_->SaveEnemyPositions();
 
 		//ゲームクリア
 		bool isClear = true;
-		for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+		if (enemies.size() != 0)
 		{
-			if (enemy->GetIsActive())
+			for (const std::unique_ptr<Enemy>& enemy : enemies)
 			{
-				isClear = false;
+				if (enemy->GetIsActive())
+				{
+					isClear = false;
+				}
 			}
-		}
-		if (isClear)
-		{
-			sceneManager_->ChangeScene("GameClearScene");
-			GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
+			if (isClear)
+			{
+				sceneManager_->ChangeScene("GameClearScene");
+				GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
+			}
 		}
 
 		//リセット処理
@@ -205,14 +202,11 @@ void GamePlayScene::Update()
 			//プレイヤーを逆再生
 			auto it = reversePlayerPositions.back();
 			reversePlayerPositions.pop_back();
-			player_->SetPosition(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it), std::get<4>(it));
+			player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
 			player_->GetWeapon()->Update();
 
 			//敵を逆再生
-			for (const std::unique_ptr<Enemy>& enemy : enemies_)
-			{
-				enemy->Reverse();
-			}
+			enemyManager_->Reverse();
 
 			//コピーを逆再生
 			copyManager_->Reverse();
@@ -306,13 +300,7 @@ void GamePlayScene::DrawBackGround()
 	player_->Draw(camera_);
 
 	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
-		{
-			enemy->Draw(camera_);
-		}
-	}
+	enemyManager_->Draw(camera_);
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
@@ -356,32 +344,22 @@ void GamePlayScene::Reset()
 	copyManager_->Reset();
 
 	//敵をリセット
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		enemy->Reset();
-	}
-}
-
-void GamePlayScene::AddEnemy(const Vector3& position)
-{
-	Enemy* enemy = new Enemy();
-	enemy->Initialize(enemyModel_.get(), position);
-	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
-	
+	enemyManager_->Reset();
 }
 
 void GamePlayScene::CalculateRating() {
 	//毎秒今いる敵の数*1ずつ減っていく
 	dislikes_ += (1.0f / 60.0f) * float(enemyNum_);
 
+	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
 	{
 		if (copyManager_->GetCopies()[i]->GetWeapon()->GetIsAttack() && !player_->GetWeapon()->GetIsAttack()) {
 			num_ = 0;
 			
-			for (int i = 0; i < enemies_.size(); ++i)
+			for (int i = 0; i < enemies.size(); ++i)
 			{
-				if (!enemies_[i].get()->GetIsActive()) {
+				if (!enemies[i].get()->GetIsActive()) {
 					num_++;
 				}
 			}
@@ -408,9 +386,9 @@ void GamePlayScene::CalculateRating() {
 	if (player_->GetWeapon()->GetIsAttack())
 	{
 		num_ = 0;
-		for (int i = 0; i < enemies_.size(); ++i)
+		for (int i = 0; i < enemies.size(); ++i)
 		{
-			if (!enemies_[i].get()->GetIsActive()) {
+			if (!enemies[i].get()->GetIsActive()) {
 				num_++;
 			}
 		}
@@ -426,7 +404,7 @@ void GamePlayScene::CalculateRating() {
 
 
 		defeatedEnemyCount = 0;
-		enemyNum_ = int(enemies_.size());
+		enemyNum_ = int(enemies.size());
 	}
 	totaScore_ = likes_ - int(dislikes_);
 }

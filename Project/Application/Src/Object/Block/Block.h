@@ -1,12 +1,12 @@
 #pragma once
-#include "Engine/3D/Model/Model.h"
+#include "Engine/3D/Model/ModelManager.h"
 #include "Engine/Components/Collision/Collider.h"
 #include "Engine/Components/Collision/CollisionConfig.h"
 
 class Block : public Collider
 {
 public:
-	void Initialize(Model* model, const Vector3& position, const Vector3& scale);
+	void Initialize(const Vector3& position, const Vector3& scale);
 
 	void Update();
 
@@ -28,8 +28,10 @@ public:
 
 	const Vector3 GetWorldPosition() const override;
 
+	void SetColor(const Vector4& color) { model_->GetMaterial(1)->SetColor(color); };
+
 private:
-	Model* model_ = nullptr;
+	std::unique_ptr<Model> model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 };

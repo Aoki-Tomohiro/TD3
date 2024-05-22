@@ -56,6 +56,16 @@ public:
 
 	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
 
+	void SetColor(const Vector4& color) { model_->GetMaterial(0)->SetColor(color); };
+
+	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
+
+	const bool GetIsEdit()const { return isEdit_; };
+
+	void UpdateMatrix();
+
+	void SavePositions();
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -137,18 +147,16 @@ private:
 	ParticleSystem* particleSystem_ = nullptr;
 
 	//逆再生時の座標
-	std::vector<Vector3> positions_{};
+	std::vector<std::tuple<Vector3, uint32_t, float>> positions_{};
 
 	//チュートリアルか
 	bool isTutorial_ = false;
 
 	uint32_t animationNumber_ = 1;
 
-	float animationTime_ = 0.0f;
-
 	//クォータニオン
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 
-	
+	bool isEdit_ = false;
 };
 

@@ -28,16 +28,14 @@ void TutorialScene1::Initialize()
 	//敵の生成
 	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	Enemy* enemy = new Enemy();
-	enemy->Initialize(enemyModel_.get(), { 10.0f,-10.0f,0.0f });
-	enemy->SetIsTutorial(true);
-	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize(enemyModel_.get(), 0);
+	enemyManager_->SetIsTutorial(true);
 
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get());
-	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+	blockManager_->Initialize(blockModel_.get(), 0);
 
 	//背景の生成
 	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
@@ -75,13 +73,7 @@ void TutorialScene1::Update()
 	blockManager_->Update();
 
 	//敵の更新
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
-		{
-			enemy->Update();
-		}
-	}
+	enemyManager_->Update();
 
 	//背景の更新
 	backGround_->Update();
@@ -96,8 +88,16 @@ void TutorialScene1::Update()
 	collisionManager_->ClearColliderList();
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	//敵
+	for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 	{
+		//編集中なら飛ばす
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		//ColliderListに登録
 		if (enemy->GetIsActive())
 		{
 			collisionManager_->SetColliderList(enemy.get());
@@ -115,16 +115,20 @@ void TutorialScene1::Update()
 
 	//ゲームクリア
 	bool isClear = true;
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+	if (enemies.size() != 0)
 	{
-		if (enemy->GetIsActive())
+		for (const std::unique_ptr<Enemy>& enemy : enemies)
 		{
-			isClear = false;
+			if (enemy->GetIsActive())
+			{
+				isClear = false;
+			}
 		}
-	}
-	if (isClear)
-	{
-		sceneManager_->ChangeScene("TutorialScene2");
+		if (isClear)
+		{
+			sceneManager_->ChangeScene("TutorialScene2");
+		}
 	}
 
 	//コントローラーのUIの座標とサイズを設定
@@ -191,13 +195,7 @@ void TutorialScene1::DrawBackGround()
 	player_->Draw(camera_);
 
 	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
-		{
-			enemy->Draw(camera_);
-		}
-	}
+	enemyManager_->Draw(camera_);
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
