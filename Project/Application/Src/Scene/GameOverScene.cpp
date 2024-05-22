@@ -1,6 +1,8 @@
 #include "GameOverScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 
+int GameOverScene::copyCount_ = 0;
+
 void GameOverScene::Initialize() 
 {
 	renderer_ = Renderer::GetInstance();
@@ -8,6 +10,13 @@ void GameOverScene::Initialize()
 	input_ = Input::GetInstance();
 
 	audio_ = Audio::GetInstance();
+
+	//リザルト画面のスプライトの作成
+	TextureManager::Load("Result.png");
+	resultSprite_.reset(Sprite::Create("Result.png", { 0.0f,0.0f }));
+
+	//音声データの読み込み
+	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 }
 
 void GameOverScene::Finalize() 
@@ -17,7 +26,23 @@ void GameOverScene::Finalize()
 
 void GameOverScene::Update()
 {
+	//タイトル画面に戻る
+	if (input_->IsControllerConnected())
+	{
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+		{
+			sceneManager_->ChangeScene("GameTitleScene");
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
+			copyCount_ = 0;
+		}
+	}
 
+	if (input_->IsPushKeyEnter(DIK_SPACE))
+	{
+		sceneManager_->ChangeScene("GameTitleScene");
+		audio_->PlayAudio(decisionHandle_, false, 0.4f);
+		copyCount_ = 0;
+	}
 }
 
 void GameOverScene::Draw()
@@ -52,6 +77,9 @@ void GameOverScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//リザルトのスプライトの描画
+	resultSprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

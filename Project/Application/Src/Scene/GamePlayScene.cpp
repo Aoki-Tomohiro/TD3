@@ -175,6 +175,10 @@ void GamePlayScene::Update()
 			}
 		}
 
+		if (dislikes_ >= 99) {
+			sceneManager_->ChangeScene("GameOverScene");
+		}
+
 		//リセット処理
 		if (player_->GetWeapon()->GetIsAttack() && !isClear)
 		{
