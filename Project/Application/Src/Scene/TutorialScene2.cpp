@@ -29,15 +29,18 @@ void TutorialScene2::Initialize()
 	//敵の生成
 	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-	AddEnemy({ 12.0f,-10.0f,0.0f });
-	AddEnemy({ 12.0f,-3.0f,0.0f });
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize(enemyModel_.get(), 1);
+	enemyManager_->SetIsTutorial(true);
+	//enemyManager_->AddEnemy({ 12.0f,-10.0f,0.0f });
+	//enemyManager_->AddEnemy({ 12.0f,-3.0f,0.0f });
 
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get());
-	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
-	blockManager_->AddBlock({ 12.0f,-5.0f,0.0f }, { 5.0f,1.0f,1.0f });
+	blockManager_->Initialize(blockModel_.get(), 1);
+	//blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+	//blockManager_->AddBlock({ 12.0f,-5.0f,0.0f }, { 5.0f,1.0f,1.0f });
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
@@ -86,13 +89,14 @@ void TutorialScene2::Update()
 		copyManager_->Update();
 
 		//敵の更新
-		for (const std::unique_ptr<Enemy>& enemy : enemies_)
-		{
-			if (enemy->GetIsActive())
-			{
-				enemy->Update();
-			}
-		}
+		enemyManager_->Update();
+		//for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		//{
+		//	if (enemy->GetIsActive())
+		//	{
+		//		enemy->Update();
+		//	}
+		//}
 
 		//背景の更新
 		backGround_->Update();
@@ -107,7 +111,7 @@ void TutorialScene2::Update()
 		collisionManager_->ClearColliderList();
 		//プレイヤー
 		collisionManager_->SetColliderList(player_.get());
-		for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 		{
 			if (enemy->GetIsActive())
 			{
@@ -140,25 +144,29 @@ void TutorialScene2::Update()
 
 		//ゲームクリア
 		bool isClear = true;
-		for (const std::unique_ptr<Enemy>& enemy : enemies_)
+		const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+		if (enemies.size() != 0)
 		{
-			if (enemy->GetIsActive())
+			for (const std::unique_ptr<Enemy>& enemy : enemies)
 			{
-				isClear = false;
+				if (enemy->GetIsActive())
+				{
+					isClear = false;
+				}
 			}
-		}
-		if (isClear)
-		{
-			sceneManager_->ChangeScene("GamePlayScene");
-		}
+			if (isClear)
+			{
+				sceneManager_->ChangeScene("GamePlayScene");
+			}
 
-		//リセット処理
-		if (player_->GetWeapon()->GetIsAttack() && !isClear)
-		{
-			reversePlayerPositions = copyManager_->GetPlayerPositions();
-			isReversed_ = true;
-			player_->StopAnimation();
-			Reset();
+			//リセット処理
+			if (player_->GetWeapon()->GetIsAttack() && !isClear)
+			{
+				reversePlayerPositions = copyManager_->GetPlayerPositions();
+				isReversed_ = true;
+				player_->StopAnimation();
+				Reset();
+			}
 		}
 
 		//コントローラーのUIの座標とサイズを設定
@@ -179,7 +187,7 @@ void TutorialScene2::Update()
 			player_->GetWeapon()->Update();
 
 			//敵を逆再生
-			for (const std::unique_ptr<Enemy>& enemy : enemies_)
+			for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 			{
 				enemy->Reverse();
 			}
@@ -261,13 +269,14 @@ void TutorialScene2::DrawBackGround()
 	player_->Draw(camera_);
 
 	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	{
-		if (enemy->GetIsActive())
-		{
-			enemy->Draw(camera_);
-		}
-	}
+	enemyManager_->Draw(camera_);
+	//for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	//{
+	//	if (enemy->GetIsActive())
+	//	{
+	//		enemy->Draw(camera_);
+	//	}
+	//}
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
@@ -311,7 +320,7 @@ void TutorialScene2::Reset()
 	copyManager_->Reset();
 
 	//敵をリセット
-	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 	{
 		enemy->Reset();
 	}
@@ -319,8 +328,8 @@ void TutorialScene2::Reset()
 
 void TutorialScene2::AddEnemy(const Vector3& position)
 {
-	Enemy* enemy = new Enemy();
-	enemy->Initialize(enemyModel_.get(), position);
-	enemy->SetIsTutorial(true);
-	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+	//Enemy* enemy = new Enemy();
+	//enemy->Initialize(enemyModel_.get(), position);
+	//enemy->SetIsTutorial(true);
+	//enemies_.push_back(std::unique_ptr<Enemy>(enemy));
 }

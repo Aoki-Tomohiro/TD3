@@ -1,5 +1,4 @@
 #include "BlockManager.h"
-#include "Application/Src/Scene/GamePlayScene.h"
 #include <iostream>
 #include <fstream>
 #include <variant>
@@ -7,11 +6,17 @@
 #include <map>
 #include <Engine/Externals/nlohmann/json.hpp>
 
-void BlockManager::Initialize(Model* model)
+void BlockManager::Initialize(Model* model, uint32_t stageNumber)
 {
 	//モデルの初期化
 	assert(model);
 	model_ = model;
+
+	//ステージの設定
+	stageNumber_ = stageNumber;
+
+	//地面の追加
+	AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
 
 	//ファイル読み込み
 	LoadFile();
@@ -28,7 +33,7 @@ void BlockManager::Update()
 	//ImGui
 	ImGui::Begin("BlockManager");
 
-	// 削除対象のブロックインデックス
+	//削除対象のブロックインデックス
 	int deleteIndex = -1;
 
 	//ID
@@ -120,13 +125,20 @@ void BlockManager::SaveData()
 	//nlohmann::json型のデータコンテナにグループの全データをまとめる
 	root = nlohmann::json::object();
 	//jsonオブジェクトの登録
-	const std::string groupName = "Stage" + std::to_string(GamePlayScene::currentStageNumber);
+	const std::string groupName = "Stage" + std::to_string(stageNumber_);
 	root[groupName] = nlohmann::json::object();
 
 	//全てのブロックについて
 	uint32_t id = 0;
 	for (std::unique_ptr<Block>& block : blocks_)
 	{
+		//最初のブロックは飛ばす
+		if (id == 0)
+		{
+			id++;
+			continue;
+		}
+
 		//jsonオブジェクトの登録
 		const std::string ItemName = "Block" + std::to_string(id);
 		root[groupName][ItemName] = nlohmann::json::object();
@@ -144,7 +156,7 @@ void BlockManager::SaveData()
 	}
 
 	//ディレクトリがなければ作成する
-	std::filesystem::path dir("Application/Resources/Editor/");
+	std::filesystem::path dir("Application/Resources/Editor/Blocks");
 	if (!std::filesystem::exists(dir))
 	{
 		std::filesystem::create_directory(dir);
@@ -175,8 +187,8 @@ void BlockManager::SaveData()
 void BlockManager::LoadFile()
 {
 	// 読み込むJSONファイルのパス
-	const std::string groupName = "Stage" + std::to_string(GamePlayScene::currentStageNumber);
-	std::filesystem::path filePath = "Application/Resources/Editor/" + groupName + ".json";
+	const std::string groupName = "Stage" + std::to_string(stageNumber_);
+	std::filesystem::path filePath = "Application/Resources/Editor/Blocks/" + groupName + ".json";
 
 	// 読み込み用ファイルストリーム
 	std::ifstream ifs(filePath);
@@ -184,14 +196,36 @@ void BlockManager::LoadFile()
 	// ファイルオープン失敗
 	if (ifs.fail())
 	{
-		std::string message = "Failed to open data file for read.";
-		MessageBoxA(nullptr, message.c_str(), groupName.c_str(), 0);
-		assert(0);
-		return;
+		// 新しいファイルを生成
+		std::ofstream ofs(filePath);
+		if (!ofs)
+		{
+			std::string message = "Failed open data file for write.";
+			MessageBoxA(nullptr, message.c_str(), groupName.c_str(), 0);
+			assert(0);
+			return;
+		}
+
+		// 初期データを書き込む (空のJSONオブジェクトとしている)
+		nlohmann::json initialData = {
+			{groupName, nlohmann::json::object()}
+		};
+		ofs << initialData.dump(4); // 4スペースインデントでフォーマット
+		ofs.close();
+
+		// 再度ファイルを開く
+		ifs.open(filePath);
+		if (ifs.fail())
+		{
+			std::string message = "Failed to open data file for read.";
+			MessageBoxA(nullptr, message.c_str(), groupName.c_str(), 0);
+			assert(0);
+			return;
+		}
 	}
 
 	nlohmann::json root;
-	// json文字列からjsonのデータ構造に展開
+	// JSON文字列からJSONのデータ構造に展開
 	ifs >> root;
 	// ファイルを閉じる
 	ifs.close();

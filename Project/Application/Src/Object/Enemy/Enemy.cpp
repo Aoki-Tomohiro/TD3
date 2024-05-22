@@ -47,7 +47,7 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 
 void Enemy::Update()
 {
-	if (!isTutorial_)
+	if (!isTutorial_ && !isEdit_)
 	{
 		DistanceFunction();
 		FindPath();

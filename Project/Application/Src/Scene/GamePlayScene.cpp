@@ -4,7 +4,7 @@
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include "Application/Src/Scene/GameClearScene.h"
 
-uint32_t GamePlayScene::currentStageNumber = 0;
+uint32_t GamePlayScene::currentStageNumber = 2;
 
 void GamePlayScene::Initialize()
 {
@@ -41,11 +41,7 @@ void GamePlayScene::Initialize()
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get());
-	blockManager_->AddBlock({ -10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 0.0f,0.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 10.0f,-6.0f,0.0f }, { 5.0f,1.0f,1.0f });
-	blockManager_->AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+	blockManager_->Initialize(blockModel_.get(),currentStageNumber);
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));

@@ -56,6 +56,10 @@ public:
 
 	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
 
+	void SetColor(const Vector4& color) { model_->GetMaterial(0)->SetColor(color); };
+
+	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -149,6 +153,6 @@ private:
 	//クォータニオン
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 
-	
+	bool isEdit_ = false;
 };
 
