@@ -47,7 +47,7 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 
 void Enemy::Update()
 {
-	if (!isTutorial_ && !isEdit_)
+	if (!isTutorial_)
 	{
 		DistanceFunction();
 		FindPath();
@@ -645,6 +645,12 @@ void Enemy::Reverse()
 		worldTransform_.UpdateMatrixFromQuaternion();
 	}
 }
+
+void Enemy::UpdateMatrix()
+{
+	worldTransform_.UpdateMatrixFromQuaternion();
+}
+
 void Enemy::OnCollision(Collider* collider)
 {
 	if (collider->GetCollisionAttribute() == kCollisionAttributeBlock)

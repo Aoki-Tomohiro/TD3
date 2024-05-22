@@ -1,6 +1,8 @@
 #pragma once
 #include "Application/Src/Object/Enemy/Enemy.h"
 
+class Copy;
+
 class EnemyManager
 {
 public:
@@ -9,6 +11,16 @@ public:
 	void Update();
 
 	void Draw(const Camera& camera);
+
+	void Reverse();
+
+	void Reset();
+
+	void SetBlockData(const Vector3& position, const Vector3& size);
+
+	void SetPlayerPosition(const Vector3& position);
+
+	void SetCopy(const std::vector<std::unique_ptr<Copy>>& copies);
 
 	void SetIsTutorial(const bool isTutorial);
 

@@ -60,6 +60,10 @@ public:
 
 	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
 
+	const bool GetIsEdit()const { return isEdit_; };
+
+	void UpdateMatrix();
+
 private:
 	//プレイヤーの状態
 	enum class Behavior

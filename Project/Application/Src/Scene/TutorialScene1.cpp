@@ -31,10 +31,6 @@ void TutorialScene1::Initialize()
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize(enemyModel_.get(), 0);
 	enemyManager_->SetIsTutorial(true);
-	//Enemy* enemy = new Enemy();
-	//enemy->Initialize(enemyModel_.get(), { 10.0f,-10.0f,0.0f });
-	//enemy->SetIsTutorial(true);
-	//enemies_.push_back(std::unique_ptr<Enemy>(enemy));
 
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
@@ -78,13 +74,6 @@ void TutorialScene1::Update()
 
 	//敵の更新
 	enemyManager_->Update();
-	//for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	//{
-	//	if (enemy->GetIsActive())
-	//	{
-	//		enemy->Update();
-	//	}
-	//}
 
 	//背景の更新
 	backGround_->Update();
@@ -99,8 +88,16 @@ void TutorialScene1::Update()
 	collisionManager_->ClearColliderList();
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
+	//敵
 	for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 	{
+		//編集中なら飛ばす
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		//ColliderListに登録
 		if (enemy->GetIsActive())
 		{
 			collisionManager_->SetColliderList(enemy.get());
@@ -199,13 +196,6 @@ void TutorialScene1::DrawBackGround()
 
 	//敵の描画
 	enemyManager_->Draw(camera_);
-	//for (const std::unique_ptr<Enemy>& enemy : enemies_)
-	//{
-	//	if (enemy->GetIsActive())
-	//	{
-	//		enemy->Draw(camera_);
-	//	}
-	//}
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);

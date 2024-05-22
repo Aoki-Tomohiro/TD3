@@ -24,6 +24,11 @@ void EnemyManager::Update()
 	//敵の更新
 	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
 		if (enemy->GetIsActive())
 		{
 			enemy->Update();
@@ -42,18 +47,29 @@ void EnemyManager::Update()
 	//各ブロックの調整
 	for (std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		//座標を取得
-		Vector3 position = enemy->GetWorldPosition();
-
 		//名前を設定
 		std::string str = "Enemy" + std::to_string(id);
 
 		//調整
 		if (ImGui::TreeNode(str.c_str()))
 		{
-			enemy->SetColor({ 1.0f,0.5f,0.0f,1.0f });
-			enemy->SetIsEdit(true);
+			//座標を取得
+			Vector3 position = enemy->GetWorldPosition();
+
+			//座標を変更
 			ImGui::DragFloat3("Position", &position.x, 0.1f);
+
+			//編集中にする
+			enemy->SetIsEdit(true);
+
+			//色を変更
+			enemy->SetColor({ 1.0f,0.5f,0.0f,1.0f });
+
+			//座標を設定
+			enemy->SetPosition(position);
+
+			//ワールド行列の更新
+			enemy->UpdateMatrix();
 
 			// 削除ボタンを追加
 			if (ImGui::Button("Delete"))
@@ -65,12 +81,12 @@ void EnemyManager::Update()
 		}
 		else
 		{
+			//色を変更
 			enemy->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+
+			//編集してない状態に戻す
 			enemy->SetIsEdit(false);
 		}
-
-		//座標を設定
-		enemy->SetPosition(position);
 
 		//IDをインクリメント
 		id++;
@@ -239,6 +255,76 @@ void EnemyManager::LoadFile()
 
 			// 敵の追加
 			AddEnemy(position);
+		}
+	}
+}
+
+void EnemyManager::Reverse()
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Reverse();
+	}
+}
+
+void EnemyManager::Reset()
+{
+	//敵をリセット
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Reset();
+	}
+}
+
+void EnemyManager::SetBlockData(const Vector3& position, const Vector3& size)
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->SetBlockPosition(position);
+			enemy->SetBlockSize(size);
+		}
+	}
+}
+
+void EnemyManager::SetPlayerPosition(const Vector3& position)
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->SetPlayerPosition(position);
+		}
+	}
+}
+
+void EnemyManager::SetCopy(const std::vector<std::unique_ptr<Copy>>& copies)
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		if (enemy->GetIsActive())
+		{
+			enemy->ClearCopy();
+			for (const std::unique_ptr<Copy>& copy : copies)
+			{
+				enemy->SetCopy(copy.get());
+			}
 		}
 	}
 }

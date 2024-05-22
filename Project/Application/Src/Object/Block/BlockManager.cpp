@@ -42,21 +42,30 @@ void BlockManager::Update()
 	//各ブロックの調整
 	for (std::unique_ptr<Block>& block : blocks_)
 	{
-		//座標を取得
-		Vector3 position = block->GetPosition();
-
-		//スケールを取得
-		Vector3 scale = block->GetScale();
-
 		//名前を設定
 		std::string str = "Block" + std::to_string(id);
 
 		//調整
 		if (ImGui::TreeNode(str.c_str()))
 		{
-			block->SetColor({ 1.0f,0.5f,0.0f,1.0f });
+			//座標を取得
+			Vector3 position = block->GetPosition();
+
+			//スケールを取得
+			Vector3 scale = block->GetScale();
+
+			//座標とスケールを変更
 			ImGui::DragFloat3("Position", &position.x, 0.1f);
 			ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+
+			//色を変更
+			block->SetColor({ 1.0f,0.5f,0.0f,1.0f });
+
+			//座標を設定
+			block->SetPosition(position);
+
+			//スケールを設定
+			block->SetScale(scale);
 
 			// 削除ボタンを追加
 			if (ImGui::Button("Delete"))
@@ -68,14 +77,9 @@ void BlockManager::Update()
 		}
 		else
 		{
+			//色を変更
 			block->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 		}
-
-		//座標を設定
-		block->SetPosition(position);
-
-		//スケールを設定
-		block->SetScale(scale);
 
 		//IDをインクリメント
 		id++;

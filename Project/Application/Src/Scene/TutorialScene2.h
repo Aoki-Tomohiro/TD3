@@ -25,8 +25,6 @@ public:
 	void DrawBackGround() override;
 
 private:
-	void AddEnemy(const Vector3& position);
-
 	void Reset();
 
 private:

@@ -8,7 +8,7 @@
 #include "Engine/Components/Collision/CollisionManager.h"
 #include "Engine/3D/Model/ModelManager.h"
 #include "Engine/2D/Sprite.h"
-#include "Application/Src/Object/Enemy/Enemy.h"
+#include "Application/Src/Object/Enemy/EnemyManager.h"
 #include "Engine/Math/MathFunction.h"
 #include "Application/Src/Object/Player/Player.h"
 #include "Application/Src/Object/Block/BlockManager.h"
@@ -41,8 +41,6 @@ private:
 	
 	void CalculateRating();
 
-	void AddEnemy(const Vector3& position);
-
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -62,7 +60,8 @@ private:
 
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies_{};
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
+	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 	int enemyNum_;//今の敵の数
 	int defeatedEnemyCount;//今倒している敵の数
 
