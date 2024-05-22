@@ -22,11 +22,19 @@ public:
 
 	void DrawBackGround() override;
 
+	static void SetCopyCount(const int copyCount) { copyCount_ = copyCount; };
+
 private:
 	Renderer* renderer_ = nullptr;
 
 	Input* input_ = nullptr;
 
 	Audio* audio_ = nullptr;
+
+	std::unique_ptr<Sprite> resultSprite_ = nullptr;
+
+	uint32_t decisionHandle_ = 0;
+
+	static int copyCount_;
 };
 
