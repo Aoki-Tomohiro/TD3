@@ -90,12 +90,6 @@ void Enemy::Update()
 	//モデルの更新
 	model_->Update(worldTransform_, animationNumber_);
 
-	//アニメーションタイムを記録
-	animationTime_ = model_->GetAnimation()->GetAnimationTime();
-
-	//座標を保存
-	positions_.push_back(worldTransform_.translation_);
-
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
@@ -640,15 +634,44 @@ void Enemy::Reverse()
 {
 	if (!positions_.empty())
 	{
-		worldTransform_.translation_ = positions_.back();
+		Vector3 prePosition = GetWorldPosition();
+		Vector3 position{};
+		uint32_t animationNumber = 0;
+		float animationTime = 0.0f;
+		std::tie(position, animationNumber, animationTime) = positions_.back();
 		positions_.pop_back();
+		worldTransform_.translation_ = position;
+		if (prePosition.x != position.x)
+		{
+			if (prePosition.x > position.x)
+			{
+				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+			}
+			else
+			{
+				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+			}
+		}
+		worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 		worldTransform_.UpdateMatrixFromQuaternion();
+		model_->GetAnimation()->SetAnimationTime(animationTime);
+		model_->Update(worldTransform_, animationNumber);
+
+		//worldTransform_.translation_ = positions_.back();
+		//positions_.pop_back();
+		//worldTransform_.UpdateMatrixFromQuaternion();
 	}
 }
 
 void Enemy::UpdateMatrix()
 {
 	worldTransform_.UpdateMatrixFromQuaternion();
+}
+
+void Enemy::SavePositions()
+{
+	//巻き戻し用のデータを保存
+	positions_.push_back({ GetWorldPosition(),animationNumber_,model_->GetAnimation()->GetAnimationTime() });
 }
 
 void Enemy::OnCollision(Collider* collider)
@@ -704,11 +727,6 @@ void Enemy::OnCollision(Collider* collider)
 
 		worldTransform_.translation_ += overlapAxis * directionAxis;
 		worldTransform_.UpdateMatrixFromQuaternion();
-		if (!positions_.empty())
-		{
-			Vector3& position = positions_.back();
-			position = worldTransform_.translation_;
-		}
 	}
 
 	if (collider->GetCollisionAttribute() == kCollisionAttributeWeapon)

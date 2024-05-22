@@ -22,6 +22,8 @@ public:
 
 	void SetCopy(const std::vector<std::unique_ptr<Copy>>& copies);
 
+	void SaveEnemyPositions();
+
 	void SetIsTutorial(const bool isTutorial);
 
 	void AddEnemy(const Vector3& position);

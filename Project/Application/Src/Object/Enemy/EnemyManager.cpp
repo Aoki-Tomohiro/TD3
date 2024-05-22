@@ -328,3 +328,11 @@ void EnemyManager::SetCopy(const std::vector<std::unique_ptr<Copy>>& copies)
 		}
 	}
 }
+
+void EnemyManager::SaveEnemyPositions()
+{
+	for (const std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->SavePositions();
+	}
+}

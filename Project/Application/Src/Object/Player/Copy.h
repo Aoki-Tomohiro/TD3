@@ -6,7 +6,7 @@
 class Copy : public Collider
 {
 public:
-	void Initialize(const std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>>& playerPositions);
+	void Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions);
 
 	void Update();
 
@@ -29,11 +29,13 @@ private:
 
 	WorldTransform worldTransform_{};
 
+	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
+
 	Vector3 velocity_{};
 
 	float gravity_ = 0.05f;
 
-	std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>> playerPositions_{};
+	std::vector<std::tuple<Vector3, bool, uint32_t, float>> playerPositions_{};
 
 	int currentIndex_ = 0;
 

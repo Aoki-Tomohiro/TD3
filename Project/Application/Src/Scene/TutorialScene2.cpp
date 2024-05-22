@@ -136,7 +136,7 @@ void TutorialScene2::Update()
 		if (!player_->GetIsStop())
 		{
 			//プレイヤーの座標を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetQuaternion(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 		}
 
 		//ゲームクリア
@@ -180,7 +180,7 @@ void TutorialScene2::Update()
 			//プレイヤーを逆再生
 			auto it = reversePlayerPositions.back();
 			reversePlayerPositions.pop_back();
-			player_->SetPosition(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it), std::get<4>(it));
+			player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
 			player_->GetWeapon()->Update();
 
 			//敵を逆再生

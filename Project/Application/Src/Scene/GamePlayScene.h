@@ -99,6 +99,6 @@ private:
 
 	//逆再生中か
 	bool isReversed_ = false;
-	std::vector<std::tuple<Vector3, Quaternion, bool, uint32_t, float>> reversePlayerPositions{};
+	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 };
 
