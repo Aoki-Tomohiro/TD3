@@ -368,7 +368,10 @@ void GamePlayScene::CalculateRating() {
 				likes_ += 50 * (num_ - defeatedEnemyCount);
 			}
 			else {
-				likes_ += 25;
+				if (defeatedEnemyCount - num_ != 0) {
+					likes_ += 25;
+				}
+				
 			}
 
 			
