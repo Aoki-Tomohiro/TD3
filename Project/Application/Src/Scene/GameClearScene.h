@@ -23,7 +23,7 @@ public:
 
 	void DrawBackGround() override;
 
-	static void SetCopyCount(const int copyCount) { copyCount_ = copyCount; };
+	static void SetTimeCount(const int copyCount) { timeCount_ = copyCount; };
 
 private:
 	Renderer* renderer_ = nullptr;
@@ -34,18 +34,20 @@ private:
 
 	std::unique_ptr<Sprite> resultSprite_ = nullptr;
 
-	std::array<std::unique_ptr<Sprite>, 2> copyCountSprites_{};
+	std::array<std::unique_ptr<Sprite>, 2> timeCountSprites_{};
 
-	Vector2 copyCountSpritePositions_[2]{ {800.0f,430.0f},{870.0f,430.0f} };
+	Vector2 timeCountSpritePositions_[2]{ {-83.0f,11.0f},{196.0f,11.0f} };
+
+	Vector2 SpriteSize_[2] = { {3.0f,3.0f},{3.0f,3.0f} };
 
 	std::unique_ptr<Sprite> scoreSprite_ = nullptr;
 
-	Vector2 scoreSpritePosition_ = { 600.0f,44.0f };
+	Vector2 scoreSpritePosition_ = { -15.0f,405.0f };
 
-	Vector2 scoreSpriteSize_ = { 130.0f,130.0f };
+	Vector2 scoreSpriteSize_ = { 330.0f,330.0f };
 	
 	uint32_t decisionHandle_ = 0;
 
-	static int copyCount_;
+	static int timeCount_;
 };
 
