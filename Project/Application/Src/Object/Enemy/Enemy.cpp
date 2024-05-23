@@ -645,26 +645,40 @@ void Enemy::Reverse()
 		float animationTime = 0.0f;
 		std::tie(position, animationNumber, animationTime) = positions_.back();
 		positions_.pop_back();
-		worldTransform_.translation_ = position;
-		if (prePosition.x != position.x)
+		if (++reverseTimer_ % 2 == 0)
 		{
-			if (prePosition.x > position.x)
+			worldTransform_.translation_ = position;
+			if (prePosition.x != position.x)
 			{
-				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+				if (prePosition.x > position.x)
+				{
+					destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+				}
+				else
+				{
+					destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+				}
 			}
-			else
+			worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+			worldTransform_.UpdateMatrixFromQuaternion();
+			model_->GetAnimation()->SetAnimationTime(animationTime);
+			model_->Update(worldTransform_, animationNumber);
+		}
+		else
+		{
+			if (!positions_.empty())
 			{
-				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+				positions_.pop_back();
 			}
 		}
-		worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-		worldTransform_.UpdateMatrixFromQuaternion();
-		model_->GetAnimation()->SetAnimationTime(animationTime);
-		model_->Update(worldTransform_, animationNumber);
 
 		//worldTransform_.translation_ = positions_.back();
 		//positions_.pop_back();
 		//worldTransform_.UpdateMatrixFromQuaternion();
+	}
+	else
+	{
+		reverseTimer_ = 0;
 	}
 }
 

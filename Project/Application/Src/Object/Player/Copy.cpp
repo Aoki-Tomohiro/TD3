@@ -164,33 +164,47 @@ void Copy::Reverse()
 	if (currentIndex_ > 0)
 	{
 		currentIndex_--;
-		Vector3 prePosition = GetWorldPosition();
-		Vector3 playerPosition{};
-		bool isAttack{};
-		std::tie(playerPosition, isAttack, animationNumber, animationTime) = playerPositions_[currentIndex_];
-		worldTransform_.translation_ = playerPosition;
-		if (prePosition.x != playerPosition.x)
+		if (++reverseTimer_ % 2 == 0)
 		{
-			if (prePosition.x > playerPosition.x)
+			Vector3 prePosition = GetWorldPosition();
+			Vector3 playerPosition{};
+			bool isAttack{};
+			std::tie(playerPosition, isAttack, animationNumber, animationTime) = playerPositions_[currentIndex_];
+			worldTransform_.translation_ = playerPosition;
+			if (prePosition.x != playerPosition.x)
 			{
-				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+				if (prePosition.x > playerPosition.x)
+				{
+					destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
+				}
+				else
+				{
+					destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+				}
 			}
-			else
+			weapon_->SetIsAttack(isAttack);
+
+			//ワールドトランスフォームの更新
+			worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+			worldTransform_.UpdateMatrixFromQuaternion();
+
+			//モデルの更新
+			model_->GetAnimation()->SetAnimationTime(animationTime);
+			model_->Update(worldTransform_, animationNumber);
+
+			//武器の更新
+			weapon_->Update();
+		}
+		else
+		{
+			if (currentIndex_ > 0)
 			{
-				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
+				currentIndex_--;
 			}
 		}
-		weapon_->SetIsAttack(isAttack);
 	}
-
-	//ワールドトランスフォームの更新
-	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-	worldTransform_.UpdateMatrixFromQuaternion();
-
-	//モデルの更新
-	model_->GetAnimation()->SetAnimationTime(animationTime);
-	model_->Update(worldTransform_, animationNumber);
-
-	//武器の更新
-	weapon_->Update();
+	else
+	{
+		reverseTimer_ = 0;
+	}
 }

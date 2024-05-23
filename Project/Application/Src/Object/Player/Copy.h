@@ -42,5 +42,7 @@ private:
 	std::unique_ptr<Model> weaponModel_ = nullptr;
 
 	std::unique_ptr<Weapon> weapon_ = nullptr;
+
+	uint32_t reverseTimer_ = 0;
 };
 

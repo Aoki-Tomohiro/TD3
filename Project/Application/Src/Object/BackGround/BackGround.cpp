@@ -13,12 +13,16 @@ void BackGround::Initialize(std::vector<Model*> models)
 	{
 		worldTransforms_[i].Initialize();
 	}
-	//worldTransforms_[kFrame].translation_ = {21.6f,-9.0f,1.6f};
-	//worldTransforms_[kFrame].scale_ = {2.92f,1.35f,1.0f};
-	//worldTransforms_[kFrame].rotation_.y = std::numbers::pi_v<float>;
-	//worldTransforms_[kMovie].translation_ = { -0.2f,5.9f,2.0f };
-	//worldTransforms_[kMovie].scale_ = { 34.6f,12.98f,1.0f };
-	//worldTransforms_[kMovie].rotation_.y = std::numbers::pi_v<float>;
+	worldTransforms_[kGenko].Initialize();
+	worldTransforms_[kGenko].translation_ = { -14.8f,-25.5f,5.0f };
+	worldTransforms_[kGenko].rotation_.y = std::numbers::pi_v<float>;
+	worldTransforms_[kGenko].scale_ = {20.3f,3.83f,1.0f};
+	worldTransforms_[kFrame].translation_ = {21.6f,-9.0f,1.6f};
+	worldTransforms_[kFrame].scale_ = {2.92f,1.35f,1.0f};
+	worldTransforms_[kFrame].rotation_.y = std::numbers::pi_v<float>;
+	worldTransforms_[kMovie].translation_ = { -0.2f,5.9f,2.0f };
+	worldTransforms_[kMovie].scale_ = { 34.6f,12.98f,1.0f };
+	worldTransforms_[kMovie].rotation_.y = std::numbers::pi_v<float>;
 	worldTransforms_[kFrame].translation_ = { 21.6f,-19.0f,1.6f };
 	worldTransforms_[kFrame].scale_ = { 2.92f,1.8f,1.0f };
 	worldTransforms_[kFrame].rotation_.y = std::numbers::pi_v<float>;
@@ -47,8 +51,9 @@ void BackGround::Update()
 
 void BackGround::Draw(const Camera& camera)
 {
-	for (uint32_t i = 0; i < kCountOfParts; ++i)
-	{
-		models_[i]->Draw(worldTransforms_[i], camera);
-	}
+	models_[0]->Draw(worldTransforms_[kGenko], camera);
+	//for (uint32_t i = 0; i < kCountOfParts; ++i)
+	//{
+	//	models_[i]->Draw(worldTransforms_[i], camera);
+	//}
 }
