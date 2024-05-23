@@ -31,7 +31,6 @@ void Player::Initialzie(std::vector<Model*> models)
 
 	//音声データの読み込み
 	moveAudioHandle_ = audio_->LoadAudioFile("Move.wav");
-	attackAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Attack.wav");
 
 	//パーティルの作成
 	particleSystem_ = ParticleManager::Create("Move");
@@ -68,6 +67,9 @@ void Player::Update()
 		//移動制限の処理
 		UpdateMovementRestriction();
 	}
+
+	//ヒットフラグをfalseにする
+	weapon_->SetIsHit(false);
 
 	//Behaviorの遷移処理
 	if (behaviorRequest_)
@@ -569,7 +571,6 @@ void Player::BehaviorAttackUpdate()
 		//通常状態に戻る
 		behaviorRequest_ = Behavior::kRoot;
 		models_[0]->GetAnimation()->PlayAnimation();
-		audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
 	}
 }
 

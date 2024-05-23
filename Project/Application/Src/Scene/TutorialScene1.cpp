@@ -59,6 +59,9 @@ void TutorialScene1::Initialize()
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
+
+	//音声データ読み込み
+	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
 }
 
 void TutorialScene1::Finalize()
@@ -129,6 +132,15 @@ void TutorialScene1::Update()
 		if (isClear)
 		{
 			sceneManager_->ChangeScene("TutorialScene2");
+		}
+	}
+
+	//空振りの音を鳴らす
+	if (player_->GetWeapon()->GetIsAttack() && !isClear)
+	{
+		if (!player_->GetWeapon()->GetIsHit())
+		{
+			audio_->PlayAudio(whiffAudioHandle_, 0, 0.4f);
 		}
 	}
 

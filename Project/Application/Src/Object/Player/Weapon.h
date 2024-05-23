@@ -30,6 +30,10 @@ public:
 
 	void SetIsAttack(const bool isAttack) { isAttack_ = isAttack; };
 
+	const bool GetIsHit() const { return isHit_; };
+
+	void SetIsHit(const bool isHit) { isHit_ = isHit; };
+
 private:
 	void ApplyGlobalVariables();
 
@@ -47,5 +51,7 @@ private:
 	bool xButtonSpriteVisible_ = false;
 
 	Vector3 offset_{ 0.0f,1.0f,3.0f };
+
+	bool isHit_ = false;
 };
 

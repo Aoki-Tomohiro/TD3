@@ -4,6 +4,8 @@
 
 void Enemy::Initialize(Model* model, const Vector3& position)
 {
+	audio_ = Audio::GetInstance();
+
 	assert(model);
 	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	model_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
@@ -43,6 +45,8 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 
 	//パーティクルの初期化
 	particleSystem_ = ParticleManager::Create("Enemy");
+
+	attackAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Attack.wav");
 }
 
 void Enemy::Update()
@@ -765,6 +769,7 @@ void Enemy::OnCollision(Collider* collider)
 			.Build();
 		particleSystem_->AddParticleEmitter(emitter);
 		isActive_ = false;
+		audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
 	}
 }
 const Vector3 Enemy::GetWorldPosition() const

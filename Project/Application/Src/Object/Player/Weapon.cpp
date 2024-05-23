@@ -105,6 +105,7 @@ void Weapon::OnCollision(Collider* collider)
 	if (collider->GetCollisionAttribute() == kCollisionAttributeEnemy)
 	{
 		xButtonSpriteVisible_ = true;
+		isHit_ = true;
 	}
 }
 

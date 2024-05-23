@@ -107,5 +107,8 @@ private:
 	bool isReversed_ = false;
 	uint32_t reverseTimer_ = 0;
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
+
+	//オーディオハンドル
+	uint32_t whiffAudioHandle_ = 0;
 };
 

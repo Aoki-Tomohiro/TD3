@@ -135,7 +135,6 @@ private:
 
 	//オーディオハンドル
 	uint32_t moveAudioHandle_ = 0;
-	uint32_t attackAudioHandle_ = 0;
 	int moveAudioTimer_ = 0;
 	int moveAudioWaitTime_ = 20;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/3D/Model/Model.h"
+#include "Engine/Components/Audio/Audio.h"
 #include "Engine/Components/Collision/Collider.h"
 #include "Engine/Components/Collision/CollisionConfig.h"
 #include "Engine/Math/MathFunction.h"
@@ -91,6 +92,9 @@ private:
 
 
 private:
+	//オーディオ
+	Audio* audio_ = nullptr;
+
 	std::unique_ptr<Model> model_ = nullptr;
 
 
@@ -160,5 +164,7 @@ private:
 	bool isEdit_ = false;
 
 	uint32_t reverseTimer_ = 0;
+
+	uint32_t attackAudioHandle_ = 0;
 };
 

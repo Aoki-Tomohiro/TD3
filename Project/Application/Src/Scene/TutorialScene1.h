@@ -67,5 +67,8 @@ private:
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
+
+	//オーディオハンドル
+	uint32_t whiffAudioHandle_ = 0;
 };
 

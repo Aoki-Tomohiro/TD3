@@ -79,6 +79,9 @@ void GamePlayScene::Initialize()
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
+
+	//音声データ読み込み
+	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
 }
 
 void GamePlayScene::Finalize()
@@ -192,6 +195,10 @@ void GamePlayScene::Update()
 		//リセット処理
 		if (player_->GetWeapon()->GetIsAttack() && !isClear)
 		{
+			if (!player_->GetWeapon()->GetIsHit())
+			{
+				audio_->PlayAudio(whiffAudioHandle_, 0, 0.4f);
+			}
 			reversePlayerPositions = copyManager_->GetPlayerPositions();
 			isReversed_ = true;
 			player_->StopAnimation();
