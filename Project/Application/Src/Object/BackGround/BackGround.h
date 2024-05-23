@@ -7,6 +7,7 @@ class BackGround
 public:
 	enum Parts
 	{
+		kGenko,
 		kFrame,
 		kMovie,
 		kCountOfParts

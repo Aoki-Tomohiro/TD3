@@ -87,6 +87,7 @@ private:
 	std::unique_ptr<CopyManager> copyManager_ = nullptr;
 
 	//背景
+	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
@@ -104,6 +105,7 @@ private:
 
 	//逆再生中か
 	bool isReversed_ = false;
+	uint32_t reverseTimer_ = 0;
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 };
 

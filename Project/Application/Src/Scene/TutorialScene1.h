@@ -63,6 +63,7 @@ private:
 	Vector2 spriteScale_ = { 360.0f,220.0f };
 
 	//背景
+	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;

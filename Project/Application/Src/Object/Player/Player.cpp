@@ -311,6 +311,7 @@ void Player::SetPositions(const Vector3& position, const bool isAttack, const ui
 	worldTransform_.UpdateMatrixFromQuaternion();
 	models_[0]->GetAnimation()->SetAnimationTime(animationTime_);
 	models_[0]->Update(worldTransform_, animationNumber_);
+	weapon_->Update();
 }
 
 void Player::BehaviorRootInitialize()
@@ -575,14 +576,14 @@ void Player::BehaviorAttackUpdate()
 void Player::UpdateMovementRestriction()
 {
 	//移動ベクトルが0ではないとき
-	if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
-	{
+	//if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
+	//{
 		//移動制限のタイマーが0以下になったときに動けないようにする
 		if (--movementRestrictionTimer_ < 0)
 		{
 			isMove_ = false;
 		}
-	}
+	//}
 
 	//移動制限時間が短くなったら
 	const int divisor = 4;

@@ -58,11 +58,12 @@ void GamePlayScene::Initialize()
 	copyManager_->Initialize();
 
 	//背景の生成
+	backGroundGenkoModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
 	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
 	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
 	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
 	backGroundMovieModel_->GetMaterial(1)->SetEnableLighting(false);
-	std::vector<Model*> backGroundModels = { backGroundFrameModel_.get(),backGroundMovieModel_.get() };
+	std::vector<Model*> backGroundModels = { backGroundGenkoModel_.get(),backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
 	backGround_->Initialize(backGroundModels);
 
@@ -154,7 +155,7 @@ void GamePlayScene::Update()
 		//衝突判定
 		collisionManager_->CheckAllCollisions();
 
-		//プレイヤーが動けるとき
+		//プレイヤーが動けるときに逆再生時のデータを保存
 		if (!player_->GetIsStop())
 		{
 			//プレイヤーの座標を保存
@@ -215,8 +216,17 @@ void GamePlayScene::Update()
 			//プレイヤーを逆再生
 			auto it = reversePlayerPositions.back();
 			reversePlayerPositions.pop_back();
-			player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
-			player_->GetWeapon()->Update();
+			if (++reverseTimer_ % 2 == 0)
+			{
+				player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
+			}
+			else
+			{
+				if (!reversePlayerPositions.empty())
+				{
+					reversePlayerPositions.pop_back();
+				}
+			}
 
 			//敵を逆再生
 			enemyManager_->Reverse();
@@ -233,6 +243,7 @@ void GamePlayScene::Update()
 		else
 		{
 			isReversed_ = false;
+			reverseTimer_ = 0;
 			copyManager_->AddCopy();
 			player_->PlayAnimation();
 		}
@@ -297,6 +308,18 @@ void GamePlayScene::Draw()
 	renderer_->ClearDepthBuffer();
 
 #pragma region 3Dオブジェクト描画
+	//プレイヤーの描画
+	player_->Draw(camera_);
+
+	//敵の描画
+	enemyManager_->Draw(camera_);
+
+	//ブロックの描画
+	blockManager_->Draw(camera_);
+
+	//コピーの描画
+	copyManager_->Draw(camera_);
+
 	//背景の描画
 	backGround_->Draw(camera_);
 
@@ -307,6 +330,9 @@ void GamePlayScene::Draw()
 #pragma region パーティクル描画
 	//パーティクル描画前処理
 	renderer_->PreDrawParticles();
+
+	//パーティクルの描画
+	particleManager_->Draw(camera_);
 
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
@@ -319,6 +345,9 @@ void GamePlayScene::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
+	//プレイヤーのUIの描画
+	player_->DrawUI(camera_);
+  
 	//timeの描画
 	for (uint32_t i = 0; i < 2; i++)
 	{
@@ -341,17 +370,6 @@ void GamePlayScene::DrawBackGround()
 #pragma endregion
 
 #pragma region 3Dオブジェクト描画
-	//プレイヤーの描画
-	player_->Draw(camera_);
-
-	//敵の描画
-	enemyManager_->Draw(camera_);
-
-	//ブロックの描画
-	blockManager_->Draw(camera_);
-
-	//コピーの描画
-	copyManager_->Draw(camera_);
 
 	//3Dオブジェクト描画
 	renderer_->Render();
@@ -361,9 +379,6 @@ void GamePlayScene::DrawBackGround()
 	//パーティクル描画前処理
 	renderer_->PreDrawParticles();
 
-	//パーティクルの描画
-	particleManager_->Draw(camera_);
-
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
 #pragma endregion
@@ -371,9 +386,6 @@ void GamePlayScene::DrawBackGround()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
-
-	//プレイヤーのUIの描画
-	player_->DrawUI(camera_);
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
