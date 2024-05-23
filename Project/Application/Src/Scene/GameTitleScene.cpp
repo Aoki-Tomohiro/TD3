@@ -1,6 +1,8 @@
 #include "GameTitleScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 
+bool GameTitleScene::isStart_ = false;
+
 void GameTitleScene::Initialize()
 {
 	renderer_ = Renderer::GetInstance();
@@ -22,8 +24,11 @@ void GameTitleScene::Initialize()
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	//BGMの再生
-	audio_->StopAudio(bgmHandle_);
-	audio_->PlayAudio(bgmHandle_, true, 0.1f);
+	if (!isStart_)
+	{
+		audio_->PlayAudio(bgmHandle_, true, 0.1f);
+		isStart_ = true;
+	}
 }
 
 void GameTitleScene::Finalize()

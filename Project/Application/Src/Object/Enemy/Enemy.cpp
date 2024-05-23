@@ -670,6 +670,12 @@ void Enemy::Reverse()
 		}
 		else
 		{
+			worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+			worldTransform_.UpdateMatrixFromQuaternion();
+			if (!positions_.empty())
+			{
+				positions_.pop_back();
+			}
 			if (!positions_.empty())
 			{
 				positions_.pop_back();

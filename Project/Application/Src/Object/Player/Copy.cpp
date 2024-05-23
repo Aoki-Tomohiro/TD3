@@ -197,6 +197,14 @@ void Copy::Reverse()
 		}
 		else
 		{
+			//ワールドトランスフォームの更新
+			worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+			worldTransform_.UpdateMatrixFromQuaternion();
+
+			if (currentIndex_ > 0)
+			{
+				currentIndex_--;
+			}
 			if (currentIndex_ > 0)
 			{
 				currentIndex_--;

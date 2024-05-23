@@ -233,6 +233,10 @@ void GamePlayScene::Update()
 				{
 					reversePlayerPositions.pop_back();
 				}
+				if (!reversePlayerPositions.empty())
+				{
+					reversePlayerPositions.pop_back();
+				}
 			}
 
 			//敵を逆再生
@@ -260,7 +264,13 @@ void GamePlayScene::Update()
 	//パーティクルの更新
 	particleManager_->Update();
 
-	int time = int(dislikes_);
+	//ゲームーオーバー
+	int time = 60 - int(dislikes_);
+	if (time < 0)
+	{
+		sceneManager_->ChangeScene("GameOverScene");
+	}
+
 	if (time > 99)
 	{
 		timeCountSprites_[0]->SetTexture("Numbers/9.png");

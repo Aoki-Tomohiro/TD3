@@ -35,11 +35,24 @@ void GameOverScene::Update()
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			copyCount_ = 0;
 		}
+
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		{
+			sceneManager_->ChangeScene("GamePlayScene");
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
+			copyCount_ = 0;
+		}
 	}
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
 		sceneManager_->ChangeScene("GameTitleScene");
+		audio_->PlayAudio(decisionHandle_, false, 0.4f);
+		copyCount_ = 0;
+	}
+	if (input_->IsPushKeyEnter(DIK_R))
+	{
+		sceneManager_->ChangeScene("GamePlayScene");
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		copyCount_ = 0;
 	}
