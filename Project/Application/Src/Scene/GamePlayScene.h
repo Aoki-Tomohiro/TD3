@@ -51,6 +51,11 @@ private:
 	//カメラ
 	Camera camera_{};
 
+	//タイマーのスプライト
+	std::array<std::unique_ptr<Sprite>, 2> timeCountSprites_{};
+	Vector2 timeCountSpritePositions_[2]{ {516.0f,11.0f},{595.0f,11.0f} };
+	Vector2 SpriteSize_[2] = { {1.0f,1.0f},{1.0f,1.0f} };
+
 	//評価
 	int likes_;
 	float dislikes_;

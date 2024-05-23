@@ -18,7 +18,15 @@ void GamePlayScene::Initialize()
 	camera_.Initialize();
 	camera_.fov_ = 45.0f * 3.141592654f / 180.0f;
 
-
+	//数字のテクスチャの読み込み
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		std::string textureName = "Numbers/" + std::to_string(i) + ".png";
+		TextureManager::Load(textureName);
+	}
+	//コピーの数のスプライトの生成
+	timeCountSprites_[0].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[0]));
+	timeCountSprites_[1].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[1]));
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
@@ -171,10 +179,11 @@ void GamePlayScene::Update()
 			if (isClear)
 			{
 				sceneManager_->ChangeScene("GameClearScene");
-				GameClearScene::SetCopyCount(copyManager_->GetCopyCount());
+				GameClearScene::SetTimeCount(int(dislikes_));
 			}
 		}
 
+		//ゲームオーバー
 		if (dislikes_ >= 99) {
 			sceneManager_->ChangeScene("GameOverScene");
 		}
@@ -229,9 +238,31 @@ void GamePlayScene::Update()
 		}
 	}
 
-	
+
 	//パーティクルの更新
 	particleManager_->Update();
+
+	int time = int(dislikes_);
+	if (time > 99)
+	{
+		timeCountSprites_[0]->SetTexture("Numbers/9.png");
+		timeCountSprites_[1]->SetTexture("Numbers/9.png");
+	}
+	else
+	{
+		timeCountSprites_[0]->SetTexture("Numbers/" + std::to_string(time / 10) + ".png");
+		time %= 10;
+		timeCountSprites_[1]->SetTexture("Numbers/" + std::to_string(time) + ".png");
+	}
+	
+	//スプライトの座標を設定
+	for (uint32_t i = 0; i < 2; i++)
+	{
+		timeCountSprites_[i]->SetPosition(timeCountSpritePositions_[i]);
+		timeCountSprites_[i]->SetScale(SpriteSize_[i]);
+	}
+
+	
 
 	//ImGui
 	ImGui::Begin("GamePlayScene");
@@ -245,6 +276,10 @@ void GamePlayScene::Update()
 		ImGui::TreePop();
 	}
 
+	ImGui::DragFloat2("SpritePositon[0]", &timeCountSpritePositions_[0].x);
+	ImGui::DragFloat2("SpritePositon[1]", &timeCountSpritePositions_[1].x);
+	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x,1.0f,1.0f,3.0f);
+	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x,1.0f,1.0f,3.0f);
 	ImGui::End();
 }
 
@@ -283,6 +318,12 @@ void GamePlayScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//timeの描画
+	for (uint32_t i = 0; i < 2; i++)
+	{
+		timeCountSprites_[i]->Draw();
+	}
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -353,7 +394,7 @@ void GamePlayScene::Reset()
 
 void GamePlayScene::CalculateRating() {
 	//毎秒今いる敵の数*1ずつ減っていく
-	dislikes_ += (1.0f / 60.0f) * float(enemyNum_);
+	dislikes_ += (1.0f / 60.0f);
 
 	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)

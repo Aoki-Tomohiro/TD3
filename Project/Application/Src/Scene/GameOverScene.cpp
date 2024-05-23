@@ -12,8 +12,8 @@ void GameOverScene::Initialize()
 	audio_ = Audio::GetInstance();
 
 	//リザルト画面のスプライトの作成
-	TextureManager::Load("Result.png");
-	resultSprite_.reset(Sprite::Create("Result.png", { 0.0f,0.0f }));
+	TextureManager::Load("gameover.png");
+	resultSprite_.reset(Sprite::Create("gameover.png", { 0.0f,0.0f }));
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
