@@ -186,13 +186,29 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 
-		if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 2 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 2) {
+		if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 3 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
 			velocity_.x = 0.0f;
 		}
 
 		worldTransform_.translation_ += velocity_;
 	}
 
+	//上にプレイヤーがいた時の移動
+	if (int(enemyPosition_.y - 2) == int(playerPosition_.y) && velocity_.x == 0.0f) {
+
+		if (int(playerPosition_.x) == int(enemyPosition_.x - 1) || int(playerPosition_.x) == int(enemyPosition_.x + 1) || int(playerPosition_.x) == int(enemyPosition_.x)) {
+			if (enemyPosition_.x < playerPosition_.x && worldTransform_.translation_.x > -32.0f) {
+				velocity_.x = -0.3f;
+
+				worldTransform_.translation_ += velocity_;
+			}
+
+			if (enemyPosition_.x > playerPosition_.x && worldTransform_.translation_.x < 32.0f) {
+				velocity_.x = 0.3f;
+				worldTransform_.translation_ += velocity_;
+			}
+		}
+	}
 
 	moveCount_--;
 	// エネミーの移動
@@ -257,7 +273,7 @@ void Enemy::BehaviorRootUpdate() {
 
 		
 
-		if (map[int(enemyPosition_.x)+1][int(enemyPosition_.y)] >= 2 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 2) {
+		if (map[int(enemyPosition_.x)+1][int(enemyPosition_.y)] >= 3 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
 			velocity_.x = 0.0f;
 		}
 		worldTransform_.translation_ += velocity_;
@@ -276,21 +292,7 @@ void Enemy::BehaviorRootUpdate() {
 	}
 
 	
-	if (int(enemyPosition_.y - 2) == int(playerPosition_.y) && velocity_.x == 0.0f) {
-		
-		if (int(playerPosition_.x) == int(enemyPosition_.x - 1) || int(playerPosition_.x) == int(enemyPosition_.x + 1) || int(playerPosition_.x) == int(enemyPosition_.x)) {
-			if (enemyPosition_.x < playerPosition_.x && worldTransform_.translation_.x > -32.0f) {
-				velocity_.x = -0.3f;
 
-				worldTransform_.translation_ += velocity_;
-			}
-
-			if (enemyPosition_.x > playerPosition_.x && worldTransform_.translation_.x < 32.0f) {
-				velocity_.x = 0.3f;
-				worldTransform_.translation_ += velocity_;
-			}
-		}
-	}
 	
 
 	//地面より下に行かないようにする
