@@ -104,7 +104,7 @@ void Enemy::Update()
 		ImGui::Text("CopyPos X%d,Y%d", int(copy_[0]->GetWorldPosition().x), int(copy_[0]->GetWorldPosition().y));
 	}
 	
-	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
+	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)+1][int(enemyPosition_.y)]);
 	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) - 1]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
@@ -186,9 +186,18 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 
-		if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 3 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
-			velocity_.x = 0.0f;
+		if (velocity_.x == 0.3f) {
+			if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 3) {
+				velocity_.x = 0.0f;
+			}
 		}
+		else {
+			if (map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
+				velocity_.x = 0.0f;
+			}
+		}
+
+		
 
 		worldTransform_.translation_ += velocity_;
 	}
@@ -273,8 +282,15 @@ void Enemy::BehaviorRootUpdate() {
 
 		
 
-		if (map[int(enemyPosition_.x)+1][int(enemyPosition_.y)] >= 3 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
-			velocity_.x = 0.0f;
+		if (velocity_.x == 0.3f) {
+			if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 3) {
+				velocity_.x = 0.0f;
+			}
+		}
+		else {
+			if (map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
+				velocity_.x = 0.0f;
+			}
 		}
 		worldTransform_.translation_ += velocity_;
 
