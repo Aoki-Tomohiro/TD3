@@ -219,30 +219,8 @@ void GamePlayScene::Update()
 	{
 		if (!reversePlayerPositions.empty())
 		{
-			//プレイヤーを逆再生
-			auto it = reversePlayerPositions.back();
-			reversePlayerPositions.pop_back();
-			if (++reverseTimer_ % 2 == 0)
-			{
-				player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
-			}
-			else
-			{
-				if (!reversePlayerPositions.empty())
-				{
-					reversePlayerPositions.pop_back();
-				}
-				if (!reversePlayerPositions.empty())
-				{
-					reversePlayerPositions.pop_back();
-				}
-			}
-
-			//敵を逆再生
-			enemyManager_->Reverse();
-
-			//コピーを逆再生
-			copyManager_->Reverse();
+			//逆再生処理
+			Reverse();
 
 			//ノイズエフェクトを有効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
@@ -253,7 +231,6 @@ void GamePlayScene::Update()
 		else
 		{
 			isReversed_ = false;
-			reverseTimer_ = 0;
 			copyManager_->AddCopy();
 			player_->PlayAnimation();
 		}
@@ -480,4 +457,25 @@ void GamePlayScene::CalculateRating() {
 		enemyNum_ = int(enemies.size());
 	}
 	totaScore_ = likes_ - int(dislikes_);
+}
+
+void GamePlayScene::Reverse()
+{
+	//プレイヤーを逆再生
+	auto it = reversePlayerPositions.back();
+	reversePlayerPositions.pop_back();
+	player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
+	for (uint32_t i = 0; i < stepSize_; ++i)
+	{
+		if (!reversePlayerPositions.empty())
+		{
+			reversePlayerPositions.pop_back();
+		}
+	}
+
+	//敵を逆再生
+	enemyManager_->Reverse(stepSize_);
+
+	//コピーを逆再生
+	copyManager_->Reverse(stepSize_);
 }

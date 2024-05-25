@@ -26,7 +26,7 @@ void Player::Initialzie(std::vector<Model*> models)
 
 	//制限時間のスプライトの生成
 	movementRestrictionSprite_.reset(Sprite::Create("white.png", { 0.0f,0.0f }));
-	movementRestrictionSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	//movementRestrictionSprite_->SetAnchorPoint({ 0.5f,0.5f });
 	movementRestrictionSprite_->SetSize(movementRestrictionSpriteSize_);
 
 	//音声データの読み込み
@@ -607,7 +607,7 @@ void Player::UpdateMovementRestrictionSprite(const Camera& camera)
 	//ビュー行列とプロジェクション行列とビューポート行列を合成
 	Matrix4x4 matViewProjectionViewport = camera.matView_ * camera.matProjection_ * matViewport;
 	//スクリーン座標に変換
-	Vector3 offset = { 0.0f,4.0f,0.0f };
+	Vector3 offset = { -1.8f,4.0f,0.0f };
 	Vector3 spritePosition = GetWorldPosition() + offset;
 	spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
 	//スプライトに座標を設定

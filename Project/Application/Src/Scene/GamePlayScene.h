@@ -41,6 +41,8 @@ private:
 	
 	void CalculateRating();
 
+	void Reverse();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -105,10 +107,12 @@ private:
 
 	//逆再生中か
 	bool isReversed_ = false;
-	uint32_t reverseTimer_ = 0;
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 
 	//オーディオハンドル
 	uint32_t whiffAudioHandle_ = 0;
+
+	//巻き戻しのデータスキップ数
+	uint32_t stepSize_ = 2;
 };
 

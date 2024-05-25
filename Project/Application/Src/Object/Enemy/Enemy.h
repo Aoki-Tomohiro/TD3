@@ -53,7 +53,7 @@ public:
 
 	void Reset();
 
-	void Reverse();
+	void Reverse(const uint32_t stepSize);
 
 	void SetIsTutorial(const bool isTutorial) { isTutorial_ = isTutorial; };
 
@@ -162,8 +162,6 @@ private:
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 
 	bool isEdit_ = false;
-
-	uint32_t reverseTimer_ = 0;
 
 	uint32_t attackAudioHandle_ = 0;
 };
