@@ -22,7 +22,7 @@ public:
 
 	Weapon* GetWeapon() { return weapon_.get(); };
 
-	void Reverse();
+	void Reverse(const uint32_t stepSize);
 
 private:
 	std::unique_ptr<Model> model_ = nullptr;
@@ -43,6 +43,6 @@ private:
 
 	std::unique_ptr<Weapon> weapon_ = nullptr;
 
-	uint32_t reverseTimer_ = 0;
+	bool isReverse_ = false;
 };
 

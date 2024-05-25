@@ -259,11 +259,11 @@ void EnemyManager::LoadFile()
 	}
 }
 
-void EnemyManager::Reverse()
+void EnemyManager::Reverse(const uint32_t stepSize)
 {
 	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		enemy->Reverse();
+		enemy->Reverse(stepSize);
 	}
 }
 

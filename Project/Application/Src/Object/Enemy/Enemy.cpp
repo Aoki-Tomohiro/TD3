@@ -657,56 +657,54 @@ void Enemy::FindPath() {
 	}
 
 }
-void Enemy::Reverse()
+void Enemy::Reverse(const uint32_t stepSize)
 {
+	//過去のデータがからではなかったら
 	if (!positions_.empty())
 	{
+		//前の座標を取得
 		Vector3 prePosition = GetWorldPosition();
+
+		//過去のデータを取得
 		Vector3 position{};
 		uint32_t animationNumber = 0;
 		float animationTime = 0.0f;
 		std::tie(position, animationNumber, animationTime) = positions_.back();
 		positions_.pop_back();
-		if (++reverseTimer_ % 2 == 0)
+
+		//座標を代入
+		worldTransform_.translation_ = position;
+
+		//移動していたら
+		if (prePosition.x != position.x)
 		{
-			worldTransform_.translation_ = position;
-			if (prePosition.x != position.x)
+			//回転させる
+			if (prePosition.x > position.x)
 			{
-				if (prePosition.x > position.x)
-				{
-					destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
-				}
-				else
-				{
-					destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
-				}
+				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
 			}
-			worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-			worldTransform_.UpdateMatrixFromQuaternion();
-			model_->GetAnimation()->SetAnimationTime(animationTime);
-			model_->Update(worldTransform_, animationNumber);
-		}
-		else
-		{
-			worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-			worldTransform_.UpdateMatrixFromQuaternion();
-			if (!positions_.empty())
+			else
 			{
-				positions_.pop_back();
-			}
-			if (!positions_.empty())
-			{
-				positions_.pop_back();
+				destinationQuaternion_ = { 0.0f,-0.707f,0.0f,0.707f };
 			}
 		}
 
-		//worldTransform_.translation_ = positions_.back();
-		//positions_.pop_back();
-		//worldTransform_.UpdateMatrixFromQuaternion();
-	}
-	else
-	{
-		reverseTimer_ = 0;
+		//ワールドトランスフォームの更新
+		worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+		worldTransform_.UpdateMatrixFromQuaternion();
+
+		//アニメーションの更新
+		model_->GetAnimation()->SetAnimationTime(animationTime);
+		model_->Update(worldTransform_, animationNumber);
+
+		//巻き戻しの速度を上げるためにデータをスキップ
+		for (uint32_t i = 0; i < stepSize; ++i)
+		{
+			if (!positions_.empty())
+			{
+				positions_.pop_back();
+			}
+		}
 	}
 }
 

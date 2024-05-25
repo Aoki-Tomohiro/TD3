@@ -12,7 +12,7 @@ public:
 
 	void Reset();
 
-	void Reverse();
+	void Reverse(const uint32_t stepSize);
 
 	void AddCopy();
 
@@ -25,10 +25,17 @@ public:
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>>& GetPlayerPositions() { return playerPositions_; };
 
 private:
+	void ApplyGlobalVariables();
+
+private:
 	Model* model_ = nullptr;
 
 	std::vector<std::unique_ptr<Copy>> copies_{};
 
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>> playerPositions_{};
+
+	int copyCount_ = 0;
+
+	int maxCopyCount_ = 5;
 };
 

@@ -12,7 +12,7 @@ public:
 
 	void Draw(const Camera& camera);
 
-	void Reverse();
+	void Reverse(const uint32_t stepSize);
 
 	void Reset();
 
