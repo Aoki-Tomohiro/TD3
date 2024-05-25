@@ -91,7 +91,7 @@ void GameClearScene::Update()
 	{
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
-			sceneManager_->ChangeScene("GameTitleScene");
+			sceneManager_->ChangeScene("StageSelectScene");
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			timeCount_ = 0;
 		}
@@ -99,7 +99,7 @@ void GameClearScene::Update()
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
-		sceneManager_->ChangeScene("GameTitleScene");
+		sceneManager_->ChangeScene("StageSelectScene");
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		timeCount_ = 0;
 	}

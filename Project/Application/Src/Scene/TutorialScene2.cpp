@@ -157,7 +157,7 @@ void TutorialScene2::Update()
 			}
 			if (isClear)
 			{
-				sceneManager_->ChangeScene("GamePlayScene");
+				sceneManager_->ChangeScene("StageSelectScene");
 			}
 
 			//リセット処理

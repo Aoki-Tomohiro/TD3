@@ -3,8 +3,9 @@
 #include "Engine/Base/ImGuiManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include "Application/Src/Scene/GameClearScene.h"
+#include "Application/Src/Scene/StageSelectScene.h"
 
-uint32_t GamePlayScene::currentStageNumber = 2;
+uint32_t GamePlayScene::currentStageNumber = StageSelectScene::stageNumber_;
 
 void GamePlayScene::Initialize()
 {
@@ -14,16 +15,14 @@ void GamePlayScene::Initialize()
 
 	audio_ = Audio::GetInstance();
 
+	//ステージ番号の読み込み
+	GamePlayScene::currentStageNumber = StageSelectScene::stageNumber_;
+
 	//カメラの初期化
 	camera_.Initialize();
 	camera_.fov_ = 45.0f * 3.141592654f / 180.0f;
 
-	//数字のテクスチャの読み込み
-	for (uint32_t i = 0; i < 10; i++)
-	{
-		std::string textureName = "Numbers/" + std::to_string(i) + ".png";
-		TextureManager::Load(textureName);
-	}
+	
 	//コピーの数のスプライトの生成
 	timeCountSprites_[0].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[0]));
 	timeCountSprites_[1].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[1]));

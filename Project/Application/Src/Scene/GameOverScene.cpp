@@ -38,7 +38,7 @@ void GameOverScene::Update()
 
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
-			sceneManager_->ChangeScene("GamePlayScene");
+			sceneManager_->ChangeScene("StageSelectScene");
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			copyCount_ = 0;
 		}
@@ -46,7 +46,7 @@ void GameOverScene::Update()
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
-		sceneManager_->ChangeScene("GameTitleScene");
+		sceneManager_->ChangeScene("StageSelectScene");
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		copyCount_ = 0;
 	}

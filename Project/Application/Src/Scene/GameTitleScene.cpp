@@ -53,6 +53,12 @@ void GameTitleScene::Update()
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
 
+	if (input_->IsPushKeyEnter(DIK_S))
+	{
+		sceneManager_->ChangeScene("StageSelectScene");
+		audio_->PlayAudio(decisionHandle_, false, 0.4f);
+	}
+
 	//スプライトの座標を設定
 	pushASprite_->SetPosition(pushASpritePosition_);
 	//titleSprite_->SetPosition(titleSpritePosition_);

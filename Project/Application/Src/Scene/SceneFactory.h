@@ -7,6 +7,7 @@
 #include "LoadScene.h"
 #include "TutorialScene1.h"
 #include "TutorialScene2.h"
+#include "StageSelectScene.h"
 
 class SceneFactory : public AbstractSceneFactory
 {
