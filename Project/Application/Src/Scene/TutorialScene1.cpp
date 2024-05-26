@@ -34,6 +34,7 @@ void TutorialScene1::Initialize()
 
 	//ブロックを生成
 	blockModel_.reset(ModelManager::Create());
+	blockModel_->GetMaterial(1)->SetColor({ 0.196f,0.196f,0.196f,1.0f });
 	blockManager_ = std::make_unique<BlockManager>();
 	blockManager_->Initialize(blockModel_.get(), 0);
 

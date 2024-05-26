@@ -78,7 +78,7 @@ void BlockManager::Update()
 		else
 		{
 			//色を変更
-			block->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+			block->SetColor({ 0.196f,0.196f,0.196f,1.0f });
 		}
 
 		//IDをインクリメント
