@@ -114,6 +114,5 @@ private:
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;
-	Vector4 blockColor = { 0.0f,0.0f,0.0f,1.0f };
 };
 

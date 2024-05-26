@@ -8,6 +8,25 @@ void CopyManager::Initialize()
 	const char* groupName = "CopyManager";
 	globalVariables->CreateGroup(groupName);
 	globalVariables->AddItem(groupName, "MaxCopyCount", maxCopyCount_);
+
+	//数字のテクスチャの読み込み
+	for (uint32_t i = 0; i < 10; i++)
+	{
+		std::string textureName = "Numbers/" + std::to_string(i) + ".png";
+		TextureManager::Load(textureName);
+	}
+	TextureManager::Load("Numbers/Slash.png");
+
+	//コピー上限のスプライトの生成
+	for (uint32_t i = 0; i < maxCopySprites_.size(); ++i)
+	{
+		if (i == 1)
+		{
+			maxCopySprites_[i].reset(Sprite::Create("Numbers/Slash.png", { 0.0f,0.0f }));
+			continue;
+		}
+		maxCopySprites_[i].reset(Sprite::Create("Numbers/0.png", { 0.0f,0.0f }));
+	}
 }
 
 void CopyManager::Update()
@@ -19,6 +38,20 @@ void CopyManager::Update()
 	}
 
 	ApplyGlobalVariables();
+
+	ImGui::Begin("CopyManager");
+	for (uint32_t i = 0; i < maxCopySprites_.size(); ++i)
+	{
+		std::string positionName = "MaxCopySpritePosition" + std::to_string(i);
+		ImGui::DragFloat2(positionName.c_str(), &spritePositions_[i].x);
+		std::string sizeName = "MaxCopySpriteSize" + std::to_string(i);
+		ImGui::DragFloat2(sizeName.c_str(), &spriteSize_[i].x);
+		maxCopySprites_[i]->SetPosition(spritePositions_[i]);
+		maxCopySprites_[i]->SetSize(spriteSize_[i]);
+	}
+	maxCopySprites_[0]->SetTexture("Numbers/" + std::to_string(copyCount_) + ".png");
+	maxCopySprites_[2]->SetTexture("Numbers/" + std::to_string(maxCopyCount_) + ".png");
+	ImGui::End();
 }
 
 void CopyManager::Draw(const Camera& camera)
@@ -27,6 +60,14 @@ void CopyManager::Draw(const Camera& camera)
 	for (std::unique_ptr<Copy>& copy : copies_)
 	{
 		copy->Draw(camera);
+	}
+}
+
+void CopyManager::DrawUI()
+{
+	for (uint32_t i = 0; i < maxCopySprites_.size(); ++i)
+	{
+		maxCopySprites_[i]->Draw();
 	}
 }
 

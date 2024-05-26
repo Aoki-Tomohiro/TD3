@@ -247,24 +247,26 @@ void GamePlayScene::Update()
 	{
 		sceneManager_->ChangeScene("GameOverScene");
 	}
-
-	if (time > 99)
-	{
-		timeCountSprites_[0]->SetTexture("Numbers/9.png");
-		timeCountSprites_[1]->SetTexture("Numbers/9.png");
-	}
 	else
 	{
-		timeCountSprites_[0]->SetTexture("Numbers/" + std::to_string(time / 10) + ".png");
-		time %= 10;
-		timeCountSprites_[1]->SetTexture("Numbers/" + std::to_string(time) + ".png");
-	}
-	
-	//スプライトの座標を設定
-	for (uint32_t i = 0; i < 2; i++)
-	{
-		timeCountSprites_[i]->SetPosition(timeCountSpritePositions_[i]);
-		timeCountSprites_[i]->SetScale(SpriteSize_[i]);
+		if (time > 99)
+		{
+			timeCountSprites_[0]->SetTexture("Numbers/9.png");
+			timeCountSprites_[1]->SetTexture("Numbers/9.png");
+		}
+		else
+		{
+			timeCountSprites_[0]->SetTexture("Numbers/" + std::to_string(time / 10) + ".png");
+			time %= 10;
+			timeCountSprites_[1]->SetTexture("Numbers/" + std::to_string(time) + ".png");
+		}
+
+		//スプライトの座標を設定
+		for (uint32_t i = 0; i < 2; i++)
+		{
+			timeCountSprites_[i]->SetPosition(timeCountSpritePositions_[i]);
+			timeCountSprites_[i]->SetScale(SpriteSize_[i]);
+		}
 	}
 
 	
@@ -341,6 +343,9 @@ void GamePlayScene::DrawUI()
 
 	//プレイヤーのUIの描画
 	player_->DrawUI(camera_);
+
+	//コピー上限のUIの描画
+	copyManager_->DrawUI();
   
 	//timeの描画
 	for (uint32_t i = 0; i < 2; i++)

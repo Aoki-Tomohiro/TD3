@@ -24,7 +24,6 @@ void TutorialScene2::Initialize()
 	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
-	player_->SetIsTutorial(true);
 
 	//敵の生成
 	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
@@ -260,6 +259,9 @@ void TutorialScene2::DrawUI()
 
 	//プレイヤーのUIの描画
 	player_->DrawUI(camera_);
+
+	//コピー上限のUIの描画
+	copyManager_->DrawUI();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
