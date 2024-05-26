@@ -11,6 +11,11 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 	model_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	model_->GetAnimation()->PlayAnimation();
 
+
+	impactScopeModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
+	impactScopeWorldTransform_.Initialize();
+	impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
+
 	worldTransform_.Initialize();
 	//worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_ = position;
@@ -89,11 +94,16 @@ void Enemy::Update()
 
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+	impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
 	worldTransform_.UpdateMatrixFromQuaternion();
+	impactScopeWorldTransform_.UpdateMatrixFromEuler();
+
 
 	//モデルの更新
 	model_->Update(worldTransform_, animationNumber_);
 
+	//影響範囲
+	impactScopeModel_->GetMaterial(1)->SetColor(Vector4{ 1.0f,0.0f,0.0f,0.3f });
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
@@ -126,7 +136,7 @@ void Enemy::Update()
 void Enemy::Draw(const Camera& camera)
 {
 	model_->Draw(worldTransform_, camera);
-
+	impactScopeModel_->Draw(impactScopeWorldTransform_, camera);
 }
 
 void Enemy::Reset()
@@ -691,7 +701,9 @@ void Enemy::Reverse(const uint32_t stepSize)
 
 		//ワールドトランスフォームの更新
 		worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+		impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
 		worldTransform_.UpdateMatrixFromQuaternion();
+		impactScopeWorldTransform_.UpdateMatrixFromEuler();
 
 		//アニメーションの更新
 		model_->GetAnimation()->SetAnimationTime(animationTime);

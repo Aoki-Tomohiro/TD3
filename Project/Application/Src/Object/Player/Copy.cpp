@@ -6,15 +6,15 @@ void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, floa
 	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
 	model_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 
-	impactScopeModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
+	//impactScopeModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
 
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 
-	impactScopeWorldTransform_.Initialize();
-	impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
+	//impactScopeWorldTransform_.Initialize();
+	//impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
 
 	//キューの初期化
 	playerPositions_ = playerPositions;
@@ -83,23 +83,23 @@ void Copy::Update()
 
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-	impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
+	//impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
 	worldTransform_.UpdateMatrixFromQuaternion();
-	impactScopeWorldTransform_.UpdateMatrixFromEuler();
+	//impactScopeWorldTransform_.UpdateMatrixFromEuler();
 
 	//モデルの更新
 	model_->GetAnimation()->SetAnimationTime(animationTime);
 	model_->Update(worldTransform_, animationNumber);
 
 	//影響範囲
-	impactScopeModel_->GetMaterial(1)->SetColor(Vector4{ 0.0f,1.0f,1.0f,0.3f });
+	//impactScopeModel_->GetMaterial(1)->SetColor(Vector4{ 0.0f,1.0f,1.0f,0.3f });
 
 	//武器の更新
 	weapon_->Update();
 	
 
 	ImGui::Begin("Copy");
-	ImGui::SliderFloat3("Scale", &impactScopeWorldTransform_.scale_.x, 1.0f, 5.0f);
+	//ImGui::SliderFloat3("Scale", &impactScopeWorldTransform_.scale_.x, 1.0f, 5.0f);
 	ImGui::End();
 }
 
@@ -110,7 +110,7 @@ void Copy::Draw(const Camera& camera)
 
 	//影響範囲の表示
 	if (!isReverse_) {
-		impactScopeModel_->Draw(impactScopeWorldTransform_, camera);
+		//impactScopeModel_->Draw(impactScopeWorldTransform_, camera);
 	}
 	
 	//武器の描画

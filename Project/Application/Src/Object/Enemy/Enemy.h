@@ -98,7 +98,9 @@ private:
 	std::unique_ptr<Model> model_ = nullptr;
 
 
+	std::unique_ptr<Model>impactScopeModel_ = nullptr;
 	WorldTransform worldTransform_{};
+	WorldTransform impactScopeWorldTransform_{};
 
 
 	Behavior behavior_ = Behavior::kRoot;
