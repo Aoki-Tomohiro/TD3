@@ -32,16 +32,55 @@ private:
 	//カメラ
 	//Camera camera_{};
 
-	int selectNumber_;
+	int selectNumber_ = 0;
 
-	std::array<std::unique_ptr<Sprite>, 3> numberSprites_{};
+	//チュートリアル数
+	static const uint32_t kMaxTutorial = 1;
 
-	Vector2 numberPositions_[3]{ {60.0f,11.0f},{380.0f,11.0f}, {700.0f,11.0f} };
+	//ステージ数
+	static const uint32_t kMaxStages = 3;
 
-	Vector2 SpriteSize_[3] = { {3.0f,3.0f},{3.0f,3.0f},{3.0f,3.0f} };
+	//背景スプライト
+	std::unique_ptr<Sprite> backGroundSprite_ = nullptr;
+
+	//矢印のスプライト
+	std::array<std::unique_ptr<Sprite>, 2> arrowSprites_{};
+	std::array<Vector2, 2> arrowSpritePosition_{};
+	std::array<Vector2, 2> arrowSpriteTargetPosition_{};
+	std::array<Vector2, 2> arrowSpriteSize_{};
+
+	//チュートリアルのスプライト
+	std::array<std::unique_ptr<Sprite>, kMaxTutorial> tutorialSprites_{};
+	std::array<Vector2, kMaxTutorial> tutorialSpritePosition_{};
+	std::array<Vector2, kMaxTutorial> tutorialSpriteTargetPosition_{};
+	std::array<Vector2, kMaxTutorial> tutorialSpriteSize_{};
+
+	//ステージのスプライト
+	std::array<std::unique_ptr<Sprite>, kMaxStages> stageSprites_{};
+	std::array<Vector2, kMaxStages> stageSpritePosition_{};
+	std::array<Vector2, kMaxStages> stageSpriteTargetPosition_{};
+	std::array<Vector2, kMaxStages> stageSpriteSize_{};
+
+	//数字のスプライトの描画
+	std::array<std::unique_ptr<Sprite>, kMaxStages> numberSprites_{};
+	std::array<Vector2, kMaxStages> numberSpritePosition_{};
+	std::array<Vector2, kMaxStages> numberSpriteTargetPosition_{};
+	std::array<Vector2, kMaxStages> numberSpriteSize_{};
+
+	//ステージ画面のスプライト
+	std::array<std::unique_ptr<Sprite>, kMaxTutorial + kMaxStages> stageScreenSprites_{};
+	std::array<Vector2, kMaxTutorial + kMaxStages> stageScreenSpritePosition_{};
+	std::array<Vector2, kMaxTutorial + kMaxStages> stageScreenSpriteTargetPosition_{};
+	std::array<Vector2, kMaxTutorial + kMaxStages> stageScreenSpriteSize_{};
+
+	//Vector2 numberPositions_[3]{ {60.0f,11.0f},{380.0f,11.0f}, {700.0f,11.0f} };
+
+	//Vector2 SpriteSize_[3] = { {3.0f,3.0f},{3.0f,3.0f},{3.0f,3.0f} };
 
 	uint32_t decisionHandle_ = 0;
 
 	bool isMovementEnabled_ = true;
 	int MovementEnableTimer_ = 0;
+	float easingParameter_ = 0.0f;
+	float delta_ = 1280.0f;
 };

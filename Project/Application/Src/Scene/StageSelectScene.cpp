@@ -2,6 +2,7 @@
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Base/ImGuiManager.h"
 #include <Engine/Math/MathFunction.h>
+#include <numbers>
 
 uint32_t StageSelectScene::stageNumber_ = 0;
 
@@ -15,19 +16,57 @@ void StageSelectScene::Initialize() {
 
 	audio_ = Audio::GetInstance();
 
+	//背景スプライトの生成
+	TextureManager::Load("backs.png");
+	backGroundSprite_.reset(Sprite::Create("backs.png", { 0.0f,0.0f }));
 
-	// 数字のテクスチャの読み込み
+	//矢印のスプライトの生成
+	TextureManager::Load("Arrow.png");
+	for (uint32_t i = 0; i < 2; ++i)
+	{
+		arrowSprites_[i].reset(Sprite::Create("Arrow.png", { 0.0f,0.0f }));
+		arrowSprites_[i]->SetAnchorPoint({ 0.5f,0.5f });
+	}
+	arrowSprites_[1]->SetRotation(std::numbers::pi_v<float>);
+	arrowSpriteTargetPosition_[0] = { 345.0f,444.0f };
+	arrowSpritePosition_[0] = arrowSpriteTargetPosition_[0];
+	arrowSpriteTargetPosition_[1] = { 988.0f,444.0f };
+	arrowSpritePosition_[1] = arrowSpriteTargetPosition_[1];
+
+	//チュートリアルのスプライトの生成
+	TextureManager::Load("Tutorial.png");
+	for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+	{
+		tutorialSprites_[i].reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
+		tutorialSpriteTargetPosition_[i] = { 350.0f + delta_ * i, 140.0f };
+		tutorialSpritePosition_[i] = tutorialSpriteTargetPosition_[i];
+	}
+
+	//ステージのスプライト生成
+	TextureManager::Load("Stage.png");
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		std::string textureName = "Numbers/" + std::to_string(i) + ".png";
 		TextureManager::Load(textureName);
 	}
-	//コピーの数のスプライトの生成
-	numberSprites_[0].reset(Sprite::Create("Numbers/1.png", numberPositions_[0]));
-	numberSprites_[1].reset(Sprite::Create("Numbers/2.png", numberPositions_[1]));
-	numberSprites_[2].reset(Sprite::Create("Numbers/3.png", numberPositions_[2]));
+	for (uint32_t i = 0; i < kMaxStages; ++i)
+	{
+		stageSprites_[i].reset(Sprite::Create("Stage.png", { 0.0f,0.0f }));
+		numberSprites_[i].reset(Sprite::Create("Numbers/" + std::to_string(i + 1) + ".png", { 0.0f,0.0f }));
+		stageSpriteTargetPosition_[i] = { 430.0f + (tutorialSprites_.size() + i) * delta_,142.0f};
+		stageSpritePosition_[i] = stageSpriteTargetPosition_[i];
+		numberSpriteTargetPosition_[i] = { 760.0f + (tutorialSprites_.size() + i) * delta_,142.0f };
+		numberSpritePosition_[i] = numberSpriteTargetPosition_[i];
+	}
 
-	selectNumber_ = 1;
+	//ステージ画面のスプライトの作成
+	for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+	{
+		stageScreenSprites_[i].reset(Sprite::Create("white.png", { 0.0f,0.0f }));
+		stageScreenSpriteTargetPosition_[i] = { 418.0f + delta_ * i,300.0f };
+		stageScreenSpritePosition_[i] = stageScreenSpriteTargetPosition_[i];
+		stageScreenSpriteSize_[i] = { 500.0f,280.0f };
+	}
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
@@ -38,116 +77,214 @@ void StageSelectScene::Finalize() {
 }
 
 void StageSelectScene::Update() {
-
-	if (!isMovementEnabled_) {
-		const uint32_t kEnableTime = 15;
-		if (++MovementEnableTimer_ >= kEnableTime) {
-			isMovementEnabled_ = true;
-			MovementEnableTimer_ = 0;
-		}
-	}
-
 	//コントローラー操作
 	if (input_->IsControllerConnected())
 	{
-			bool isSelect = false;
+		bool isSelect = false;
 
-			const float threshold = 0.8f;
+		const float threshold = 0.8f;
 
-			Vector3 stickTilt{
-				input_->GetLeftStickX(),
-				input_->GetLeftStickY(),
-				0.0f
-			};
+		Vector3 stickTilt{
+			input_->GetLeftStickX(),
+			input_->GetLeftStickY(),
+			0.0f
+		};
 
-			if (Mathf::Length(stickTilt) > threshold) {
-				if (isMovementEnabled_) {
-					//左右にカーソルを動かす
-					if (stickTilt.x < -threshold) {
-						++selectNumber_;
-						isMovementEnabled_ = false;
+		if (Mathf::Length(stickTilt) > threshold) {
+			if (isMovementEnabled_) {
+				float delta = 0.0f;
+				//左右にカーソルを動かす
+				if (stickTilt.x < -threshold) {
+					--selectNumber_;
+					isMovementEnabled_ = false;
+					delta = delta_;
+				}
+				else if (stickTilt.x > threshold) {
+					++selectNumber_;
+					isMovementEnabled_ = false;
+					delta = -delta_;
+				}
+				//ステージ上限を超えないようにする
+				if (selectNumber_ < 0)
+				{
+					selectNumber_ = 0;
+				}
+				else if (selectNumber_ > kMaxTutorial + kMaxStages - 1)
+				{
+					selectNumber_ = kMaxTutorial + kMaxStages - 1;
+				}
+				//ステージ上限を超えていなかったらスプライトをずらす
+				else
+				{
+					//目標座標を決める
+					for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+					{
+						tutorialSpriteTargetPosition_[i].x += delta;
 					}
-					else if (stickTilt.x > threshold) {
-						--selectNumber_;
-						isMovementEnabled_ = false;
+					for (uint32_t i = 0; i < kMaxStages; ++i)
+					{
+						stageSpriteTargetPosition_[i].x += delta;
+						numberSpriteTargetPosition_[i].x += delta;
+					}
+					for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+					{
+						stageScreenSpriteTargetPosition_[i].x += delta;
 					}
 				}
 			}
+		}
 	}
 
-
-
-	if (input_->IsPushKeyEnter(DIK_D)) {
-		++selectNumber_;
-	}
-	else if (input_->IsPushKeyEnter(DIK_A)) {
-		--selectNumber_;
-	}
-	if (selectNumber_ <= 0) {
-		selectNumber_ = 1;
-	}
-	else if (selectNumber_ >= 4) {
-		selectNumber_ = 3;
-	}
-
-	if (selectNumber_ == 1) {
-		SpriteSize_[0] = { 5.0f,5.0f };
-		SpriteSize_[1] = { 3.0f,3.0f };
-		SpriteSize_[2] = { 3.0f,3.0f };
-		numberPositions_[0] = { -120.0f,11.0f };
-		numberPositions_[1] = {380.0f,11.0f };
-		numberPositions_[2] = {700.0f,11.0f };
-	}
-	else if (selectNumber_ == 2) {
-		SpriteSize_[1] = { 5.0f,5.0f };
-		SpriteSize_[0] = { 3.0f,3.0f };
-		SpriteSize_[2] = { 3.0f,3.0f };
-		numberPositions_[1] = { 200.0f,11.0f };
-		numberPositions_[0] = { 60.0f,11.0f };
-		numberPositions_[2] = { 700.0f,11.0f };
-	}
-	else if(selectNumber_ == 3){
-		SpriteSize_[2] = { 5.0f,5.0f };
-		SpriteSize_[0] = { 3.0f,3.0f };
-		SpriteSize_[1] = { 3.0f,3.0f };
-		numberPositions_[2] = { 560.0f,11.0f };
-		numberPositions_[0] = { 60.0f,11.0f };
-		numberPositions_[1] = { 380.0f,11.0f };
-	}
-
-
-	//スプライトの座標を設定
-	for (uint32_t i = 0; i < 3; i++)
+	//キーボード操作
+	if (isMovementEnabled_)
 	{
-		numberSprites_[i]->SetPosition(numberPositions_[i]);
-		numberSprites_[i]->SetScale(SpriteSize_[i]);
+		float delta = 0.0f;
+		if (input_->IsPushKeyEnter(DIK_D)) {
+			++selectNumber_;
+			isMovementEnabled_ = false;
+			delta = -delta_;
+		}
+		else if (input_->IsPushKeyEnter(DIK_A)) {
+			--selectNumber_;
+			isMovementEnabled_ = false;
+			delta = delta_;
+		}
+
+		if (selectNumber_ < 0)
+		{
+			selectNumber_ = 0;
+		}
+		else if (selectNumber_ > kMaxTutorial + kMaxStages - 1)
+		{
+			selectNumber_ = kMaxTutorial + kMaxStages - 1;
+		}
+		else
+		{
+			//目標座標を決める
+			for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+			{
+				tutorialSpriteTargetPosition_[i].x += delta;
+			}
+			for (uint32_t i = 0; i < kMaxStages; ++i)
+			{
+				stageSpriteTargetPosition_[i].x += delta;
+				numberSpriteTargetPosition_[i].x += delta;
+			}
+			for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+			{
+				stageScreenSpriteTargetPosition_[i].x += delta;
+			}
+		}
+	}
+
+	if (!isMovementEnabled_)
+	{
+		easingParameter_ += 1.0f / 20.0f;
+		//チュートリアル
+		for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+		{
+			tutorialSpritePosition_[i].x = Mathf::Lerp(tutorialSpritePosition_[i].x, tutorialSpriteTargetPosition_[i].x, easingParameter_);
+		}
+		//ステージ
+		for (uint32_t i = 0; i < kMaxStages; ++i)
+		{
+			stageSpritePosition_[i].x = Mathf::Lerp(stageSpritePosition_[i].x, stageSpriteTargetPosition_[i].x, easingParameter_);
+			numberSpritePosition_[i].x = Mathf::Lerp(numberSpritePosition_[i].x, numberSpriteTargetPosition_[i].x, easingParameter_);
+		}
+		//ステージ画面
+		for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+		{
+			stageScreenSpritePosition_[i].x = Mathf::Lerp(stageScreenSpritePosition_[i].x, stageScreenSpriteTargetPosition_[i].x, easingParameter_);
+		}
+
+		if (easingParameter_ >= 1.0f)
+		{
+			easingParameter_ = 0.0f;
+			isMovementEnabled_ = true;
+		}
 	}
 
 	if (input_->IsControllerConnected())
 	{
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
-			StageSelectScene::stageNumber_ = selectNumber_ + 1;
-			sceneManager_->ChangeScene("GamePlayScene");
+			if (selectNumber_ == 0)
+			{
+				sceneManager_->ChangeScene("TutorialScene1");
+			}
+			else
+			{
+				StageSelectScene::stageNumber_ = selectNumber_ + 1;
+				sceneManager_->ChangeScene("GamePlayScene");
+			}
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
-		StageSelectScene::stageNumber_ = selectNumber_ + 1;
-		sceneManager_->ChangeScene("GamePlayScene");
+		if (selectNumber_ == 0)
+		{
+			sceneManager_->ChangeScene("TutorialScene1");
+		}
+		else
+		{
+			StageSelectScene::stageNumber_ = selectNumber_ + 1;;
+			sceneManager_->ChangeScene("GamePlayScene");
+		}
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
 
 
 	ImGui::Begin("SelectScene");
-	ImGui::DragFloat2("SpritePositon[0]", &numberPositions_[0].x);
-	ImGui::DragFloat2("SpritePositon[1]", &numberPositions_[1].x);
-	ImGui::DragFloat2("SpritePositon[2]", &numberPositions_[2].x);
-	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x);
-	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x);
-	ImGui::DragFloat2("SpriteSize[2]", &SpriteSize_[2].x);
+	ImGui::Text("SelectNumber : %d", selectNumber_);
+	//矢印
+	for (uint32_t i = 0; i < arrowSprites_.size(); ++i)
+	{
+		std::string positionName = "ArrowSpritePosition" + std::to_string(i);
+		ImGui::DragFloat2(positionName.c_str(), &arrowSpritePosition_[i].x);
+		std::string sizeName = "ArrowSpriteSize" + std::to_string(i);
+		ImGui::DragFloat2(sizeName.c_str(), &arrowSpriteSize_[i].x);
+		arrowSprites_[i]->SetPosition(arrowSpritePosition_[i]);
+		//arrowSprites_[i]->SetSize(arrowSpriteSize_[i]);
+	}
+	//チュートリアル
+	for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+	{
+		std::string positionName = "TutorialSpritePosition" + std::to_string(i);
+		ImGui::DragFloat2(positionName.c_str(), &tutorialSpritePosition_[i].x);
+		std::string sizeName = "TutorialSpriteSize" + std::to_string(i);
+		ImGui::DragFloat2(sizeName.c_str(), &tutorialSpriteSize_[i].x);
+		tutorialSprites_[i]->SetPosition(tutorialSpritePosition_[i]);
+		//tutorialSprites_[i]->SetSize(tutorialSpriteSize_[i]);
+	}
+	//ステージ
+	for (uint32_t i = 0; i < kMaxStages; ++i)
+	{
+		std::string stagePositionName = "StageSpritePosition" + std::to_string(i);
+		ImGui::DragFloat2(stagePositionName.c_str(), &stageSpritePosition_[i].x);
+		std::string stageSizeName = "StageSpriteSize" + std::to_string(i);
+		ImGui::DragFloat2(stageSizeName.c_str(), &stageSpriteSize_[i].x);
+		stageSprites_[i]->SetPosition(stageSpritePosition_[i]);
+		//stageSprites_[i]->SetSize(stageSpriteSize_[i]);
+
+		std::string numberPositionName = "NumberSpritePosition" + std::to_string(i);
+		ImGui::DragFloat2(numberPositionName.c_str(), &numberSpritePosition_[i].x);
+		std::string numberSizeName = "NumberSpriteSize" + std::to_string(i);
+		ImGui::DragFloat2(numberSizeName.c_str(), &numberSpriteSize_[i].x);
+		numberSprites_[i]->SetPosition(numberSpritePosition_[i]);
+		//numberSprites_[i]->SetSize(numberSpriteSize_[i]);
+	}
+	//ステージ画面
+	for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+	{
+		std::string positionName = "StageScreenPosition" + std::to_string(i);
+		ImGui::DragFloat2(positionName.c_str(), &stageScreenSpritePosition_[i].x);
+		std::string sizeName = "StageScreenSpriteSize" + std::to_string(i);
+		ImGui::DragFloat2(sizeName.c_str(), &stageScreenSpriteSize_[i].x);
+		stageScreenSprites_[i]->SetPosition(stageScreenSpritePosition_[i]);
+		stageScreenSprites_[i]->SetSize(stageScreenSpriteSize_[i]);
+	}
 	ImGui::End();
 }
 
@@ -155,6 +292,9 @@ void StageSelectScene::Draw(){
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//背景スプライトの描画
+	backGroundSprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -182,10 +322,32 @@ void StageSelectScene::DrawUI() {
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//コピーの数の描画
-	for (uint32_t i = 0; i < 3; i++)
+	//矢印のスプライトの描画
+	if (isMovementEnabled_)
 	{
+		for (uint32_t i = 0; i < arrowSprites_.size(); ++i)
+		{
+			arrowSprites_[i]->Draw();
+		}
+	}
+
+	//チュートリアルのスプライトの描画
+	for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+	{
+		tutorialSprites_[i]->Draw();
+	}
+
+	//ステージのスプライトの描画
+	for (uint32_t i = 0; i < kMaxStages; ++i)
+	{
+		stageSprites_[i]->Draw();
 		numberSprites_[i]->Draw();
+	}
+
+	//ステージ画面のスプライトの描画
+	for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+	{
+		stageScreenSprites_[i]->Draw();
 	}
 
 	//前景スプライト描画後処理
