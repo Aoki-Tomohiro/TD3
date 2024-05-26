@@ -22,6 +22,7 @@ public:
 	void DrawBackGround() override;
 
 	static uint32_t stageNumber_;
+	static uint32_t preSelectNumber_;
 private:
 	Renderer* renderer_ = nullptr;
 

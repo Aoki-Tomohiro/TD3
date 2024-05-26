@@ -123,6 +123,16 @@ void GamePlayScene::Update()
 		//カメラの更新
 		camera_.UpdateMatrix();
 
+		//プレイヤーが動けるときに逆再生時のデータを保存
+		if (!player_->GetIsStop())
+		{
+			//プレイヤーの座標を保存
+			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+		}
+
+		//敵の逆再生時に必要なデータを保存
+		enemyManager_->SaveEnemyPositions();
+
 		//コライダーをクリア
 		collisionManager_->ClearColliderList();
 		//プレイヤー
@@ -157,16 +167,6 @@ void GamePlayScene::Update()
 		}
 		//衝突判定
 		collisionManager_->CheckAllCollisions();
-
-		//プレイヤーが動けるときに逆再生時のデータを保存
-		if (!player_->GetIsStop())
-		{
-			//プレイヤーの座標を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
-		}
-
-		//敵の逆再生時に必要なデータを保存
-		enemyManager_->SaveEnemyPositions();
 
 		//ゲームクリア
 		bool isClear = true;

@@ -5,6 +5,7 @@
 #include <numbers>
 
 uint32_t StageSelectScene::stageNumber_ = 0;
+uint32_t StageSelectScene::preSelectNumber_ = 0;
 
 void StageSelectScene::Initialize() {
 	//camera_.Initialize();
@@ -15,6 +16,9 @@ void StageSelectScene::Initialize() {
 	input_ = Input::GetInstance();
 
 	audio_ = Audio::GetInstance();
+
+	//前の選択したステージに設定
+	selectNumber_ = preSelectNumber_;
 
 	//背景スプライトの生成
 	TextureManager::Load("backs.png");
@@ -70,6 +74,28 @@ void StageSelectScene::Initialize() {
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
+
+	//座標を合わせる
+	for (uint32_t i = 0; i < preSelectNumber_; ++i)
+	{
+		for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+		{
+			tutorialSpriteTargetPosition_[i].x -= delta_;
+			tutorialSpritePosition_[i] = tutorialSpriteTargetPosition_[i];
+		}
+		for (uint32_t i = 0; i < kMaxStages; ++i)
+		{
+			stageSpriteTargetPosition_[i].x -= delta_;
+			stageSpritePosition_[i] = stageSpriteTargetPosition_[i];
+			numberSpriteTargetPosition_[i].x -= delta_;
+			numberSpritePosition_[i] = numberSpriteTargetPosition_[i];
+		}
+		for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+		{
+			stageScreenSpriteTargetPosition_[i].x -= delta_;
+			stageScreenSpritePosition_[i] = stageScreenSpriteTargetPosition_[i];
+		}
+	}
 }
 
 void StageSelectScene::Finalize() {
@@ -214,6 +240,7 @@ void StageSelectScene::Update() {
 			}
 			else
 			{
+				preSelectNumber_ = selectNumber_;
 				StageSelectScene::stageNumber_ = selectNumber_ + 1;
 				sceneManager_->ChangeScene("GamePlayScene");
 			}
@@ -229,6 +256,7 @@ void StageSelectScene::Update() {
 		}
 		else
 		{
+			preSelectNumber_ = selectNumber_;
 			StageSelectScene::stageNumber_ = selectNumber_ + 1;;
 			sceneManager_->ChangeScene("GamePlayScene");
 		}

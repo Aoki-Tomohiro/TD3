@@ -136,7 +136,10 @@ void Enemy::Update()
 void Enemy::Draw(const Camera& camera)
 {
 	model_->Draw(worldTransform_, camera);
-	impactScopeModel_->Draw(impactScopeWorldTransform_, camera);
+	if (!isTutorial_)
+	{
+		impactScopeModel_->Draw(impactScopeWorldTransform_, camera);
+	}
 }
 
 void Enemy::Reset()
