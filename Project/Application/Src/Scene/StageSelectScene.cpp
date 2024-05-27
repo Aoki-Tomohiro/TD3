@@ -31,7 +31,7 @@ void StageSelectScene::Initialize() {
 		arrowSprites_[i].reset(Sprite::Create("Arrow.png", { 0.0f,0.0f }));
 		arrowSprites_[i]->SetAnchorPoint({ 0.5f,0.5f });
 	}
-	arrowSprites_[1]->SetRotation(std::numbers::pi_v<float>);
+	arrowSprites_[0]->SetRotation(std::numbers::pi_v<float>);
 	arrowSpriteTargetPosition_[0] = { 345.0f,444.0f };
 	arrowSpritePosition_[0] = arrowSpriteTargetPosition_[0];
 	arrowSpriteTargetPosition_[1] = { 988.0f,444.0f };
