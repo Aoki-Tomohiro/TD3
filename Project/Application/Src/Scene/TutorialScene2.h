@@ -86,5 +86,9 @@ private:
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;
+
+	//チュートリアルのスプライト
+	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;
+	std::unique_ptr<Sprite> numberSprite_ = nullptr;
 };
 

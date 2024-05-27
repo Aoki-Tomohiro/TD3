@@ -70,5 +70,9 @@ private:
 
 	//オーディオハンドル
 	uint32_t whiffAudioHandle_ = 0;
+
+	//チュートリアルのスプライト
+	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;
+	std::unique_ptr<Sprite> numberSprite_ = nullptr;
 };
 

@@ -63,6 +63,15 @@ void TutorialScene1::Initialize()
 
 	//音声データ読み込み
 	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
+
+
+	//チュートリアルのスプライトの生成
+	TextureManager::Load("Tutorial.png");
+	TextureManager::Load("Numbers/1.png");
+	tutorialSprite_.reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
+	tutorialSprite_->SetScale({ 0.6f,0.6f });
+	numberSprite_.reset(Sprite::Create("Numbers/1.png", { 337.0f,0.0f }));
+	numberSprite_->SetScale({ 0.6f,0.6f });
 }
 
 void TutorialScene1::Finalize()
@@ -203,6 +212,10 @@ void TutorialScene1::DrawUI()
 
 	//プレイヤーのUIの描画
 	player_->DrawUI(camera_);
+
+	//チュートリアルのスプライトの描画
+	tutorialSprite_->Draw();
+	numberSprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
