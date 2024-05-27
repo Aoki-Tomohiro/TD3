@@ -1,5 +1,7 @@
 #include "GameClearScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include "Application/Src/Scene/GamePlayScene.h"
+#include "Application/Src/Scene/StageSelectScene.h"
 #include "Engine/Base/ImGuiManager.h"
 
 int GameClearScene::timeCount_ = 0;
@@ -91,7 +93,15 @@ void GameClearScene::Update()
 	{
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
-			sceneManager_->ChangeScene("StageSelectScene");
+			if (GamePlayScene::currentStageNumber == GamePlayScene::kMaxStageCount - 1)
+			{
+				sceneManager_->ChangeScene("GameTitleScene");
+				StageSelectScene::preSelectNumber_ = 0;
+			}
+			else
+			{
+				sceneManager_->ChangeScene("StageSelectScene");
+			}
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			timeCount_ = 0;
 		}
@@ -99,7 +109,15 @@ void GameClearScene::Update()
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
-		sceneManager_->ChangeScene("StageSelectScene");
+		if (GamePlayScene::currentStageNumber == GamePlayScene::kMaxStageCount - 1)
+		{
+			sceneManager_->ChangeScene("GameTitleScene");
+			StageSelectScene::preSelectNumber_ = 0;
+		}
+		else
+		{
+			sceneManager_->ChangeScene("StageSelectScene");
+		}
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		timeCount_ = 0;
 	}
