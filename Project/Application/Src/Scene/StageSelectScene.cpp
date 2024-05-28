@@ -72,25 +72,31 @@ void StageSelectScene::Initialize() {
 		stageScreenSpriteSize_[i] = { 500.0f,280.0f };
 	}
 
+	//PushAのスプライトの作成
+	TextureManager::Load("PushA2.png");
+	pushASprite_.reset(Sprite::Create("PushA2.png", { 0.0f,0.0f }));
+	pushASpritePosition_ = { 890.0f,600.0f };
+	pushASpriteScale_ = { 0.6f,0.6f };
+
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	//座標を合わせる
-	for (uint32_t i = 0; i < preSelectNumber_; ++i)
+	for (uint32_t i = 0; i < preSelectNumber_; i++)
 	{
-		for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+		for (uint32_t i = 0; i < tutorialSprites_.size(); i++)
 		{
 			tutorialSpriteTargetPosition_[i].x -= delta_;
 			tutorialSpritePosition_[i] = tutorialSpriteTargetPosition_[i];
 		}
-		for (uint32_t i = 0; i < kMaxStages; ++i)
+		for (uint32_t i = 0; i < kMaxStages; i++)
 		{
 			stageSpriteTargetPosition_[i].x -= delta_;
 			stageSpritePosition_[i] = stageSpriteTargetPosition_[i];
 			numberSpriteTargetPosition_[i].x -= delta_;
 			numberSpritePosition_[i] = numberSpriteTargetPosition_[i];
 		}
-		for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+		for (uint32_t i = 0; i < stageScreenSprites_.size(); i++)
 		{
 			stageScreenSpriteTargetPosition_[i].x -= delta_;
 			stageScreenSpritePosition_[i] = stageScreenSpriteTargetPosition_[i];
@@ -267,7 +273,7 @@ void StageSelectScene::Update() {
 	ImGui::Begin("SelectScene");
 	ImGui::Text("SelectNumber : %d", selectNumber_);
 	//矢印
-	for (uint32_t i = 0; i < arrowSprites_.size(); ++i)
+	for (uint32_t i = 0; i < arrowSprites_.size(); i++)
 	{
 		std::string positionName = "ArrowSpritePosition" + std::to_string(i);
 		ImGui::DragFloat2(positionName.c_str(), &arrowSpritePosition_[i].x);
@@ -277,7 +283,7 @@ void StageSelectScene::Update() {
 		//arrowSprites_[i]->SetSize(arrowSpriteSize_[i]);
 	}
 	//チュートリアル
-	for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+	for (uint32_t i = 0; i < tutorialSprites_.size(); i++)
 	{
 		std::string positionName = "TutorialSpritePosition" + std::to_string(i);
 		ImGui::DragFloat2(positionName.c_str(), &tutorialSpritePosition_[i].x);
@@ -287,7 +293,7 @@ void StageSelectScene::Update() {
 		//tutorialSprites_[i]->SetSize(tutorialSpriteSize_[i]);
 	}
 	//ステージ
-	for (uint32_t i = 0; i < kMaxStages; ++i)
+	for (uint32_t i = 0; i < kMaxStages; i++)
 	{
 		std::string stagePositionName = "StageSpritePosition" + std::to_string(i);
 		ImGui::DragFloat2(stagePositionName.c_str(), &stageSpritePosition_[i].x);
@@ -304,7 +310,7 @@ void StageSelectScene::Update() {
 		//numberSprites_[i]->SetSize(numberSpriteSize_[i]);
 	}
 	//ステージ画面
-	for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+	for (uint32_t i = 0; i < stageScreenSprites_.size(); i++)
 	{
 		std::string positionName = "StageScreenPosition" + std::to_string(i);
 		ImGui::DragFloat2(positionName.c_str(), &stageScreenSpritePosition_[i].x);
@@ -313,6 +319,11 @@ void StageSelectScene::Update() {
 		stageScreenSprites_[i]->SetPosition(stageScreenSpritePosition_[i]);
 		stageScreenSprites_[i]->SetSize(stageScreenSpriteSize_[i]);
 	}
+	//PushA
+	ImGui::DragFloat2("PushAPosition", &pushASpritePosition_.x);
+	ImGui::DragFloat2("PushAScale", &pushASpriteScale_.x);
+	pushASprite_->SetPosition(pushASpritePosition_);
+	pushASprite_->SetScale(pushASpriteScale_);
 	ImGui::End();
 }
 
@@ -353,14 +364,14 @@ void StageSelectScene::DrawUI() {
 	//矢印のスプライトの描画
 	if (isMovementEnabled_)
 	{
-		for (uint32_t i = 0; i < arrowSprites_.size(); ++i)
+		for (uint32_t i = 0; i < arrowSprites_.size(); i++)
 		{
 			arrowSprites_[i]->Draw();
 		}
 	}
 
 	//チュートリアルのスプライトの描画
-	for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
+	for (uint32_t i = 0; i < tutorialSprites_.size(); i++)
 	{
 		tutorialSprites_[i]->Draw();
 	}
@@ -373,10 +384,13 @@ void StageSelectScene::DrawUI() {
 	}
 
 	//ステージ画面のスプライトの描画
-	for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
+	for (uint32_t i = 0; i < stageScreenSprites_.size(); i++)
 	{
 		stageScreenSprites_[i]->Draw();
 	}
+
+	//PushAのスプライトの描画
+	pushASprite_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
