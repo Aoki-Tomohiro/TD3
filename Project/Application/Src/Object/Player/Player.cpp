@@ -16,7 +16,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = -10.0f;
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 
 	//武器の生成
@@ -39,8 +39,8 @@ void Player::Initialzie(std::vector<Model*> models)
 
 	//衝突判定の初期化
 	AABB aabb = {
-	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,2.0f,1.0f}
+	.min{-1.0f,-1.5f,-1.0f},
+	.max{1.0f,4.5f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);
@@ -131,12 +131,12 @@ void Player::Update()
 	//着地フラグをリセット
 	isLanded_ = false;
 
-	//地面に埋まらないようにする
-	if (worldTransform_.translation_.y <= -10.0f)
-	{
-		worldTransform_.translation_.y = -10.0f;
-		velocity_.y = 0.0f;
-	}
+	////地面に埋まらないようにする
+	//if (worldTransform_.translation_.y <= -10.0f)
+	//{
+	//	worldTransform_.translation_.y = -10.0f;
+	//	velocity_.y = 0.0f;
+	//}
 
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
@@ -177,6 +177,7 @@ void Player::Update()
 	//ImGui
 	ImGui::Begin("Player");
 	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
+	ImGui::DragFloat3("Scale", &worldTransform_.scale_.x);
 	ImGui::DragFloat4("Quaternion", &worldTransform_.quaternion_.x);
 	ImGui::DragFloat3("Velocity", &velocity_.x);
 	ImGui::DragFloat2("MovementRestrictionSpriteSize", &movementRestrictionSpriteSize_.x);
@@ -187,10 +188,10 @@ void Player::Update()
 	ImGui::Text("IsPlay : %d", models_[0]->GetAnimation()->IsPlaying());
 	if (ImGui::TreeNode("Particle")) {
 		ImGui::DragFloat2("Azimuth", &azimuth_.x, 1.0f, 0.0f, 360.0f);
-		ImGui::DragFloat2("PopLifeTime", &PopLifeTime.x,0.1f,0.1f,1.0f);
-		ImGui::DragInt("PopCount", &PopCount, 1,1, 20);
-		ImGui::DragFloat("PopFrequency", &PopFrequency,0.1f, 0.1f, 10.0f);
-		ImGui::DragFloat("DeleteTime", &DeleteTime,0.1f, 0.1f, 10.0f);
+		ImGui::DragFloat2("PopLifeTime", &PopLifeTime.x, 0.1f, 0.1f, 1.0f);
+		ImGui::DragInt("PopCount", &PopCount, 1, 1, 20);
+		ImGui::DragFloat("PopFrequency", &PopFrequency, 0.1f, 0.1f, 10.0f);
+		ImGui::DragFloat("DeleteTime", &DeleteTime, 0.1f, 0.1f, 10.0f);
 		ImGui::TreePop();
 	}
 	ImGui::End();
@@ -431,13 +432,13 @@ void Player::BehaviorRootUpdate()
 	//速度を加算
 	worldTransform_.translation_ += velocity_;
 
-	//地面に埋まらないようにする
-	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
-	{
-		worldTransform_.translation_.y = -10.0f;
-		velocity_.y = 0.0f;
-		isLanded_ = true;
-	}
+	////地面に埋まらないようにする
+	//if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
+	//{
+	//	worldTransform_.translation_.y = -10.0f;
+	//	velocity_.y = 0.0f;
+	//	isLanded_ = true;
+	//}
 
 	//コントローラーが接続されているとき
 	if (input_->IsControllerConnected())
@@ -531,14 +532,14 @@ void Player::BehaviorJumpUpdate()
 	//速度を加算
 	worldTransform_.translation_ += velocity_;
 
-	//地面についたら通常状態に戻す
-	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
-	{
-		behaviorRequest_ = Behavior::kRoot;
-		worldTransform_.translation_.y = -10.0f;
-		velocity_.y = 0.0f;
-		isLanded_ = true;
-	}
+	////地面についたら通常状態に戻す
+	//if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
+	//{
+	//	behaviorRequest_ = Behavior::kRoot;
+	//	worldTransform_.translation_.y = -10.0f;
+	//	velocity_.y = 0.0f;
+	//	isLanded_ = true;
+	//}
 
 	//コントローラーが接続されているとき
 	if (input_->IsControllerConnected())

@@ -46,12 +46,14 @@ void BackGround::Update()
 	ImGui::DragFloat3("MovieTranslate", &worldTransforms_[kMovie].translation_.x, 0.1f);
 	ImGui::DragFloat3("MovieRotate", &worldTransforms_[kMovie].rotation_.x, 0.01f);
 	ImGui::DragFloat3("MovieScale", &worldTransforms_[kMovie].scale_.x, 0.01f);
+	ImGui::DragFloat3("GenkoTranslate", &worldTransforms_[kGenko].translation_.x, 0.1f);
+	ImGui::DragFloat3("GenkoRotate", &worldTransforms_[kGenko].rotation_.x, 0.01f);
+	ImGui::DragFloat3("GenkoScale", &worldTransforms_[kGenko].scale_.x, 0.01f);
 	ImGui::End();
 }
 
 void BackGround::Draw(const Camera& camera)
 {
-	models_[0]->Draw(worldTransforms_[kGenko], camera);
 	//for (uint32_t i = 0; i < kCountOfParts; ++i)
 	//{
 	//	models_[i]->Draw(worldTransforms_[i], camera);
