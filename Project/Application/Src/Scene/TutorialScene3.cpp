@@ -92,6 +92,9 @@ void TutorialScene3::Update()
 		//過去のプレイヤーの情報がなくなったら
 		else
 		{
+			//最初の情報を保存
+			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+			enemyManager_->SaveReverseData();
 			//逆再生のフラグを折る
 			isReversed_ = false;
 			//コピーを出す
@@ -351,6 +354,11 @@ void TutorialScene3::Reverse()
 		if (!reversePlayerPositions.empty())
 		{
 			reversePlayerPositions.pop_back();
+		}
+		else
+		{
+			//位置ズレ対策
+			player_->SetPositions({ 0.0f,-10.0f,0.0f }, false, 1, 0.0f);
 		}
 	}
 
