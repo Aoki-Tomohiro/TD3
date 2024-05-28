@@ -48,6 +48,8 @@ public:
 
 	void PlayAnimation() { models_[0]->GetAnimation()->PlayAnimation(); };
 
+	bool GetIsMove() { return isMove_; }
+
 private:
 	enum class Behavior
 	{

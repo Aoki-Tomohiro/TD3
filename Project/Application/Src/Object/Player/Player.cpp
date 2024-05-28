@@ -548,14 +548,14 @@ void Player::BehaviorJumpUpdate()
 		//攻撃行動に変更
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X))
 		{
-			behaviorRequest_ = Behavior::kAttack;
+			//behaviorRequest_ = Behavior::kAttack;
 		}
 	}
 
 	//キーボード入力
 	if (input_->IsPushKeyEnter(DIK_E))
 	{
-		behaviorRequest_ = Behavior::kAttack;
+		//behaviorRequest_ = Behavior::kAttack;
 	}
 }
 
@@ -583,11 +583,12 @@ void Player::UpdateMovementRestriction()
 	//移動ベクトルが0ではないとき
 	//if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
 	//{
-		//移動制限のタイマーが0以下になったときに動けないようにする
-		if (--movementRestrictionTimer_ < 0)
-		{
-			isMove_ = false;
-		}
+	//移動制限のタイマーが0以下になったときに動けないようにする
+	if (--movementRestrictionTimer_ < 0)
+	{
+		isMove_ = false;
+		
+	}
 	//}
 
 	//移動制限時間が短くなったら

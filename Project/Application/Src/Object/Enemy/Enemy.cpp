@@ -156,7 +156,7 @@ void Enemy::BehaviorRootInitialize() {
 
 void Enemy::BehaviorRootUpdate() {
 
-	//velocity_.x = 0.0f;
+	velocity_.x = 0.0f;
 	//移動
 	//worldTransform_.translation_ += velocity_;
 	//重力加速度
@@ -210,7 +210,9 @@ void Enemy::BehaviorRootUpdate() {
 			}
 		}
 
-		
+		if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] == 0) {
+			velocity_.x = 0.0f;
+		}
 
 		worldTransform_.translation_ += velocity_;
 	}
@@ -304,6 +306,10 @@ void Enemy::BehaviorRootUpdate() {
 			if (map[int(enemyPosition_.x) - 1][int(enemyPosition_.y)] >= 3) {
 				velocity_.x = 0.0f;
 			}
+		}
+
+		if (map[int(enemyPosition_.x)][int(enemyPosition_.y)] == 0) {
+			velocity_.x = 0.0f;
 		}
 		worldTransform_.translation_ += velocity_;
 

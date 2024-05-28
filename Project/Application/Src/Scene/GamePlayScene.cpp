@@ -193,7 +193,7 @@ void GamePlayScene::Update()
 		}
 
 		//リセット処理
-		if (player_->GetWeapon()->GetIsAttack() && !isClear)
+		if ((player_->GetWeapon()->GetIsAttack()|| !player_->GetIsMove()) && !isClear)
 		{
 			if (!player_->GetWeapon()->GetIsHit())
 			{
