@@ -592,7 +592,15 @@ void Player::UpdateMovementRestriction()
 	if (movementRestrictionTimer_ < movementRestrictionTime_ / divisor)
 	{
 		//モデルの色を変更
-		Vector4 color = { 1.0f,0.25f,0.0f,1.0f };
+		Vector4 color{};
+		if (movementRestrictionTimer_ % 2 == 0)
+		{
+			color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		}
+		else
+		{
+			color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		}
 		models_[0]->GetMaterial(0)->SetColor(color);
 	}
 }
