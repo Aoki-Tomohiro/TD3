@@ -139,6 +139,11 @@ void Player::Update()
 		velocity_.y = 0.0f;
 	}
 
+	//移動制限
+	const float kMoveLimit = 36;
+	worldTransform_.translation_.x = std::max<float>(worldTransform_.translation_.x, -kMoveLimit);
+	worldTransform_.translation_.x = std::min<float>(worldTransform_.translation_.x, +kMoveLimit);
+
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	worldTransform_.UpdateMatrixFromQuaternion();
