@@ -125,8 +125,9 @@ private:
 	bool blockHit_ = false;
 
 	//ジャンプの情報
-
 	bool jump_ = false;
+	bool leftJump_;
+	bool rightJump_;
 
 	//マップチップ
 	int map[36][36] = {};

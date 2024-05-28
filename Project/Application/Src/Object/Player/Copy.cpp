@@ -11,7 +11,7 @@ void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, floa
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 
 	//impactScopeWorldTransform_.Initialize();
 	//impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
