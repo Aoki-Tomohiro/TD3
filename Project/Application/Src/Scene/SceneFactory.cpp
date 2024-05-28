@@ -33,6 +33,10 @@ IScene* SceneFactory::CreateScene(const std::string& sceneName)
 	{
 		newScene = new TutorialScene2();
 	}
+	else if (sceneName == "TutorialScene3")
+	{
+		newScene = new TutorialScene3();
+	}
 	else if (sceneName == "StageSelectScene") 
 	{
 		newScene = new StageSelectScene();

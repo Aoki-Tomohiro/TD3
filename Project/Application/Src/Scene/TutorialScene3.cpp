@@ -1,8 +1,8 @@
-#include "TutorialScene2.h"
+#include "TutorialScene3.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
 
-void TutorialScene2::Initialize()
+void TutorialScene3::Initialize()
 {
 	renderer_ = Renderer::GetInstance();
 
@@ -75,15 +75,15 @@ void TutorialScene2::Initialize()
 	TextureManager::Load("Numbers/2.png");
 	tutorialSprite_.reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
-	numberSprite_.reset(Sprite::Create("Numbers/3.png", { 337.0f,0.0f }));
+	numberSprite_.reset(Sprite::Create("Numbers/2.png", { 337.0f,0.0f }));
 	numberSprite_->SetScale({ 0.6f,0.6f });
 }
 
-void TutorialScene2::Finalize()
+void TutorialScene3::Finalize()
 {
 }
 
-void TutorialScene2::Update()
+void TutorialScene3::Update()
 {
 	if (!isReversed_)
 	{
@@ -165,7 +165,7 @@ void TutorialScene2::Update()
 			}
 			if (isClear)
 			{
-				sceneManager_->ChangeScene("TutorialScene3");
+				sceneManager_->ChangeScene("StageSelectScene");
 			}
 
 			//リセット処理
@@ -214,7 +214,7 @@ void TutorialScene2::Update()
 	particleManager_->Update();
 }
 
-void TutorialScene2::Draw()
+void TutorialScene3::Draw()
 {
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
@@ -259,7 +259,7 @@ void TutorialScene2::Draw()
 #pragma endregion
 }
 
-void TutorialScene2::DrawUI()
+void TutorialScene3::DrawUI()
 {
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
@@ -280,7 +280,7 @@ void TutorialScene2::DrawUI()
 #pragma endregion
 }
 
-void TutorialScene2::DrawBackGround()
+void TutorialScene3::DrawBackGround()
 {
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
@@ -313,7 +313,7 @@ void TutorialScene2::DrawBackGround()
 #pragma endregion
 }
 
-void TutorialScene2::Reset()
+void TutorialScene3::Reset()
 {
 	//プレイヤーをリセット
 	player_->Reset();
@@ -328,7 +328,7 @@ void TutorialScene2::Reset()
 	}
 }
 
-void TutorialScene2::Reverse()
+void TutorialScene3::Reverse()
 {
 	//プレイヤーを逆再生
 	auto it = reversePlayerPositions.back();

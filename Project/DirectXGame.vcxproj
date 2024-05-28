@@ -40,6 +40,7 @@
     <ClCompile Include="Application\Src\Scene\StageSelectScene.cpp" />
     <ClCompile Include="Application\Src\Scene\TutorialScene1.cpp" />
     <ClCompile Include="Application\Src\Scene\TutorialScene2.cpp" />
+    <ClCompile Include="Application\Src\Scene\TutorialScene3.cpp" />
     <ClCompile Include="Engine\2D\Sprite.cpp" />
     <ClCompile Include="Engine\3D\Camera\Camera.cpp" />
     <ClCompile Include="Engine\3D\Camera\DebugCamera.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Application\Src\Scene\StageSelectScene.h" />
     <ClInclude Include="Application\Src\Scene\TutorialScene1.h" />
     <ClInclude Include="Application\Src\Scene\TutorialScene2.h" />
+    <ClInclude Include="Application\Src\Scene\TutorialScene3.h" />
     <ClInclude Include="Engine\2D\Sprite.h" />
     <ClInclude Include="Engine\3D\Camera\Camera.h" />
     <ClInclude Include="Engine\3D\Camera\DebugCamera.h" />
