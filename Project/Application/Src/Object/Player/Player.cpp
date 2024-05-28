@@ -90,18 +90,41 @@ void Player::Update()
 		behaviorRequest_ = std::nullopt;
 	}
 
-	//Behaviorの実行
+	//Behaviorの実行とアニメーション番号の変更
 	switch (behavior_)
 	{
 	case Behavior::kRoot:
 	default:
 		BehaviorRootUpdate();
+		//移動しているとき
+		if (velocity_.x != 0.0f)
+		{
+			//着地しているとき
+			if (isLanded_)
+			{
+				//走りアニメーション
+				animationNumber_ = 3;
+			}
+		}
+		//移動していないときは直立アニメーション
+		else
+		{
+			//着地しているとき
+			if (isLanded_)
+			{
+				animationNumber_ = 1;
+			}
+		}
 		break;
 	case Behavior::kJump:
 		BehaviorJumpUpdate();
+		//ジャンプアニメーション
+		animationNumber_ = 2;
 		break;
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();
+		//攻撃アニメーション
+		animationNumber_ = 0;
 		break;
 	}
 
@@ -118,28 +141,6 @@ void Player::Update()
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	worldTransform_.UpdateMatrixFromQuaternion();
-
-	//アニメーションの番号の変更
-	switch (behavior_)
-	{
-	case Behavior::kRoot:
-	default:
-		if (velocity_.x != 0.0f)
-		{
-			animationNumber_ = 3;
-		}
-		else
-		{
-			animationNumber_ = 1;
-		}
-		break;
-	case Behavior::kJump:
-		animationNumber_ = 2;
-		break;
-	case Behavior::kAttack:
-		animationNumber_ = 0;
-		break;
-	}
 
 	//モデルの更新
 	models_[0]->Update(worldTransform_, animationNumber_);
@@ -262,14 +263,13 @@ void Player::OnCollision(Collider* collider)
 			//Y軸方向で最小の重なりが発生している場合
 			directionAxis.y = (worldTransform_.translation_.y < collider->GetWorldTransform().translation_.y) ? -1.0f : 1.0f;
 			directionAxis.x = 0.0f;
+			velocity_.y = 0.0f;
 			if (behaviorRequest_ != Behavior::kAttack && behavior_ != Behavior::kAttack)
 			{
 				behaviorRequest_ = Behavior::kRoot;
 			}
 			if (directionAxis.y == 1.0f)
 			{
-
-				velocity_.y = 0.0f;
 				isLanded_ = true;
 			}
 		}
@@ -437,7 +437,6 @@ void Player::BehaviorRootUpdate()
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;
 		isLanded_ = true;
-
 	}
 
 	//コントローラーが接続されているとき
@@ -535,7 +534,6 @@ void Player::BehaviorJumpUpdate()
 	//地面についたら通常状態に戻す
 	if (worldTransform_.translation_.y <= -10.0f && !isLanded_)
 	{
-	
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = -10.0f;
 		velocity_.y = 0.0f;

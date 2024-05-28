@@ -74,6 +74,11 @@ private:
 	std::array<Vector2, kMaxTutorial + kMaxStages> stageScreenSpriteTargetPosition_{};
 	std::array<Vector2, kMaxTutorial + kMaxStages> stageScreenSpriteSize_{};
 
+	//PushAスプライト
+	std::unique_ptr<Sprite> pushASprite_ = nullptr;
+	Vector2 pushASpritePosition_{};
+	Vector2 pushASpriteScale_{};
+
 	//Vector2 numberPositions_[3]{ {60.0f,11.0f},{380.0f,11.0f}, {700.0f,11.0f} };
 
 	//Vector2 SpriteSize_[3] = { {3.0f,3.0f},{3.0f,3.0f},{3.0f,3.0f} };
