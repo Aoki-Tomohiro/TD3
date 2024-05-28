@@ -30,6 +30,7 @@ void TutorialScene1::Initialize()
 	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize(enemyModel_.get(), 0);
+	enemyManager_->SaveReverseData();
 	enemyManager_->SetIsTutorial(true);
 
 	//ブロックを生成
@@ -52,10 +53,6 @@ void TutorialScene1::Initialize()
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetWorldTransform());
-
-	//スプライトの生成
-	TextureManager::Load("cont.png");
-	contSprite_.reset(Sprite::Create("cont.png", spritePosition_));
 
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
@@ -103,7 +100,8 @@ void TutorialScene1::Update()
 	//プレイヤー
 	collisionManager_->SetColliderList(player_.get());
 	//敵
-	for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
+	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+	for (const std::unique_ptr<Enemy>& enemy : enemies)
 	{
 		//編集中なら飛ばす
 		if (enemy->GetIsEdit())
@@ -127,11 +125,12 @@ void TutorialScene1::Update()
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
 
-	//ゲームクリア
+	//ゲームクリアのフラグ
 	bool isClear = true;
-	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+	//敵が存在するとき
 	if (enemies.size() != 0)
 	{
+		//生きている敵がいるか確認する
 		for (const std::unique_ptr<Enemy>& enemy : enemies)
 		{
 			if (enemy->GetIsActive())
@@ -139,6 +138,7 @@ void TutorialScene1::Update()
 				isClear = false;
 			}
 		}
+		//ゲームクリアのフラグが立っていたらシーンを変える
 		if (isClear)
 		{
 			sceneManager_->ChangeScene("TutorialScene2");
@@ -154,10 +154,6 @@ void TutorialScene1::Update()
 		}
 	}
 
-	//コントローラーのUIの座標とサイズを設定
-	contSprite_->SetPosition(spritePosition_);
-	contSprite_->SetSize(spriteScale_);
-
 	//パーティクルの更新
 	particleManager_->Update();
 }
@@ -167,6 +163,9 @@ void TutorialScene1::Draw()
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//背景の描画
+	backGround_->DrawSprite();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();

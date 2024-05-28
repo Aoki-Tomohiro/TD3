@@ -247,7 +247,7 @@ void StageSelectScene::Update() {
 			else
 			{
 				preSelectNumber_ = selectNumber_;
-				StageSelectScene::stageNumber_ = selectNumber_ + 1;
+				StageSelectScene::stageNumber_ = selectNumber_ + 2;
 				sceneManager_->ChangeScene("GamePlayScene");
 			}
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
@@ -263,7 +263,7 @@ void StageSelectScene::Update() {
 		else
 		{
 			preSelectNumber_ = selectNumber_;
-			StageSelectScene::stageNumber_ = selectNumber_ + 1;;
+			StageSelectScene::stageNumber_ = selectNumber_ + 2;;
 			sceneManager_->ChangeScene("GamePlayScene");
 		}
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);

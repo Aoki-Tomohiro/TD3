@@ -65,7 +65,7 @@ public:
 
 	void UpdateMatrix();
 
-	void SavePositions();
+	void SaveReverseData();
 
 private:
 	//プレイヤーの状態
@@ -152,8 +152,8 @@ private:
 	//パーティクル
 	ParticleSystem* particleSystem_ = nullptr;
 
-	//逆再生時の座標
-	std::vector<std::tuple<Vector3, uint32_t, float>> positions_{};
+	//逆再生時のデータ
+	std::vector<std::tuple<Vector3, uint32_t, float>> reverseData_{};
 
 	//チュートリアルか
 	bool isTutorial_ = false;

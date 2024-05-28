@@ -16,12 +16,12 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 	impactScopeWorldTransform_.Initialize();
 	impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
 
+	startPosition_ = position;
 	worldTransform_.Initialize();
-	//worldTransform_.translation_.y = 2.0f;
 	worldTransform_.translation_ = position;
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
-	startPosition_ = position;
+	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//衝突判定の初期化
 	AABB aabb = {
@@ -145,7 +145,6 @@ void Enemy::Draw(const Camera& camera)
 void Enemy::Reset()
 {
 	isActive_ = true;
-	//worldTransform_.translation_ = startPosition_;
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -679,7 +678,7 @@ void Enemy::FindPath() {
 void Enemy::Reverse(const uint32_t stepSize)
 {
 	//過去のデータがからではなかったら
-	if (!positions_.empty())
+	if (!reverseData_.empty())
 	{
 		//前の座標を取得
 		Vector3 prePosition = GetWorldPosition();
@@ -688,8 +687,8 @@ void Enemy::Reverse(const uint32_t stepSize)
 		Vector3 position{};
 		uint32_t animationNumber = 0;
 		float animationTime = 0.0f;
-		std::tie(position, animationNumber, animationTime) = positions_.back();
-		positions_.pop_back();
+		std::tie(position, animationNumber, animationTime) = reverseData_.back();
+		reverseData_.pop_back();
 
 		//座標を代入
 		worldTransform_.translation_ = position;
@@ -721,9 +720,9 @@ void Enemy::Reverse(const uint32_t stepSize)
 		//巻き戻しの速度を上げるためにデータをスキップ
 		for (uint32_t i = 0; i < stepSize; ++i)
 		{
-			if (!positions_.empty())
+			if (!reverseData_.empty())
 			{
-				positions_.pop_back();
+				reverseData_.pop_back();
 			}
 		}
 	}
@@ -734,10 +733,10 @@ void Enemy::UpdateMatrix()
 	worldTransform_.UpdateMatrixFromQuaternion();
 }
 
-void Enemy::SavePositions()
+void Enemy::SaveReverseData()
 {
 	//巻き戻し用のデータを保存
-	positions_.push_back({ GetWorldPosition(),animationNumber_,model_->GetAnimation()->GetAnimationTime() });
+	reverseData_.push_back({ GetWorldPosition(),animationNumber_,model_->GetAnimation()->GetAnimationTime() });
 }
 
 void Enemy::OnCollision(Collider* collider)

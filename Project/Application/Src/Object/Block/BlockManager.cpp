@@ -16,7 +16,7 @@ void BlockManager::Initialize(Model* model, uint32_t stageNumber)
 	stageNumber_ = stageNumber;
 
 	//地面の追加
-	AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,1.0f });
+	AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,8.0f });
 
 	//ファイル読み込み
 	LoadFile();

@@ -119,7 +119,6 @@ void Copy::Draw(const Camera& camera)
 
 void Copy::Reset()
 {
-	//currentIndex_ = 0;
 	velocity_ = { 0.0f,0.0f,0.0f };
 }
 

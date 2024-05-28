@@ -18,6 +18,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	worldTransform_.translation_.y = -10.0f;
 	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
+	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//武器の生成
 	weapon_ = std::make_unique<Weapon>();
@@ -224,9 +225,6 @@ void Player::DrawUI(const Camera& camera)
 
 void Player::Reset()
 {
-	//destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
-	//worldTransform_.quaternion_ = destinationQuaternion_;
-	//worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	isMove_ = true;
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };

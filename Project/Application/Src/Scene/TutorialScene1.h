@@ -45,7 +45,6 @@ private:
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
-	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;
@@ -56,11 +55,6 @@ private:
 
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;
-
-	//コントローラーのUI
-	std::unique_ptr<Sprite> contSprite_ = nullptr;
-	Vector2 spritePosition_ = { 0.0f,540.0f };
-	Vector2 spriteScale_ = { 360.0f,220.0f };
 
 	//背景
 	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;

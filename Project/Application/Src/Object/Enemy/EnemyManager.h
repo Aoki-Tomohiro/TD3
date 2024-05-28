@@ -22,7 +22,7 @@ public:
 
 	void SetCopy(const std::vector<std::unique_ptr<Copy>>& copies);
 
-	void SaveEnemyPositions();
+	void SaveReverseData();
 
 	void SetIsTutorial(const bool isTutorial);
 
