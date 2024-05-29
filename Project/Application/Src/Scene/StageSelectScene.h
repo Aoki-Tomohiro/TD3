@@ -21,6 +21,8 @@ public:
 
 	void DrawBackGround() override;
 
+	void Transition();
+
 	static uint32_t stageNumber_;
 	static uint32_t preSelectNumber_;
 private:
@@ -89,4 +91,9 @@ private:
 	int MovementEnableTimer_ = 0;
 	float easingParameter_ = 0.0f;
 	float delta_ = 1280.0f;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	float timer_ = 0.0f;
 };

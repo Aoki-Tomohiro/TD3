@@ -175,6 +175,12 @@ void GamePlayScene::Update()
 		{
 			for (const std::unique_ptr<Enemy>& enemy : enemies)
 			{
+				if (enemy->GetIsGameOver())
+				{
+					isFadeOut_ = true;
+					isGameOver_ = true;
+					
+				}
 				if (enemy->GetIsActive())
 				{
 					isClear = false;
@@ -182,14 +188,16 @@ void GamePlayScene::Update()
 			}
 			if (isClear)
 			{
-				sceneManager_->ChangeScene("GameClearScene");
+				isFadeOut_ = true;
+				
 				GameClearScene::SetTimeCount(int(dislikes_));
 			}
 		}
 
 		//ゲームオーバー
 		if (dislikes_ >= 99) {
-			sceneManager_->ChangeScene("GameOverScene");
+			isFadeOut_ = true;
+			isGameOver_ = true;
 		}
 
 		//リセット処理
@@ -269,7 +277,8 @@ void GamePlayScene::Update()
 		}
 	}
 
-	
+	//トランジション
+	Transition();
 
 	//ImGui
 	ImGui::Begin("GamePlayScene");
@@ -484,4 +493,38 @@ void GamePlayScene::Reverse()
 
 	//コピーを逆再生
 	copyManager_->Reverse(stepSize_);
+}
+
+void GamePlayScene::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			if (isGameOver_) {
+				sceneManager_->ChangeScene("GameOverScene");
+			}
+			else {
+				sceneManager_->ChangeScene("GameClearScene");
+			}
+			
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
+
 }

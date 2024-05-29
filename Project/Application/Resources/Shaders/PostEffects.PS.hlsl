@@ -111,13 +111,20 @@ PixelShaderOutput main(VertexShaderOutput input)
     if (gVignetteParameter.isEnable)
     {
         //周囲を0に、中心になるほど明るくなるように計算で調整
-        float32_t2 correct = input.texcoord * (1.0f - input.texcoord.yx);
+        //float32_t2 correct = input.texcoord * (1.0f - input.texcoord.yx);
         //correctだけで計算すると中心の最大値が0.0625で暗すぎるのでScaleで調整。この例では16倍して1にしている
-        float vignette = correct.x * correct.y * gVignetteParameter.scale;
+        //float vignette = correct.x * correct.y * gVignetteParameter.scale;
         //とりあえず0.8乗でそれっぽくしてみた
-        vignette = saturate(pow(vignette, gVignetteParameter.intensity));
+        //vignette = saturate(pow(vignette, gVignetteParameter.intensity));
         //係数として乗算
-        output.color.rgb *= vignette;
+        //output.color.rgb *= vignette;
+        
+        
+        float distance = length(float2(0.5f, 0.5f) - input.texcoord);
+        float brightness = saturate(1.0f - distance / gVignetteParameter.intensity);
+        output.color *= brightness;
+        
+       
     }
     
     //GrayScale

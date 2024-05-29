@@ -37,6 +37,8 @@ public:
 
 	void Reset();
 
+	void Transition();
+
 private:
 	
 	void CalculateRating();
@@ -114,5 +116,11 @@ private:
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	bool isGameOver_ = false;
+	float timer_ = 0.0f;
 };
 

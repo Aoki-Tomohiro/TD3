@@ -24,6 +24,8 @@ public:
 
 	void DrawBackGround() override;
 
+	void Transition();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -74,5 +76,10 @@ private:
 	//チュートリアルのスプライト
 	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;
 	std::unique_ptr<Sprite> numberSprite_ = nullptr;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	float timer_ = 0.0f;
 };
 

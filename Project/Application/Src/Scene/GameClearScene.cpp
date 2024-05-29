@@ -3,6 +3,7 @@
 #include "Application/Src/Scene/GamePlayScene.h"
 #include "Application/Src/Scene/StageSelectScene.h"
 #include "Engine/Base/ImGuiManager.h"
+#include <Engine/Components/PostEffects/PostEffects.h>
 
 int GameClearScene::timeCount_ = 0;
 
@@ -89,38 +90,27 @@ void GameClearScene::Update()
 
 
 	//タイトル画面に戻る
-	if (input_->IsControllerConnected())
-	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+	if(!isFadeOut_ && !isFadeIn_){
+		if (input_->IsControllerConnected())
 		{
-			if (GamePlayScene::currentStageNumber == GamePlayScene::kMaxStageCount - 1)
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 			{
-				sceneManager_->ChangeScene("GameTitleScene");
-				StageSelectScene::preSelectNumber_ = 0;
+				isFadeOut_ = true;
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
+				
 			}
-			else
-			{
-				sceneManager_->ChangeScene("StageSelectScene");
-			}
-			audio_->PlayAudio(decisionHandle_, false, 0.4f);
-			timeCount_ = 0;
 		}
-	}
 
-	if (input_->IsPushKeyEnter(DIK_SPACE))
-	{
-		if (GamePlayScene::currentStageNumber == GamePlayScene::kMaxStageCount - 1)
+		if (input_->IsPushKeyEnter(DIK_SPACE))
 		{
-			sceneManager_->ChangeScene("GameTitleScene");
-			StageSelectScene::preSelectNumber_ = 0;
+			isFadeOut_ = true;
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
+			
 		}
-		else
-		{
-			sceneManager_->ChangeScene("StageSelectScene");
-		}
-		audio_->PlayAudio(decisionHandle_, false, 0.4f);
-		timeCount_ = 0;
 	}
+	
+	//トランジション
+	Transition();
 
 	ImGui::Begin("GameClearScene");
 	ImGui::DragInt("CopyCount", &timeCount_);
@@ -138,6 +128,18 @@ void GameClearScene::Draw()
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//リザルトのスプライトの描画
+	resultSprite_->Draw();
+
+	//スコアのスプライトの描画
+	scoreSprite_->Draw();
+
+	//コピーの数の描画
+	for (uint32_t i = 0; i < 2; i++)
+	{
+		timeCountSprites_[i]->Draw();
+	}
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -166,17 +168,7 @@ void GameClearScene::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//リザルトのスプライトの描画
-	resultSprite_->Draw();
-
-	//スコアのスプライトの描画
-	scoreSprite_->Draw();
-
-	//コピーの数の描画
-	for (uint32_t i = 0; i < 2; i++)
-	{
-		timeCountSprites_[i]->Draw();
-	}
+	
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -185,5 +177,43 @@ void GameClearScene::DrawUI()
 
 void GameClearScene::DrawBackGround()
 {
+
+}
+
+void GameClearScene::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			if (GamePlayScene::currentStageNumber == GamePlayScene::kMaxStageCount - 1)
+			{
+				sceneManager_->ChangeScene("GameTitleScene");
+				StageSelectScene::preSelectNumber_ = 0;
+				timeCount_ = 0;
+			}
+			else
+			{
+				sceneManager_->ChangeScene("StageSelectScene");
+				timeCount_ = 0;
+			}
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
 
 }

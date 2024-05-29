@@ -75,7 +75,7 @@ void TutorialScene3::Initialize()
 	TextureManager::Load("Numbers/2.png");
 	tutorialSprite_.reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
-	numberSprite_.reset(Sprite::Create("Numbers/2.png", { 337.0f,0.0f }));
+	numberSprite_.reset(Sprite::Create("Numbers/3.png", { 337.0f,0.0f }));
 	numberSprite_->SetScale({ 0.6f,0.6f });
 }
 
@@ -165,7 +165,7 @@ void TutorialScene3::Update()
 			}
 			if (isClear)
 			{
-				sceneManager_->ChangeScene("StageSelectScene");
+				isFadeOut_ = true;
 			}
 
 			//リセット処理
@@ -212,6 +212,9 @@ void TutorialScene3::Update()
 
 	//パーティクルの更新
 	particleManager_->Update();
+
+	//トランジション
+	Transition();
 }
 
 void TutorialScene3::Draw()
@@ -347,4 +350,32 @@ void TutorialScene3::Reverse()
 
 	//コピーを逆再生
 	copyManager_->Reverse(stepSize_);
+}
+
+void TutorialScene3::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			sceneManager_->ChangeScene("StageSelectScene");
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
+
 }
