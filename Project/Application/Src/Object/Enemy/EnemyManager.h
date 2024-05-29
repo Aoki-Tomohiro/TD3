@@ -22,13 +22,15 @@ public:
 
 	void SetCopy(const std::vector<std::unique_ptr<Copy>>& copies);
 
-	void SaveEnemyPositions();
+	void SaveReverseData();
 
 	void SetIsTutorial(const bool isTutorial);
 
 	void AddEnemy(const Vector3& position);
 
 	const std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies_; };
+
+	void SetIsDoubleSpeed(const bool isDoubleSpeed);
 	
 private:
 	void SaveData();

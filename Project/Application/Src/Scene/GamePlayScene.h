@@ -14,7 +14,7 @@
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
-#include "Application/Src/Object/FollowCamera/FollowCamera.h"
+#include "Application/Src/Object/Score/Score.h"
 
 enum changeScene
 {
@@ -112,13 +112,8 @@ private:
 	//ポーズ用スプライト
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
 
-	//FollowCamera
-	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
-
-	//コントローラーのUI
-	std::unique_ptr<Sprite> contSprite_ = nullptr;
-	Vector2 spritePosition_ = { 0.0f,540.0f };
-	Vector2 spriteScale_ = { 360.0f,220.0f };
+	//スコア
+	std::unique_ptr<Score> score_ = nullptr;
 
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;
@@ -127,8 +122,8 @@ private:
 	bool isReversed_ = false;
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 
-	//オーディオハンドル
-	uint32_t whiffAudioHandle_ = 0;
+	//倍速中か
+	bool isDoubleSpeed_ = false;
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;

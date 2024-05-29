@@ -69,7 +69,9 @@ public:
 
 	void UpdateMatrix();
 
-	void SavePositions();
+	void SaveReverseData();
+
+	void SetIsDoubleSpeed(const bool isDoubleSpeed) { isDoubleSpeed_ = isDoubleSpeed; };
 
 private:
 	//プレイヤーの状態
@@ -160,8 +162,8 @@ private:
 	//パーティクル
 	ParticleSystem* particleSystem_ = nullptr;
 
-	//逆再生時の座標
-	std::vector<std::tuple<Vector3, uint32_t, float>> positions_{};
+	//逆再生時のデータ
+	std::vector<std::tuple<Vector3, uint32_t, float>> reverseData_{};
 
 	//チュートリアルか
 	bool isTutorial_ = false;
@@ -174,6 +176,8 @@ private:
 	bool isEdit_ = false;
 
 	uint32_t attackAudioHandle_ = 0;
+
+	bool isDoubleSpeed_ = false;
 
 	//ジャンプする方向
 	int dir_ = 0;

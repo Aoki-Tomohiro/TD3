@@ -137,6 +137,7 @@ struct ConstBuffDataGrayScale
 struct ConstBuffDataGlitchNoise
 {
 	bool isEnable;
+	int32_t noiseType;
 	float blockSize;
 	float time;
 	float noiseSpeed;

@@ -241,6 +241,16 @@ void StageSelectScene::Update() {
 	{
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 		{
+			if (selectNumber_ == 0)
+			{
+				sceneManager_->ChangeScene("TutorialScene1");
+			}
+			else
+			{
+				preSelectNumber_ = selectNumber_;
+				StageSelectScene::stageNumber_ = selectNumber_ + 2;
+				sceneManager_->ChangeScene("GamePlayScene");
+			}
 			isFadeOut_ = true;
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
@@ -248,6 +258,16 @@ void StageSelectScene::Update() {
 
 	if (input_->IsPushKeyEnter(DIK_SPACE))
 	{
+		if (selectNumber_ == 0)
+		{
+			sceneManager_->ChangeScene("TutorialScene1");
+		}
+		else
+		{
+			preSelectNumber_ = selectNumber_;
+			StageSelectScene::stageNumber_ = selectNumber_ + 2;;
+			sceneManager_->ChangeScene("GamePlayScene");
+		}
 		isFadeOut_ = true;
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}

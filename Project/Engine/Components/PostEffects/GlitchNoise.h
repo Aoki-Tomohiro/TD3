@@ -16,6 +16,10 @@ public:
 
 	void SetIsEnable(const bool isEnable) { isEnable_ = isEnable; };
 
+	const int32_t GetNoiseType() const { return noiseType_; };
+
+	void SetNoiseType(const int32_t noiseType) { noiseType_ = noiseType; };
+
 	const float GetBlockSize() const { return blockSize_; };
 
 	void SetBlockSize(const float blockSize) { blockSize_ = blockSize; };
@@ -24,6 +28,8 @@ private:
 	std::unique_ptr<UploadBuffer> constBuff_ = nullptr;
 
 	bool isEnable_ = false;
+
+	int32_t noiseType_ = 0;
 
 	float blockSize_ = 1.0f;
 

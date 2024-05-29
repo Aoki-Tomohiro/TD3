@@ -139,6 +139,14 @@ void EnemyManager::AddEnemy(const Vector3& position)
 	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
 }
 
+void EnemyManager::SetIsDoubleSpeed(const bool isDoubleSpeed)
+{
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->SetIsDoubleSpeed(isDoubleSpeed);
+	}
+}
+
 void EnemyManager::SaveData()
 {
 	nlohmann::json root;
@@ -329,10 +337,10 @@ void EnemyManager::SetCopy(const std::vector<std::unique_ptr<Copy>>& copies)
 	}
 }
 
-void EnemyManager::SaveEnemyPositions()
+void EnemyManager::SaveReverseData()
 {
 	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
-		enemy->SavePositions();
+		enemy->SaveReverseData();
 	}
 }

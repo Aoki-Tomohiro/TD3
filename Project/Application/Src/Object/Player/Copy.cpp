@@ -44,11 +44,20 @@ void Copy::Update()
 	//座標を設定
 	if (currentIndex_ < playerPositions_.size())
 	{
+		//前のフレームのワールド座標を取得
 		Vector3 prePlayerPosition = GetWorldPosition();
+
+		//新しく設定する座標と攻撃フラグ
 		Vector3 playerPosition{};
 		bool isAttack{};
+
+		//データを取得
 		std::tie(playerPosition, isAttack,animationNumber,animationTime) = playerPositions_[currentIndex_];
+
+		//座標を代入
 		worldTransform_.translation_ = playerPosition;
+
+		//前のフレームの座標と現在のフレームの座標が変わっていたら回転させる
 		if (prePlayerPosition.x != playerPosition.x)
 		{
 			if (prePlayerPosition.x > playerPosition.x)
@@ -60,11 +69,30 @@ void Copy::Update()
 				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
 			}
 		}
+
+		//攻撃フラグを設定
 		weapon_->SetIsAttack(isAttack);
+
+		//インデックスを進める
 		currentIndex_++;
+
+		//倍速状態ならさらにインデックスを進める
+		if (isDoubleSpeed_)
+		{
+			for (uint32_t i = 0; i < 4; i++)
+			{
+				if (currentIndex_ < playerPositions_.size())
+				{
+					currentIndex_++;
+				}
+			}
+		}
 	}
 	else
 	{
+		//移動していない状態にする
+		isActive_ = false;
+		//武器の当たり判定をなくす
 		weapon_->SetIsAttack(false);
 		//加速ベクトル
 		Vector3 accelerationVector = { 0.0f, -gravity_, 0.0f };
@@ -94,9 +122,17 @@ void Copy::Update()
 	//影響範囲
 	//impactScopeModel_->GetMaterial(1)->SetColor(Vector4{ 0.0f,1.0f,1.0f,0.3f });
 
+	//攻撃が当たっていたらフラグをtrueにする
+	if (weapon_->GetIsAttack() && weapon_->GetIsHit())
+	{
+		isEnemyDefeated_ = true;
+	}
+	//ヒットフラグをfalseにする
+	weapon_->SetIsHit(false);
+
 	//武器の更新
 	weapon_->Update();
-	
+
 
 	ImGui::Begin("Copy");
 	//ImGui::SliderFloat3("Scale", &impactScopeWorldTransform_.scale_.x, 1.0f, 5.0f);
@@ -119,7 +155,8 @@ void Copy::Draw(const Camera& camera)
 
 void Copy::Reset()
 {
-	//currentIndex_ = 0;
+	isActive_ = true;
+	isEnemyDefeated_ = false;
 	velocity_ = { 0.0f,0.0f,0.0f };
 }
 
@@ -186,6 +223,15 @@ void Copy::Reverse(const uint32_t stepSize)
 		//インデックスを減らす
 		currentIndex_--;
 
+		//巻き戻しの速度を上げるためにデータをスキップ
+		for (uint32_t i = 0; i < stepSize; ++i)
+		{
+			if (currentIndex_ > 0)
+			{
+				currentIndex_--;
+			}
+		}
+
 		//前の座標を取得
 		Vector3 prePosition = GetWorldPosition();
 
@@ -224,14 +270,5 @@ void Copy::Reverse(const uint32_t stepSize)
 		//武器の更新
 		weapon_->SetIsAttack(isAttack);
 		weapon_->Update();
-
-		//巻き戻しの速度を上げるためにデータをスキップ
-		for (uint32_t i = 0; i < stepSize; ++i)
-		{
-			if (currentIndex_ > 0)
-			{
-				currentIndex_--;
-			}
-		}
 	}
 }

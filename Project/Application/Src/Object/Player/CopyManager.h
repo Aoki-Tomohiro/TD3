@@ -22,9 +22,11 @@ public:
 
 	const std::vector<std::unique_ptr<Copy>>& GetCopies() const { return copies_; };
 
-	void SetPlayerPosition(const Vector3& playerPosition, const bool isAttack, const uint32_t animationNumber, const float animationTime) { playerPositions_.push_back({ playerPosition, isAttack,animationNumber,animationTime }); };
+	void SetPlayerData(const Vector3& playerPosition, const bool isAttack, const uint32_t animationNumber, const float animationTime) { playerPositions_.push_back({ playerPosition, isAttack,animationNumber,animationTime }); };
 
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>>& GetPlayerPositions() { return playerPositions_; };
+
+	void SetIsDoubleSpeed(const bool isDoubleSpeed);
 
 private:
 	void ApplyGlobalVariables();
@@ -40,9 +42,11 @@ private:
 
 	int maxCopyCount_ = 5;
 
+	std::vector<Vector4> copyColors_{};
+
 	//コピーの上限のスプライト
 	std::array<std::unique_ptr<Sprite>, 3> maxCopySprites_{};
-	Vector2 spritePositions_[3]{ {1038.0f,-7.0f},{1089.0f,3.0f},{1143.0f,-7.0f} };
-	Vector2 spriteSize_[3] = { {96.0f,96.0f},{96.0f,96.0f},{96.0f,96.0f} };
+	Vector2 spritePositions_[3]{ {1012.0f,30.0f},{1090.0f,30.0f},{1140.0f,30.0f} };
+	Vector2 spriteScale_[3] = { {0.8f,0.8f},{0.8f,0.8f},{0.8f,0.8f} };
 };
 

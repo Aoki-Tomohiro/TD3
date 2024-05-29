@@ -8,6 +8,7 @@
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
 #include "Application/Src/Object/FollowCamera/FollowCamera.h"
+#include "Application/Src/Object/Score/Score.h"
 
 class TutorialScene1 : public IScene
 {
@@ -47,7 +48,6 @@ private:
 	//敵
 	std::unique_ptr<Model> enemyModel_ = nullptr;
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
-	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 
 	//ブロック
 	std::unique_ptr<Model> blockModel_ = nullptr;
@@ -59,16 +59,14 @@ private:
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;
 
-	//コントローラーのUI
-	std::unique_ptr<Sprite> contSprite_ = nullptr;
-	Vector2 spritePosition_ = { 0.0f,540.0f };
-	Vector2 spriteScale_ = { 360.0f,220.0f };
-
 	//背景
 	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
+
+	//スコア
+	std::unique_ptr<Score> score_ = nullptr;
 
 	//オーディオハンドル
 	uint32_t whiffAudioHandle_ = 0;
@@ -76,6 +74,10 @@ private:
 	//チュートリアルのスプライト
 	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;
 	std::unique_ptr<Sprite> numberSprite_ = nullptr;
+	Vector2 tutorialSpritePosition_{ 446.0f,25.0f };
+	Vector2 tutorialSpriteScale_{ 0.6f,0.6f };
+	Vector2 numberSpritePosition_{ 780.0f,25.0f };
+	Vector2 numberSpriteScale_{ 0.6f,0.6f };
 
 	//トランジションのフラグ
 	bool isFadeIn_ = true;

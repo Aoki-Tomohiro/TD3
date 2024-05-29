@@ -30,6 +30,7 @@ void TutorialScene2::Initialize()
 	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize(enemyModel_.get(), 1);
+	enemyManager_->SaveReverseData();
 	enemyManager_->SetIsTutorial(true);
 
 	//ブロックを生成
@@ -43,6 +44,7 @@ void TutorialScene2::Initialize()
 	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize();
+	copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 
 	//背景の生成
 	backGroundGenkoModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
@@ -54,14 +56,9 @@ void TutorialScene2::Initialize()
 	backGround_ = std::make_unique<BackGround>();
 	backGround_->Initialize(backGroundModels);
 
-	//FollowCameraの生成
-	followCamera_ = std::make_unique<FollowCamera>();
-	followCamera_->Initialize();
-	followCamera_->SetTarget(&player_->GetWorldTransform());
-
-	//スプライトの生成
-	TextureManager::Load("cont.png");
-	contSprite_.reset(Sprite::Create("cont.png", spritePosition_));
+	//スコアの生成
+	score_ = std::make_unique<Score>();
+	score_->Initialize();
 
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
@@ -73,9 +70,9 @@ void TutorialScene2::Initialize()
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
 	TextureManager::Load("Numbers/2.png");
-	tutorialSprite_.reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
+	tutorialSprite_.reset(Sprite::Create("Tutorial.png", tutorialSpritePosition_));
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
-	numberSprite_.reset(Sprite::Create("Numbers/2.png", { 337.0f,0.0f }));
+	numberSprite_.reset(Sprite::Create("Numbers/2.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
 }
 
@@ -85,132 +82,212 @@ void TutorialScene2::Finalize()
 
 void TutorialScene2::Update()
 {
-	if (!isReversed_)
+	//逆再生中だったら
+	if (isReversed_)
 	{
-		//プレイヤーの更新
-		player_->Update();
-
-		//ブロックの更新
-		blockManager_->Update();
-
-		//コピーの更新
-		copyManager_->Update();
-
-		//敵の更新
-		enemyManager_->Update();
-
-		//背景の更新
-		backGround_->Update();
-
-		//FollowCameraの更新
-		followCamera_->Update();
-
-		//カメラの更新
-		camera_.UpdateMatrix();
-
-		//コライダーをクリア
-		collisionManager_->ClearColliderList();
-		//プレイヤー
-		collisionManager_->SetColliderList(player_.get());
-		//敵
-		for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
+		//過去のプレイヤーの情報があるとき
+		if (!reversePlayerPositions.empty())
 		{
-			//編集中なら飛ばす
-			if (enemy->GetIsEdit())
-			{
-				continue;
-			}
+			//逆再生処理
+			Reverse();
 
-			//ColliderListに登録
+			//パーティクルの更新
+			particleManager_->Update();
+		}
+		//過去のプレイヤーの情報がなくなったら
+		else
+		{
+			//逆再生のフラグを折る
+			isReversed_ = false;
+			//コピーを出す
+			copyManager_->AddCopy();
+			//プレイヤーのアニメーションを再生
+			player_->PlayAnimation();
+			//最初の情報を保存
+			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+			enemyManager_->SaveReverseData();
+			//スコアをリセット
+			score_->Reset();
+			//倍速をなくす
+			isDoubleSpeed_ = false;
+			copyManager_->SetIsDoubleSpeed(false);
+			enemyManager_->SetIsDoubleSpeed(false);
+			//ノイズエフェクト無効化
+			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
+		}
+		//後の処理を飛ばす
+		return;
+	}
+
+	//プレイヤーの更新
+	player_->Update();
+
+	//ブロックの更新
+	blockManager_->Update();
+
+	//コピーの更新
+	copyManager_->Update();
+
+	//敵の更新
+	enemyManager_->Update();
+
+	//背景の更新
+	backGround_->Update();
+
+	//カメラの更新
+	camera_.UpdateMatrix();
+
+	//コライダーをクリア
+	collisionManager_->ClearColliderList();
+	//プレイヤー
+	collisionManager_->SetColliderList(player_.get());
+	//敵
+	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+	for (const std::unique_ptr<Enemy>& enemy : enemies)
+	{
+		//編集中なら飛ばす
+		if (enemy->GetIsEdit())
+		{
+			continue;
+		}
+
+		//ColliderListに登録
+		if (enemy->GetIsActive())
+		{
+			collisionManager_->SetColliderList(enemy.get());
+		}
+	}
+	//武器
+	collisionManager_->SetColliderList(player_->GetWeapon());
+	//ブロック
+	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
+	for (const std::unique_ptr<Block>& block : blocks)
+	{
+		collisionManager_->SetColliderList(block.get());
+	}
+	//コピー
+	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	for (const std::unique_ptr<Copy>& copy : copies)
+	{
+		collisionManager_->SetColliderList(copy.get());
+		collisionManager_->SetColliderList(copy->GetWeapon());
+	}
+	//衝突判定
+	collisionManager_->CheckAllCollisions();
+
+	//プレイヤーが動けるときに逆再生時のデータを保存
+	if (!player_->GetIsStop())
+	{
+		//プレイヤーの座標を保存
+		copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+	}
+
+	//逆再生に必要なプレイヤーのデータを保存
+	reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+	if (isDoubleSpeed_)
+	{
+		for (uint32_t i = 0; i < 4; i++)
+		{
+			reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+		}
+	}
+
+	//スコアの更新
+	score_->Update(player_.get(), copies);
+
+	//パーティクルの更新
+	particleManager_->Update();
+
+	//ゲームクリアのフラグ
+	bool isClear = true;
+	//敵が存在するとき
+	if (enemies.size() != 0)
+	{
+		//生きている敵がいるか確認する
+		for (const std::unique_ptr<Enemy>& enemy : enemies)
+		{
 			if (enemy->GetIsActive())
 			{
-				collisionManager_->SetColliderList(enemy.get());
+				isClear = false;
 			}
 		}
-		//武器
-		collisionManager_->SetColliderList(player_->GetWeapon());
-		//ブロック
-		const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
-		for (const std::unique_ptr<Block>& block : blocks)
-		{
-			collisionManager_->SetColliderList(block.get());
-		}
-		//コピー
-		for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
-		{
-			collisionManager_->SetColliderList(copy.get());
-			collisionManager_->SetColliderList(copy->GetWeapon());
-		}
-		//衝突判定
-		collisionManager_->CheckAllCollisions();
-
-		//プレイヤーが動けるときに逆再生時のデータを保存
-		if (!player_->GetIsStop())
-		{
-			//プレイヤーの座標を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
-		}
-
-		//ゲームクリア
-		bool isClear = true;
-		const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
-		if (enemies.size() != 0)
-		{
-			for (const std::unique_ptr<Enemy>& enemy : enemies)
-			{
-				if (enemy->GetIsActive())
-				{
-					isClear = false;
-				}
-			}
+		//ゲームクリアのフラグが立っていたらシーンを変える
 			if (isClear)
 			{
 				isFadeOut_ = true;
 				
 			}
 
-			//リセット処理
-			if (player_->GetWeapon()->GetIsAttack() && !isClear)
+		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
+		if (player_->GetIsStop())
+		{
+			if (!isDoubleSpeed_)
 			{
-				if (!player_->GetWeapon()->GetIsHit())
+				if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 				{
-					audio_->PlayAudio(whiffAudioHandle_, 0, 0.4f);
+					isDoubleSpeed_ = true;
+					copyManager_->SetIsDoubleSpeed(true);
+					enemyManager_->SetIsDoubleSpeed(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 				}
-				reversePlayerPositions = copyManager_->GetPlayerPositions();
-				isReversed_ = true;
-				player_->StopAnimation();
-				Reset();
+
+			}
+
+				if (input_->IsPushKeyEnter(DIK_F))
+				{
+					isDoubleSpeed_ = true;
+					copyManager_->SetIsDoubleSpeed(true);
+					enemyManager_->SetIsDoubleSpeed(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
+				}
 			}
 		}
 
-		//コントローラーのUIの座標とサイズを設定
-		contSprite_->SetPosition(spritePosition_);
-		contSprite_->SetSize(spriteScale_);
-
-		//ノイズエフェクトを無効化
-		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
-	}
-	else
-	{
-		if (!reversePlayerPositions.empty())
+		//リセットのフラグ
+		bool isReset = true;
+		if (isClear)
 		{
-			//逆再生処理
-			Reverse();
+			isReset = false;
+		}
+		if (!player_->GetIsStop())
+		{
+			isReset = false;
+		}
+		for (const std::unique_ptr<Copy>& copy : copies)
+		{
+			if (copy->GetIsActive())
+			{
+				isReset = false;
+			}
+		}
 
+		//プレイヤーの攻撃が終了したらリセット
+		if (isReset)
+		{
+			//逆再生のフラグを立てる
+			isReversed_ = true;
+			//アニメーションを停止
+			player_->StopAnimation();
+			//リセット
+			Reset();
 			//ノイズエフェクトを有効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-
-			//FollowCameraの更新
-			followCamera_->Update();
-		}
-		else
-		{
-			isReversed_ = false;
-			copyManager_->AddCopy();
-			player_->PlayAnimation();
+			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
 	}
 
+	ImGui::Begin("TutorialScene2");
+	ImGui::DragFloat2("TutorialSpritePosition", &tutorialSpritePosition_.x);
+	ImGui::DragFloat2("TutorialSpriteScale", &tutorialSpriteScale_.x);
+	ImGui::DragFloat2("NumberSpritePosition", &numberSpritePosition_.x);
+	ImGui::DragFloat2("NumberSpriteScale", &numberSpriteScale_.x);
+	ImGui::End();
+	tutorialSprite_->SetPosition(tutorialSpritePosition_);
+	tutorialSprite_->SetScale(tutorialSpriteScale_);
+	numberSprite_->SetPosition(numberSpritePosition_);
+	numberSprite_->SetScale(numberSpriteScale_);
 	//パーティクルの更新
 	particleManager_->Update();
 
@@ -224,6 +301,9 @@ void TutorialScene2::Draw()
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//背景の描画
+	backGround_->DrawSprite();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -280,6 +360,9 @@ void TutorialScene2::DrawUI()
 	tutorialSprite_->Draw();
 	numberSprite_->Draw();
 
+	//スコアの描画
+	score_->Draw();
+
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
@@ -335,15 +418,24 @@ void TutorialScene2::Reset()
 
 void TutorialScene2::Reverse()
 {
-	//プレイヤーを逆再生
+	//逆再生データを取得
 	auto it = reversePlayerPositions.back();
 	reversePlayerPositions.pop_back();
+
+	//プレイヤーを逆再生
 	player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));
+
+	//巻き戻しの速度を上げるためにデータをスキップ
 	for (uint32_t i = 0; i < stepSize_; ++i)
 	{
 		if (!reversePlayerPositions.empty())
 		{
 			reversePlayerPositions.pop_back();
+		}
+		else
+		{
+			//位置ズレ対策
+			player_->SetPositions({ 0.0f,-10.0f,0.0f }, false, 1, 0.0f);
 		}
 	}
 
