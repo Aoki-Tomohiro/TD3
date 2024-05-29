@@ -44,7 +44,7 @@ private:
 
 	//コピーの上限のスプライト
 	std::array<std::unique_ptr<Sprite>, 3> maxCopySprites_{};
-	Vector2 spritePositions_[3]{ {1038.0f,-7.0f},{1089.0f,3.0f},{1143.0f,-7.0f} };
-	Vector2 spriteSize_[3] = { {96.0f,96.0f},{96.0f,96.0f},{96.0f,96.0f} };
+	Vector2 spritePositions_[3]{ {1012.0f,30.0f},{1090.0f,30.0f},{1140.0f,30.0f} };
+	Vector2 spriteScale_[3] = { {0.8f,0.8f},{0.8f,0.8f},{0.8f,0.8f} };
 };
 

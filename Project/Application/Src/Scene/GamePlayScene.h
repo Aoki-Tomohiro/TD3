@@ -14,6 +14,7 @@
 #include "Application/Src/Object/Block/BlockManager.h"
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
+#include "Application/Src/Object/Score/Score.h"
 
 class GamePlayScene : public IScene
 {
@@ -92,6 +93,9 @@ private:
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
+
+	//スコア
+	std::unique_ptr<Score> score_ = nullptr;
 
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;

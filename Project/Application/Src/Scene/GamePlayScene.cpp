@@ -69,6 +69,10 @@ void GamePlayScene::Initialize()
 	backGround_ = std::make_unique<BackGround>();
 	backGround_->Initialize(backGroundModels);
 
+	//スコアの生成
+	score_ = std::make_unique<Score>();
+	score_->Initialize();
+
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
@@ -105,6 +109,8 @@ void GamePlayScene::Update()
 			//最初の情報を保存
 			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 			enemyManager_->SaveReverseData();
+			//スコアをリセット
+			score_->Reset();
 			//ノイズエフェクト無効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 		}
@@ -189,8 +195,11 @@ void GamePlayScene::Update()
 	//敵の逆再生時に必要なデータを保存
 	enemyManager_->SaveReverseData();
 
-	//評価の計算
-	CalculateRating();
+	//スコアの更新
+	score_->Update(player_.get(), copies);
+
+	////評価の計算
+	//CalculateRating();
 
 	//パーティクルの更新
 	particleManager_->Update();
@@ -374,6 +383,9 @@ void GamePlayScene::DrawUI()
 		timeCountSprites_[i]->Draw();
 	}
 
+	//スコアの描画
+	score_->Draw();
+
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
@@ -425,34 +437,65 @@ void GamePlayScene::Reset()
 }
 
 void GamePlayScene::CalculateRating() {
-	//加算される基本のポイント
-	const float point = 100.0f;
-	//倍率
-	float multiplier = 1.0f;
+	//毎秒今いる敵の数*1ずつ減っていく
+	dislikes_ += (1.0f / 60.0f);
 
-	//プレイヤーが倒した時
-	if ((player_->GetWeapon()->GetIsAttack() || !player_->GetIsMove()))
+	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
 	{
-		//プレイヤーの攻撃が当たっていなかったら
-		if (player_->GetWeapon()->GetIsHit())
-		{
-			totaScore_ += int(point * multiplier);
+		if (copyManager_->GetCopies()[i]->GetWeapon()->GetIsAttack() && !player_->GetWeapon()->GetIsAttack()) {
+			num_ = 0;
+
+			for (int i = 0; i < enemies.size(); ++i)
+			{
+				if (!enemies[i].get()->GetIsActive()) {
+					num_++;
+				}
+			}
+
+			if (defeatedEnemyCount - num_ <= -2) {
+				likes_ += 50 * (num_ - defeatedEnemyCount);
+			}
+			else {
+				if (defeatedEnemyCount - num_ != 0) {
+					likes_ += 25;
+				}
+
+			}
+
+
+			defeatedEnemyCount = num_;
+
+			enemyNum_ = enemyNum_ - defeatedEnemyCount;
 		}
+
 	}
 
-	//コピーが倒した時
-	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
-	for (const std::unique_ptr<Copy>& copy : copies)
+
+	if (player_->GetWeapon()->GetIsAttack())
 	{
-		if (copy->GetIsActive())
+		num_ = 0;
+		for (int i = 0; i < enemies.size(); ++i)
 		{
-			if (copy->GetIsEnemyDefeated())
-			{
-				totaScore_ += int(point * multiplier);
+			if (!enemies[i].get()->GetIsActive()) {
+				num_++;
 			}
 		}
-		multiplier += 0.5f;
+
+		if (defeatedEnemyCount - num_ <= -2) {
+			likes_ += 100 * (num_ - defeatedEnemyCount);
+		}
+
+		if (defeatedEnemyCount - num_ == -1) {
+			likes_ += 50;
+		}
+
+
+
+		defeatedEnemyCount = 0;
+		enemyNum_ = int(enemies.size());
 	}
+	totaScore_ = likes_ - int(dislikes_);
 }
 
 void GamePlayScene::Reverse()

@@ -58,9 +58,9 @@ void CopyManager::Update()
 		std::string positionName = "MaxCopySpritePosition" + std::to_string(i);
 		ImGui::DragFloat2(positionName.c_str(), &spritePositions_[i].x);
 		std::string sizeName = "MaxCopySpriteSize" + std::to_string(i);
-		ImGui::DragFloat2(sizeName.c_str(), &spriteSize_[i].x);
+		ImGui::DragFloat2(sizeName.c_str(), &spriteScale_[i].x);
 		maxCopySprites_[i]->SetPosition(spritePositions_[i]);
-		maxCopySprites_[i]->SetSize(spriteSize_[i]);
+		maxCopySprites_[i]->SetScale(spriteScale_[i]);
 	}
 	maxCopySprites_[0]->SetTexture("Numbers/" + std::to_string(copyCount_) + ".png");
 	maxCopySprites_[2]->SetTexture("Numbers/" + std::to_string(maxCopyCount_) + ".png");

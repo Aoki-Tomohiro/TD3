@@ -585,8 +585,11 @@ void Player::BehaviorAttackUpdate()
 		//通常状態に戻る
 		behaviorRequest_ = Behavior::kRoot;
 		models_[0]->GetAnimation()->PlayAnimation();
-		//動けないようにする
-		isMove_ = false;
+		if (!isTutorial_)
+		{
+			//動けないようにする
+			isMove_ = false;
+		}
 	}
 }
 
