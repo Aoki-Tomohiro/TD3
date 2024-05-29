@@ -91,6 +91,20 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
+	//ポーズメニュ
+	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_0))
+	{
+		if (!pause_) {
+			pause_ = true;
+		}
+		else {
+			pause_ = false;
+			rule_ = false;
+		}
+
+
+	}
+
 	if (!pause_) {
 		//逆再生中だったら
 		if (isReversed_)
@@ -637,19 +651,7 @@ void GamePlayScene::Transition() {
 }
 
 void GamePlayScene::Pause() {
-	//ポーズメニュ
-	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_0))
-	{
-		if (!pause_) {
-			pause_ = true;
-		}
-		else {
-			pause_ = false;
-			rule_ = false;
-		}
 
-
-	}
 
 	
 
