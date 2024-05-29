@@ -111,6 +111,10 @@ void GamePlayScene::Update()
 			enemyManager_->SaveReverseData();
 			//スコアをリセット
 			score_->Reset();
+			//倍速をなくす
+			isDoubleSpeed_ = false;
+			copyManager_->SetIsDoubleSpeed(false);
+			enemyManager_->SetIsDoubleSpeed(false);
 			//ノイズエフェクト無効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 		}
@@ -191,6 +195,13 @@ void GamePlayScene::Update()
 
 	//逆再生に必要なプレイヤーのデータを保存
 	reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+	if (isDoubleSpeed_)
+	{
+		for (uint32_t i = 0; i < 4; i++)
+		{
+			reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+		}
+	}
 
 	//敵の逆再生時に必要なデータを保存
 	enemyManager_->SaveReverseData();
@@ -198,8 +209,8 @@ void GamePlayScene::Update()
 	//スコアの更新
 	score_->Update(player_.get(), copies);
 
-	////評価の計算
-	//CalculateRating();
+	//評価の計算
+	CalculateRating();
 
 	//パーティクルの更新
 	particleManager_->Update();
@@ -264,6 +275,19 @@ void GamePlayScene::Update()
 				if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 				{
 					isDoubleSpeed_ = true;
+					copyManager_->SetIsDoubleSpeed(true);
+					enemyManager_->SetIsDoubleSpeed(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
+				}
+
+				if (input_->IsPushKeyEnter(DIK_F))
+				{
+					isDoubleSpeed_ = true;
+					copyManager_->SetIsDoubleSpeed(true);
+					enemyManager_->SetIsDoubleSpeed(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 				}
 			}
 		}
@@ -297,6 +321,7 @@ void GamePlayScene::Update()
 			Reset();
 			//ノイズエフェクトを有効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
 	}
 

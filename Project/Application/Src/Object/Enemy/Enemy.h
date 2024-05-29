@@ -67,6 +67,8 @@ public:
 
 	void SaveReverseData();
 
+	void SetIsDoubleSpeed(const bool isDoubleSpeed) { isDoubleSpeed_ = isDoubleSpeed; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -166,5 +168,7 @@ private:
 	bool isEdit_ = false;
 
 	uint32_t attackAudioHandle_ = 0;
+
+	bool isDoubleSpeed_ = false;
 };
 

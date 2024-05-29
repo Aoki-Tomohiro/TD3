@@ -30,6 +30,8 @@ public:
 
 	const bool GetIsEnemyDefeated() const { return isEnemyDefeated_; };
 
+	void SetIsDoubleSpeed(const bool isDoubleSpeed) { isDoubleSpeed_ = isDoubleSpeed; };
+
 private:
 	std::unique_ptr<Model> model_ = nullptr;
 	//std::unique_ptr<Model>impactScopeModel_ = nullptr;
@@ -54,5 +56,7 @@ private:
 	bool isActive_ = true;
 
 	bool isEnemyDefeated_ = false;
+
+	bool isDoubleSpeed_ = false;
 };
 

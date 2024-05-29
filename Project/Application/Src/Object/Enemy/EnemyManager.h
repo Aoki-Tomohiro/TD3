@@ -29,6 +29,8 @@ public:
 	void AddEnemy(const Vector3& position);
 
 	const std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies_; };
+
+	void SetIsDoubleSpeed(const bool isDoubleSpeed);
 	
 private:
 	void SaveData();

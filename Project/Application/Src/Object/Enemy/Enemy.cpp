@@ -165,7 +165,11 @@ void Enemy::BehaviorRootUpdate() {
 	//加速
 	velocity_ += accelerationVector;
 
-	float speed_ = 0.3f;
+	float speed = 0.3f;
+	if (isDoubleSpeed_)
+	{
+		speed *= 4.0f;
+	}
 
 	if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10) {
 		velocity_.y = 0.00f;
@@ -178,18 +182,18 @@ void Enemy::BehaviorRootUpdate() {
 		if (velocity_.y >= -1.0f) {
 			if (playerPosition_.x < enemyPosition_.x) {
 				if (map[int(enemyPosition_.x-1)][int(enemyPosition_.y) + 1] != 10) {
-					velocity_.x = -0.3f;
+					velocity_.x = -speed;
 				}else if (map[int(enemyPosition_.x + 1)][int(enemyPosition_.y) + 1] != 10) {
-					velocity_.x = 0.3f;
+					velocity_.x = speed;
 				}
 				
 			}
 			else {
 				if (map[int(enemyPosition_.x - 1)][int(enemyPosition_.y) + 1] != 10) {
-					velocity_.x = -0.3f;
+					velocity_.x = -speed;
 				}
 				else if (map[int(enemyPosition_.x + 1)][int(enemyPosition_.y) + 1] != 10) {
-					velocity_.x = 0.3f;
+					velocity_.x = speed;
 				}
 			}
 		}
@@ -198,7 +202,7 @@ void Enemy::BehaviorRootUpdate() {
 		}
 
 
-		if (velocity_.x == 0.3f) {
+		if (velocity_.x == speed) {
 			if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 3) {
 				velocity_.x = 0.0f;
 			}
@@ -221,13 +225,13 @@ void Enemy::BehaviorRootUpdate() {
 
 		if (int(playerPosition_.x) == int(enemyPosition_.x - 1) || int(playerPosition_.x) == int(enemyPosition_.x + 1) || int(playerPosition_.x) == int(enemyPosition_.x)) {
 			if (enemyPosition_.x < playerPosition_.x && worldTransform_.translation_.x > -32.0f) {
-				velocity_.x = -0.3f;
+				velocity_.x = -speed;
 
 				worldTransform_.translation_ += velocity_;
 			}
 
 			if (enemyPosition_.x > playerPosition_.x && worldTransform_.translation_.x < 32.0f) {
-				velocity_.x = 0.3f;
+				velocity_.x = speed;
 				worldTransform_.translation_ += velocity_;
 			}
 		}
@@ -248,12 +252,12 @@ void Enemy::BehaviorRootUpdate() {
 		for (int i = 0; i < copy_.size(); ++i) {
 
 			if (velocity_.x == 0.3 && worldTransform_.translation_.y == copy_[i]->GetWorldPosition().x) {
-				if (worldTransform_.translation_.x + 0.3f == copy_[i]->GetWorldPosition().x) {
+				if (worldTransform_.translation_.x + speed == copy_[i]->GetWorldPosition().x) {
 					//velocity_.x = 0.0f;
 				}
 			}
 			else if (velocity_.x == -0.3 && worldTransform_.translation_.y == copy_[i]->GetWorldPosition().x) {
-				if (worldTransform_.translation_.x - 0.3f == copy_[i]->GetWorldPosition().x) {
+				if (worldTransform_.translation_.x - speed == copy_[i]->GetWorldPosition().x) {
 					//velocity_.x = 0.0f;
 				}
 			}
@@ -274,17 +278,17 @@ void Enemy::BehaviorRootUpdate() {
 
 
 		if (nextPosition_.x > worldTransform_.translation_.x) {
-			velocity_.x = 0.3f;
+			velocity_.x = speed;
 		}
 		else {
-			velocity_.x = -0.3f;
+			velocity_.x = -speed;
 
 		}
 
 		if (velocity_.x != 0.0f)
 		{
 			animationNumber_ = 3;
-			if (velocity_.x == 0.3f)
+			if (velocity_.x == speed)
 			{
 				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
 			}
@@ -296,7 +300,7 @@ void Enemy::BehaviorRootUpdate() {
 
 		
 
-		if (velocity_.x == 0.3f) {
+		if (velocity_.x == speed) {
 			if (map[int(enemyPosition_.x) + 1][int(enemyPosition_.y)] >= 3) {
 				velocity_.x = 0.0f;
 			}
@@ -352,6 +356,11 @@ void Enemy::BehaviorJumpInitialize()
 	model_->GetAnimation()->SetAnimationTime(0.0f);
 	model_->GetAnimation()->SetLoop(false);
 	animationNumber_ = 2;
+	float speed = 0.3f;
+	if (isDoubleSpeed_)
+	{
+		speed *= 4.0f;
+	}
 
 	/*
 	if (playerPosition_.y <= enemyPosition_.y) {
@@ -370,10 +379,10 @@ void Enemy::BehaviorJumpInitialize()
 		}
 	}*/
 	if (playerPosition_.x < enemyPosition_.x) {
-		velocity_.x = 0.3f;
+		velocity_.x = speed;
 	}
 	else {
-		velocity_.x = -0.3f;
+		velocity_.x = -speed;
 	}
 
 	blockHit_ = false;
@@ -385,7 +394,11 @@ void Enemy::BehaviorJumpUpdate()
 {
 	//velocity_.x = 0.0f;
 	worldTransform_.translation_ += velocity_;
-	const float kGravityAcceleration = 0.05f;
+	float kGravityAcceleration = 0.05f;
+	if (isDoubleSpeed_)
+	{
+		kGravityAcceleration *= 4.0f;
+	}
 	Vector3 accelerationVector = { 0.0f,-kGravityAcceleration,0.0f };
 	velocity_ += accelerationVector;
 

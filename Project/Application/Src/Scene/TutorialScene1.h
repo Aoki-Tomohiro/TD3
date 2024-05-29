@@ -8,6 +8,7 @@
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
 #include "Application/Src/Object/FollowCamera/FollowCamera.h"
+#include "Application/Src/Object/Score/Score.h"
 
 class TutorialScene1 : public IScene
 {
@@ -62,11 +63,18 @@ private:
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
 
+	//スコア
+	std::unique_ptr<Score> score_ = nullptr;
+
 	//オーディオハンドル
 	uint32_t whiffAudioHandle_ = 0;
 
 	//チュートリアルのスプライト
 	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;
 	std::unique_ptr<Sprite> numberSprite_ = nullptr;
+	Vector2 tutorialSpritePosition_{ 446.0f,25.0f };
+	Vector2 tutorialSpriteScale_{ 0.6f,0.6f };
+	Vector2 numberSpritePosition_{ 780.0f,25.0f };
+	Vector2 numberSpriteScale_{ 0.6f,0.6f };
 };
 

@@ -75,6 +75,18 @@ void Copy::Update()
 
 		//インデックスを進める
 		currentIndex_++;
+
+		//倍速状態ならさらにインデックスを進める
+		if (isDoubleSpeed_)
+		{
+			for (uint32_t i = 0; i < 4; i++)
+			{
+				if (currentIndex_ < playerPositions_.size())
+				{
+					currentIndex_++;
+				}
+			}
+		}
 	}
 	else
 	{

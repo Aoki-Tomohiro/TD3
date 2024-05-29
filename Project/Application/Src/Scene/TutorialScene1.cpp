@@ -49,6 +49,10 @@ void TutorialScene1::Initialize()
 	backGround_ = std::make_unique<BackGround>();
 	backGround_->Initialize(backGroundModels);
 
+	//スコアの生成
+	score_ = std::make_unique<Score>();
+	score_->Initialize();
+
 	//FollowCameraの生成
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
@@ -65,9 +69,9 @@ void TutorialScene1::Initialize()
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
 	TextureManager::Load("Numbers/1.png");
-	tutorialSprite_.reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
+	tutorialSprite_.reset(Sprite::Create("Tutorial.png", tutorialSpritePosition_));
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
-	numberSprite_.reset(Sprite::Create("Numbers/1.png", { 337.0f,0.0f }));
+	numberSprite_.reset(Sprite::Create("Numbers/1.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
 }
 
@@ -156,6 +160,17 @@ void TutorialScene1::Update()
 
 	//パーティクルの更新
 	particleManager_->Update();
+
+	ImGui::Begin("TutorialScene1");
+	ImGui::DragFloat2("TutorialSpritePosition", &tutorialSpritePosition_.x);
+	ImGui::DragFloat2("TutorialSpriteScale", &tutorialSpriteScale_.x);
+	ImGui::DragFloat2("NumberSpritePosition", &numberSpritePosition_.x);
+	ImGui::DragFloat2("NumberSpriteScale", &numberSpriteScale_.x);
+	ImGui::End();
+	tutorialSprite_->SetPosition(tutorialSpritePosition_);
+	tutorialSprite_->SetScale(tutorialSpriteScale_);
+	numberSprite_->SetPosition(numberSpritePosition_);
+	numberSprite_->SetScale(numberSpriteScale_);
 }
 
 void TutorialScene1::Draw()
@@ -215,6 +230,9 @@ void TutorialScene1::DrawUI()
 	//チュートリアルのスプライトの描画
 	tutorialSprite_->Draw();
 	numberSprite_->Draw();
+
+	//スコアの描画
+	score_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

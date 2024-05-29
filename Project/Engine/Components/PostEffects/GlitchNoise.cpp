@@ -14,6 +14,7 @@ void GlitchNoise::Update()
 	time_ = std::fmod(time_, 1000.0f);
 	ConstBuffDataGlitchNoise* glitchNoiseData = static_cast<ConstBuffDataGlitchNoise*>(constBuff_->Map());
 	glitchNoiseData->isEnable = isEnable_;
+	glitchNoiseData->noiseType = noiseType_;
 	glitchNoiseData->blockSize = blockSize_;
 	glitchNoiseData->time = time_;
 	glitchNoiseData->noiseSpeed = noiseSpeed_;

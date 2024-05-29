@@ -462,7 +462,7 @@ void Player::BehaviorRootUpdate()
 		}
 
 		//攻撃行動に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X) && isMove_)
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X) && isLanded_ && isMove_)
 		{
 			behaviorRequest_ = Behavior::kAttack;
 		}

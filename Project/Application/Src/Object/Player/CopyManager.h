@@ -26,6 +26,8 @@ public:
 
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>>& GetPlayerPositions() { return playerPositions_; };
 
+	void SetIsDoubleSpeed(const bool isDoubleSpeed);
+
 private:
 	void ApplyGlobalVariables();
 

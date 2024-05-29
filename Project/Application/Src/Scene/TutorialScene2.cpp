@@ -56,6 +56,10 @@ void TutorialScene2::Initialize()
 	backGround_ = std::make_unique<BackGround>();
 	backGround_->Initialize(backGroundModels);
 
+	//スコアの生成
+	score_ = std::make_unique<Score>();
+	score_->Initialize();
+
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
@@ -66,9 +70,9 @@ void TutorialScene2::Initialize()
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
 	TextureManager::Load("Numbers/2.png");
-	tutorialSprite_.reset(Sprite::Create("Tutorial.png", { 0.0f,0.0f }));
+	tutorialSprite_.reset(Sprite::Create("Tutorial.png", tutorialSpritePosition_));
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
-	numberSprite_.reset(Sprite::Create("Numbers/2.png", { 337.0f,0.0f }));
+	numberSprite_.reset(Sprite::Create("Numbers/2.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
 }
 
@@ -102,6 +106,12 @@ void TutorialScene2::Update()
 			//最初の情報を保存
 			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 			enemyManager_->SaveReverseData();
+			//スコアをリセット
+			score_->Reset();
+			//倍速をなくす
+			isDoubleSpeed_ = false;
+			copyManager_->SetIsDoubleSpeed(false);
+			enemyManager_->SetIsDoubleSpeed(false);
 			//ノイズエフェクト無効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 		}
@@ -174,6 +184,16 @@ void TutorialScene2::Update()
 
 	//逆再生に必要なプレイヤーのデータを保存
 	reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+	if (isDoubleSpeed_)
+	{
+		for (uint32_t i = 0; i < 4; i++)
+		{
+			reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+		}
+	}
+
+	//スコアの更新
+	score_->Update(player_.get(), copies);
 
 	//パーティクルの更新
 	particleManager_->Update();
@@ -195,6 +215,31 @@ void TutorialScene2::Update()
 		if (isClear)
 		{
 			sceneManager_->ChangeScene("TutorialScene3");
+		}
+
+		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
+		if (player_->GetIsStop())
+		{
+			if (!isDoubleSpeed_)
+			{
+				if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+				{
+					isDoubleSpeed_ = true;
+					copyManager_->SetIsDoubleSpeed(true);
+					enemyManager_->SetIsDoubleSpeed(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
+				}
+
+				if (input_->IsPushKeyEnter(DIK_F))
+				{
+					isDoubleSpeed_ = true;
+					copyManager_->SetIsDoubleSpeed(true);
+					enemyManager_->SetIsDoubleSpeed(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
+				}
+			}
 		}
 
 		//リセットのフラグ
@@ -226,8 +271,20 @@ void TutorialScene2::Update()
 			Reset();
 			//ノイズエフェクトを有効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
 	}
+
+	ImGui::Begin("TutorialScene2");
+	ImGui::DragFloat2("TutorialSpritePosition", &tutorialSpritePosition_.x);
+	ImGui::DragFloat2("TutorialSpriteScale", &tutorialSpriteScale_.x);
+	ImGui::DragFloat2("NumberSpritePosition", &numberSpritePosition_.x);
+	ImGui::DragFloat2("NumberSpriteScale", &numberSpriteScale_.x);
+	ImGui::End();
+	tutorialSprite_->SetPosition(tutorialSpritePosition_);
+	tutorialSprite_->SetScale(tutorialSpriteScale_);
+	numberSprite_->SetPosition(numberSpritePosition_);
+	numberSprite_->SetScale(numberSpriteScale_);
 }
 
 void TutorialScene2::Draw()
@@ -293,6 +350,9 @@ void TutorialScene2::DrawUI()
 	//チュートリアルのスプライトの描画
 	tutorialSprite_->Draw();
 	numberSprite_->Draw();
+
+	//スコアの描画
+	score_->Draw();
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

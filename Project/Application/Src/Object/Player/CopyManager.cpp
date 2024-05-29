@@ -119,6 +119,14 @@ void CopyManager::AddCopy()
 	playerPositions_.clear();
 }
 
+void CopyManager::SetIsDoubleSpeed(const bool isDoubleSpeed)
+{
+	for (std::unique_ptr<Copy>& copy : copies_)
+	{
+		copy->SetIsDoubleSpeed(isDoubleSpeed);
+	}
+}
+
 void CopyManager::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
