@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "Engine/Base/ImGuiManager.h"
 #include <Engine/3D/Model/ModelManager.h>
+#include <Application/Src/Scene/GamePlayScene.h>
 
 void Enemy::Initialize(Model* model, const Vector3& position)
 {
@@ -58,8 +59,11 @@ void Enemy::Update()
 {
 	if (!isTutorial_)
 	{
-		DistanceFunction();
-		FindPath();
+		if (!isEscaping_) {
+			DistanceFunction();
+			FindPath();
+		}
+	
 
 		//Behaviorの遷移処理
 		if (behaviorRequest_)
@@ -92,12 +96,30 @@ void Enemy::Update()
 		}
 	}
 
+	//画面端に行ったら逃げる
+	if (isEscaping_) {
+
+		if (int(enemyPosition_.x) <= 0) {
+			worldTransform_.translation_.x -= 0.3f;
+		}
+
+		if (int(enemyPosition_.x) >= 35) {
+			worldTransform_.translation_.x += 0.3f;
+		}
+		
+		
+		if (worldTransform_.translation_.x <= -36.5f || worldTransform_.translation_.x >= 36.5f) {
+			isGameOver_ = true;
+		}
+	}
+
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
 	impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
 	worldTransform_.UpdateMatrixFromQuaternion();
 	impactScopeWorldTransform_.UpdateMatrixFromEuler();
 
+	
 
 	//モデルの更新
 	model_->Update(worldTransform_, animationNumber_);
@@ -114,7 +136,7 @@ void Enemy::Update()
 		ImGui::Text("CopyPos X%d,Y%d", int(copy_[0]->GetWorldPosition().x), int(copy_[0]->GetWorldPosition().y));
 	}
 	
-	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)+1][int(enemyPosition_.y)]);
+	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
 	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) - 1]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
@@ -145,6 +167,10 @@ void Enemy::Draw(const Camera& camera)
 void Enemy::Reset()
 {
 	isActive_ = true;
+	isEscaping_ = false;
+	isResult_ = false;
+	isGameOver_ = false;
+	//worldTransform_.translation_ = startPosition_;
 }
 
 void Enemy::BehaviorRootInitialize() {
@@ -330,7 +356,9 @@ void Enemy::BehaviorRootUpdate() {
 	}
 
 	
-
+	if (int(enemyPosition_.x) <= 0 || int(enemyPosition_.x) >= 35) {
+		isEscaping_ = true;
+	}
 	
 
 	//地面より下に行かないようにする
@@ -378,10 +406,11 @@ void Enemy::BehaviorJumpInitialize()
 			}
 		}
 	}*/
-	if (playerPosition_.x < enemyPosition_.x) {
+
+	if (dir_ == 1) {
 		velocity_.x = speed;
 	}
-	else {
+	else if(dir_ == 2 ){
 		velocity_.x = -speed;
 	}
 
@@ -606,53 +635,36 @@ void Enemy::DistanceFunction() {
 					for (int x = 1; x <= 3; x++) {
 						if (playerPosition_.y <= enemyPosition_.y) {
 							if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 ) {
-								if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 3)] == 0 && velocity_.x != 0.0f) {
+								if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 3)] == 0) {
 									jump_ = true;
+									dir_ = 1;
 								}
 								else {
 									jump_ = false;
+									dir_ = 0;
 								}
 								break;
+								
 							}
 							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
-								if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 &&velocity_.x != 0.0f) {
+								if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0) {
 									jump_ = true;
+									dir_ = 2;
+									
 								}
 								else {
 									jump_ = false;
+									dir_ = 0;
+									
 								}
 								break;
 							}
 						}
 
-						for (int i = 0; i < copy_.size(); ++i){
-
-							if (copy_[i]->GetWorldPosition().y <= enemyPosition_.y) {
-								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 1][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x < enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) +2][int(enemyPosition_.y -3)] == 0 && (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 2)] == 10|| map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 2)] == 10) && velocity_.x != 0.0f) {
-										jump_ = true;
-									}
-									else {
-										jump_ = false;
-									}
-									
-									break;
-								}
-								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 1][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x >= enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 && (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 2)] == 10 || map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 2)] == 10) && velocity_.x != 0.0f) {
-										jump_ = true;
-									}
-									else {
-										jump_ = false;
-									}
-									break;
-								}
-							}
-						}
+						
 
 
 					}
-
 
 					
 
@@ -825,6 +837,9 @@ void Enemy::OnCollision(Collider* collider)
 		particleSystem_->AddParticleEmitter(emitter);
 		isActive_ = false;
 		audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
+	}
+	if (!isActive_ || isEscaping_) {
+		isResult_ = true;
 	}
 }
 const Vector3 Enemy::GetWorldPosition() const

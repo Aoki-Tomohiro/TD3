@@ -30,8 +30,12 @@ public:
 	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
 
 	const bool GetIsActive() const { return isActive_; };
+	
+	const bool GetIsGameOver() const { return isGameOver_; }
 
 	const bool GetIsCopied() const { return isCopied_; };
+
+	const bool GetIsResult() const { return isResult_; }
 
 	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
 
@@ -116,6 +120,7 @@ private:
 	Vector3 blockSize_[36] = {};
 
 	bool isActive_ = true;
+	bool isGameOver_ = false;
 
 	int activeTimer_ = 0;
 
@@ -127,8 +132,11 @@ private:
 	bool blockHit_ = false;
 
 	//ジャンプの情報
-
 	bool jump_ = false;
+	
+
+	//逃げるフラグと時間
+	bool isEscaping_ = false;
 
 	//マップチップ
 	int map[36][36] = {};
@@ -170,5 +178,10 @@ private:
 	uint32_t attackAudioHandle_ = 0;
 
 	bool isDoubleSpeed_ = false;
+
+	//ジャンプする方向
+	int dir_ = 0;
+
+	bool isResult_ = false;
 };
 

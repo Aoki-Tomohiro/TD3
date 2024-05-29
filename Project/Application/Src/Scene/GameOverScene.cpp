@@ -1,5 +1,6 @@
 #include "GameOverScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include <Engine/Components/PostEffects/PostEffects.h>
 
 int GameOverScene::copyCount_ = 0;
 
@@ -27,35 +28,42 @@ void GameOverScene::Finalize()
 void GameOverScene::Update()
 {
 	//タイトル画面に戻る
-	if (input_->IsControllerConnected())
-	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+	if (!isFadeOut_ && !isFadeIn_) {
+		if (input_->IsControllerConnected())
 		{
-			sceneManager_->ChangeScene("GameTitleScene");
-			audio_->PlayAudio(decisionHandle_, false, 0.4f);
-			copyCount_ = 0;
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+			{
+				isFadeOut_ = true;
+				isSelect_ = true;
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
+				
+			}
+
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+			{
+				isFadeOut_ = true;
+				isPlay_ = true;
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
+			}
 		}
 
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		if (input_->IsPushKeyEnter(DIK_SPACE))
 		{
-			sceneManager_->ChangeScene("StageSelectScene");
+			isFadeOut_ = true;
+			isSelect_ = true;
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
-			copyCount_ = 0;
+		}
+		if (input_->IsPushKeyEnter(DIK_R))
+		{
+			isFadeOut_ = true;
+			isPlay_ = true;
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
+	
+	//トランジション
+	Transition();
 
-	if (input_->IsPushKeyEnter(DIK_SPACE))
-	{
-		sceneManager_->ChangeScene("StageSelectScene");
-		audio_->PlayAudio(decisionHandle_, false, 0.4f);
-		copyCount_ = 0;
-	}
-	if (input_->IsPushKeyEnter(DIK_R))
-	{
-		sceneManager_->ChangeScene("GamePlayScene");
-		audio_->PlayAudio(decisionHandle_, false, 0.4f);
-		copyCount_ = 0;
-	}
 }
 
 void GameOverScene::Draw()
@@ -63,6 +71,9 @@ void GameOverScene::Draw()
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//リザルトのスプライトの描画
+	resultSprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -91,8 +102,7 @@ void GameOverScene::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//リザルトのスプライトの描画
-	resultSprite_->Draw();
+	
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -101,5 +111,44 @@ void GameOverScene::DrawUI()
 
 void GameOverScene::DrawBackGround()
 {
+
+}
+
+void GameOverScene::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			if (isSelect_)
+			{
+				
+				sceneManager_->ChangeScene("StageSelectScene");
+				copyCount_ = 0;
+			}
+
+			if (isPlay_)
+			{
+				sceneManager_->ChangeScene("GamePlayScene");
+				copyCount_ = 0;
+			}
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
 
 }

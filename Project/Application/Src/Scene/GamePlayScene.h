@@ -16,6 +16,14 @@
 #include "Application/Src/Object/BackGround/BackGround.h"
 #include "Application/Src/Object/Score/Score.h"
 
+enum changeScene
+{
+	kTitle,
+	kSelect,
+	kClear,
+	kOver,
+};
+
 class GamePlayScene : public IScene
 {
 public:
@@ -36,6 +44,10 @@ public:
 	void DrawBackGround() override;
 
 	void Reset();
+
+	void Transition();
+
+	void Pause();
 
 private:
 	
@@ -92,7 +104,13 @@ private:
 	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;
 	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
 	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
-	std::unique_ptr<BackGround> backGround_ = nullptr;
+	std::unique_ptr<BackGround> backGround_ = nullptr;	
+	
+	//矢印のテクスチャ
+	std::unique_ptr<Sprite> yajiSprite_ = nullptr;
+	
+	//ポーズ用スプライト
+	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
 
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;
@@ -109,5 +127,21 @@ private:
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	int nextScene_ = kClear;
+	float timer_ = 0.0f;
+
+	//ポーズメニューフラグ
+	bool pause_ = false;
+	bool rule_;
+	//カーソルの座標
+	Vector2 cursorPosition_{ 0.0f,0.0f };
+	Vector2 cursorVelocity_{ 50.0f,100.0f };
+	//カーソルの移動のフラグ
+	bool isCursorMovementEnabled_ = true;
+	uint32_t cursorMovementEnableTimer_ = 0;
 };
 

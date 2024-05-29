@@ -25,6 +25,8 @@ public:
 
 	void DrawBackGround() override;
 
+	void Transition();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -76,5 +78,10 @@ private:
 	Vector2 tutorialSpriteScale_{ 0.6f,0.6f };
 	Vector2 numberSpritePosition_{ 780.0f,25.0f };
 	Vector2 numberSpriteScale_{ 0.6f,0.6f };
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	float timer_ = 0.0f;
 };
 

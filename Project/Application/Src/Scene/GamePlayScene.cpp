@@ -73,6 +73,21 @@ void GamePlayScene::Initialize()
 	score_ = std::make_unique<Score>();
 	score_->Initialize();
 
+	TextureManager::Load("pause.png");
+	pauseSprite_.reset(Sprite::Create("pause.png", { 0.0f,0.0f }));
+
+	TextureManager::Load("yaji.png");
+	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
+
+	//FollowCameraの生成
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetWorldTransform());
+
+	//スプライトの生成
+	TextureManager::Load("cont.png");
+	contSprite_.reset(Sprite::Create("cont.png", spritePosition_));
+
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
@@ -85,7 +100,7 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
-	//逆再生中だったら
+  	//逆再生中だったら
 	if (isReversed_)
 	{
 		//過去のプレイヤーの情報があるとき
@@ -215,29 +230,44 @@ void GamePlayScene::Update()
 	//パーティクルの更新
 	particleManager_->Update();
 
-	//ゲームクリアのフラグ
-	bool isClear = true;
-	//敵が存在するとき
-	if (enemies.size() != 0)
-	{
-		//生きている敵がいるか確認する
-		for (const std::unique_ptr<Enemy>& enemy : enemies)
-		{
-			if (enemy->GetIsActive())
+		//ゲームクリア
+			bool isClear = true;
+			bool isOver = true;
+			const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
+			if (enemies.size() != 0)
 			{
-				isClear = false;
-			}
-		}
-		//ゲームクリアのフラグが立っていたらシーンを変える
-		if (isClear)
-		{
-			sceneManager_->ChangeScene("GameClearScene");
-		}
+				for (const std::unique_ptr<Enemy>& enemy : enemies)
+				{
+					if (!enemy->GetIsGameOver())
+					{
+						isOver = false;
+					}
+					
+					
+					if (!enemy->GetIsResult())
+					{
+						isClear = false;
+					}
+				}
+				if (isClear)
+				{
+					isFadeOut_ = true;
+					nextScene_ = kClear;
+					GameClearScene::SetTimeCount(int(dislikes_));
+				}
 
-		//ゲームオーバー
-		if (dislikes_ >= 99) {
-			sceneManager_->ChangeScene("GameOverScene");
-		}
+				if (isOver)
+				{
+					isFadeOut_ = true;
+					nextScene_ = kOver;
+				}
+			}
+
+			//ゲームオーバー
+			if (dislikes_ >= 99) {
+				isFadeOut_ = true;
+				nextScene_ = kOver;
+			}
 
 		//ゲームーオーバー
 		int time = 60 - int(dislikes_);
@@ -290,21 +320,21 @@ void GamePlayScene::Update()
 					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 				}
 			}
-		}
+      }
 
 		//リセットのフラグ
 		bool isReset = true;
 		if (isClear)
 		{
-			isReset = false;
+      		isReset = false;
 		}
 		if (!player_->GetIsStop())
 		{
 			isReset = false;
-		}
+     }
 		for (const std::unique_ptr<Copy>& copy : copies)
 		{
-			if (copy->GetIsActive())
+      	if (copy->GetIsActive())
 			{
 				isReset = false;
 			}
@@ -324,6 +354,12 @@ void GamePlayScene::Update()
 			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
 	}
+
+	//ポーズ
+	Pause();
+
+	//トランジション
+	Transition();
 
 	//ImGui
 	ImGui::Begin("GamePlayScene");
@@ -410,6 +446,11 @@ void GamePlayScene::DrawUI()
 
 	//スコアの描画
 	score_->Draw();
+
+	if (pause_) {
+		yajiSprite_->Draw();
+		pauseSprite_->Draw();
+	}
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -547,4 +588,144 @@ void GamePlayScene::Reverse()
 
 	//コピーを逆再生
 	copyManager_->Reverse(stepSize_);
+}
+
+void GamePlayScene::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+
+			if (nextScene_ == kTitle) {
+				sceneManager_->ChangeScene("GameTitleScene");
+			}
+			if (nextScene_ == kSelect) {
+				sceneManager_->ChangeScene("StageSelectScene");
+			}
+			if (nextScene_ == kClear) {
+				sceneManager_->ChangeScene("GameClearScene");
+			}
+			if (nextScene_ == kOver) {
+				sceneManager_->ChangeScene("GameOverScene");
+			}
+			
+			
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
+
+}
+
+void GamePlayScene::Pause() {
+	//ポーズメニュ
+	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START))
+	{
+		if (!pause_) {
+			pause_ = true;
+		}
+		else {
+			pause_ = false;
+			rule_ = false;
+		}
+
+
+	}
+
+	
+
+
+	if (pause_) {
+
+		if (!isCursorMovementEnabled_) {
+			const uint32_t kEnableTime = 10;
+			if (++cursorMovementEnableTimer_ >= kEnableTime) {
+				isCursorMovementEnabled_ = true;
+				cursorMovementEnableTimer_ = 0;
+			}
+		}
+
+		bool isSelect = false;
+
+		const float threshold = 0.8f;
+
+		Vector3 stickTilt{
+			0.0f,
+			input_->GetLeftStickY(),
+			0.0f
+		};
+
+		if (Mathf::Length(stickTilt) > threshold && !rule_) {
+			if (isCursorMovementEnabled_) {
+
+				//上下にカーソルを動かす
+				if (stickTilt.y < -threshold) {
+					cursorPosition_.y += cursorVelocity_.y;
+					isCursorMovementEnabled_ = false;
+				}
+				else if (stickTilt.y > threshold) {
+					cursorPosition_.y -= cursorVelocity_.y;
+					isCursorMovementEnabled_ = false;
+				}
+			}
+		}
+
+		if (input_->IsPushKeyEnter(DIK_W)) {
+			cursorPosition_.y += cursorVelocity_.y;
+			//isCursorMovementEnabled_ = false;
+		}
+		else if (input_->IsPushKeyEnter(DIK_S))
+		{
+			cursorPosition_.y -= cursorVelocity_.y;
+			//isCursorMovementEnabled_ = false;
+		}
+
+		const float kPosMinY = 0.0f;
+		const float kPosMaxY = 200.0f;
+
+		cursorPosition_.y = std::clamp(cursorPosition_.y, kPosMinY, kPosMaxY);
+
+		//スプライトの座標を設定
+		yajiSprite_->SetPosition(cursorPosition_);
+
+		//ゲームタイトル画面
+		if (cursorPosition_.y == 0.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE)))
+		{
+			isFadeOut_ = true;
+			nextScene_ = kTitle;
+		}
+
+		//セレクト画面
+		if (cursorPosition_.y == 100.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE))) {
+			isFadeOut_ = true;
+			nextScene_ = kSelect;
+		}
+
+		//ルール画面
+		if (rule_ && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+			rule_ = false;
+		}
+		else if (cursorPosition_.y == 200.0f && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+			rule_ = true;
+		}
+
+	}
+	else {
+		cursorPosition_.y = 0.0f;
+	}
 }

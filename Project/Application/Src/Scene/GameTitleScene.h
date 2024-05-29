@@ -23,6 +23,8 @@ public:
 
 	void DrawBackGround() override;
 
+	void Transition();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -49,5 +51,10 @@ private:
 	Vector2 titleSpriteSize_ = { 661.0f,376.0f };
 
 	static bool isStart_;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	float timer_ = 0.0f;
 };
 

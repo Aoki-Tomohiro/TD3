@@ -222,11 +222,11 @@ void TutorialScene3::Update()
 			}
 		}
 		//ゲームクリアのフラグが立っていたらシーンを変える
-		if (isClear)
-		{
-			sceneManager_->ChangeScene("StageSelectScene");
-		}
-
+			if (isClear)
+			{
+				isFadeOut_ = true;
+			}
+    
 		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
 		if (player_->GetIsStop())
 		{
@@ -240,6 +240,7 @@ void TutorialScene3::Update()
 					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 				}
+			}
 
 				if (input_->IsPushKeyEnter(DIK_F))
 				{
@@ -295,6 +296,11 @@ void TutorialScene3::Update()
 	tutorialSprite_->SetScale(tutorialSpriteScale_);
 	numberSprite_->SetPosition(numberSpritePosition_);
 	numberSprite_->SetScale(numberSpriteScale_);
+	//パーティクルの更新
+	particleManager_->Update();
+
+	//トランジション
+	Transition();
 }
 
 void TutorialScene3::Draw()
@@ -441,4 +447,32 @@ void TutorialScene3::Reverse()
 
 	//コピーを逆再生
 	copyManager_->Reverse(stepSize_);
+}
+
+void TutorialScene3::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			sceneManager_->ChangeScene("StageSelectScene");
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
+
 }

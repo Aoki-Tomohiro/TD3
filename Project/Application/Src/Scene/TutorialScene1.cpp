@@ -1,5 +1,6 @@
 #include "TutorialScene1.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include <Engine/Components/PostEffects/PostEffects.h>
 
 void TutorialScene1::Initialize()
 {
@@ -116,6 +117,7 @@ void TutorialScene1::Update()
 		//ColliderListに登録
 		if (enemy->GetIsActive())
 		{
+			
 			collisionManager_->SetColliderList(enemy.get());
 		}
 	}
@@ -145,7 +147,7 @@ void TutorialScene1::Update()
 		//ゲームクリアのフラグが立っていたらシーンを変える
 		if (isClear)
 		{
-			sceneManager_->ChangeScene("TutorialScene2");
+			isFadeOut_ = true;
 		}
 	}
 
@@ -171,6 +173,8 @@ void TutorialScene1::Update()
 	tutorialSprite_->SetScale(tutorialSpriteScale_);
 	numberSprite_->SetPosition(numberSpritePosition_);
 	numberSprite_->SetScale(numberSpriteScale_);
+	//トランジション
+	Transition();
 }
 
 void TutorialScene1::Draw()
@@ -270,4 +274,32 @@ void TutorialScene1::DrawBackGround()
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
+}
+
+void TutorialScene1::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			sceneManager_->ChangeScene("TutorialScene2");
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
+
 }

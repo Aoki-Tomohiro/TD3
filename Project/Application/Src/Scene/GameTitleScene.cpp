@@ -1,5 +1,6 @@
 #include "GameTitleScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include "Engine/Components/PostEffects/PostEffects.h"
 
 bool GameTitleScene::isStart_ = false;
 
@@ -38,26 +39,35 @@ void GameTitleScene::Finalize()
 
 void GameTitleScene::Update() 
 {
-	if (input_->IsControllerConnected())
-	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+
+	if (!isFadeIn_ && !isFadeOut_) {
+		if (input_->IsControllerConnected())
 		{
-			sceneManager_->ChangeScene("TutorialScene1");
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+			{
+				isFadeOut_ = true;
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
+			}
+		}
+
+		if (input_->IsPushKeyEnter(DIK_SPACE))
+		{
+			isFadeOut_ = true;
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
-
-	if (input_->IsPushKeyEnter(DIK_SPACE))
-	{
-		sceneManager_->ChangeScene("TutorialScene1");
-		audio_->PlayAudio(decisionHandle_, false, 0.4f);
-	}
+	
+	
 
 	if (input_->IsPushKeyEnter(DIK_S))
 	{
 		sceneManager_->ChangeScene("StageSelectScene");
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
+
+	Transition();
+
+	
 
 	//スプライトの座標を設定
 	pushASprite_->SetPosition(pushASpritePosition_);
@@ -69,6 +79,7 @@ void GameTitleScene::Update()
 	ImGui::DragFloat2("PushASpritePosition", &pushASpritePosition_.x);
 	ImGui::DragFloat2("TitleSpritePosition", &titleSpritePosition_.x);
 	ImGui::DragFloat2("TitleSpriteSize", &titleSpriteSize_.x);
+	ImGui::SliderFloat("Intensity", &timer_, 0.0f, 5.0f);
 	ImGui::End();
 }
 
@@ -77,6 +88,12 @@ void GameTitleScene::Draw()
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	//背景のスプライトの描画
+	backGroundSprite_->Draw();
+
+	//タイトルのスプライトの描画
+	titleSprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -102,11 +119,7 @@ void GameTitleScene::Draw()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	//背景のスプライトの描画
-	backGroundSprite_->Draw();
-
-	//タイトルのスプライトの描画
-	titleSprite_->Draw();
+	
 
 	//PushAのスプライトの描画
 	//pushASprite_->Draw();
@@ -138,5 +151,33 @@ void GameTitleScene::DrawUI()
 
 void GameTitleScene::DrawBackGround()
 {
+
+}
+
+void GameTitleScene::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			sceneManager_->ChangeScene("TutorialScene1");
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
 
 }

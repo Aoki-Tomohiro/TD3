@@ -3,6 +3,7 @@
 #include "Engine/Base/ImGuiManager.h"
 #include <Engine/Math/MathFunction.h>
 #include <numbers>
+#include <Engine/Components/PostEffects/PostEffects.h>
 
 uint32_t StageSelectScene::stageNumber_ = 0;
 uint32_t StageSelectScene::preSelectNumber_ = 0;
@@ -250,6 +251,7 @@ void StageSelectScene::Update() {
 				StageSelectScene::stageNumber_ = selectNumber_ + 2;
 				sceneManager_->ChangeScene("GamePlayScene");
 			}
+			isFadeOut_ = true;
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
@@ -266,6 +268,7 @@ void StageSelectScene::Update() {
 			StageSelectScene::stageNumber_ = selectNumber_ + 2;;
 			sceneManager_->ChangeScene("GamePlayScene");
 		}
+		isFadeOut_ = true;
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
 
@@ -319,6 +322,8 @@ void StageSelectScene::Update() {
 		stageScreenSprites_[i]->SetPosition(stageScreenSpritePosition_[i]);
 		stageScreenSprites_[i]->SetSize(stageScreenSpriteSize_[i]);
 	}
+	//トランジション
+	Transition();
 	//PushA
 	ImGui::DragFloat2("PushAPosition", &pushASpritePosition_.x);
 	ImGui::DragFloat2("PushAScale", &pushASpriteScale_.x);
@@ -334,32 +339,6 @@ void StageSelectScene::Draw(){
 
 	//背景スプライトの描画
 	backGroundSprite_->Draw();
-
-	//背景スプライト描画後処理
-	renderer_->PostDrawSprites();
-#pragma endregion
-
-	//深度バッファをクリア
-	renderer_->ClearDepthBuffer();
-
-#pragma region 3Dオブジェクト描画
-	//3Dオブジェクト描画
-	renderer_->Render();
-#pragma endregion
-
-#pragma region パーティクル描画
-	//パーティクル描画前処理
-	renderer_->PreDrawParticles();
-
-	//パーティクル描画後処理
-	renderer_->PostDrawParticles();
-#pragma endregion
-}
-
-void StageSelectScene::DrawUI() {
-#pragma region 前景スプライト描画
-	//前景スプライト描画前処理
-	renderer_->PreDrawSprites(kBlendModeNormal);
 
 	//矢印のスプライトの描画
 	if (isMovementEnabled_)
@@ -392,11 +371,76 @@ void StageSelectScene::DrawUI() {
 	//PushAのスプライトの描画
 	pushASprite_->Draw();
 
+
+	//背景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+
+	//深度バッファをクリア
+	renderer_->ClearDepthBuffer();
+
+#pragma region 3Dオブジェクト描画
+	//3Dオブジェクト描画
+	renderer_->Render();
+#pragma endregion
+
+#pragma region パーティクル描画
+	//パーティクル描画前処理
+	renderer_->PreDrawParticles();
+
+	//パーティクル描画後処理
+	renderer_->PostDrawParticles();
+#pragma endregion
+}
+
+void StageSelectScene::DrawUI() {
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
+
+	
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
 }
 
 void StageSelectScene::DrawBackGround() {
+
+}
+
+void StageSelectScene::Transition() {
+	//フェードインの処理
+	if (isFadeIn_)
+	{
+		timer_ += 1.0f / 10.0f;
+
+		if (timer_ >= 3.0f)
+		{
+			timer_ = 3.0f;
+			isFadeIn_ = false;
+		}
+	}
+
+	//フェードアウトの処理
+	if (isFadeOut_)
+	{
+		timer_ -= 1.0f / 10.0f;
+		if (timer_ <= 0.0f)
+		{
+			if (selectNumber_ == 0)
+			{
+				sceneManager_->ChangeScene("TutorialScene1");
+			}
+			else
+			{
+				preSelectNumber_ = selectNumber_;
+				StageSelectScene::stageNumber_ = selectNumber_ + 1;
+				sceneManager_->ChangeScene("GamePlayScene");
+			}
+			timer_ = 0.0f;
+		}
+	}
+
+	PostEffects::GetInstance()->GetVignette()->SetIntensity(timer_);
 
 }

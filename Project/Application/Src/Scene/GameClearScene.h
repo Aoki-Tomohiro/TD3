@@ -25,6 +25,7 @@ public:
 
 	static void SetTimeCount(const int copyCount) { timeCount_ = copyCount; };
 
+	void Transition();
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -49,5 +50,10 @@ private:
 	uint32_t decisionHandle_ = 0;
 
 	static int timeCount_;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	float timer_ = 0.0f;
 };
 

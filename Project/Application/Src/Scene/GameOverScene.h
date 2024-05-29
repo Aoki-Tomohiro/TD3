@@ -24,6 +24,8 @@ public:
 
 	static void SetCopyCount(const int copyCount) { copyCount_ = copyCount; };
 
+	void Transition();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -36,5 +38,12 @@ private:
 	uint32_t decisionHandle_ = 0;
 
 	static int copyCount_;
+
+	//トランジションのフラグ
+	bool isFadeIn_ = true;
+	bool isFadeOut_ = false;
+	bool isSelect_ = false;
+	bool isPlay_ = false;
+	float timer_ = 0.0f;
 };
 

@@ -1,10 +1,12 @@
 #include "GameManager.h"
+#include "Engine/Components/PostEffects/PostEffects.h"
 
 void GameManager::Initialize()
 {
 	//基底クラスの初期化
 	GameCore::Initialize();
-
+	PostEffects::GetInstance()->SetIsEnable(true);
+	PostEffects::GetInstance()->GetVignette()->SetIsEnable(true);
 	//シーンの生成
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	sceneManager_->SetSceneFactory(sceneFactory_.get());
