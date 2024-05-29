@@ -178,18 +178,19 @@ void GamePlayScene::Update()
 
 			//ゲームクリア
 			bool isClear = true;
+			bool isOver = true;
 			const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 			if (enemies.size() != 0)
 			{
 				for (const std::unique_ptr<Enemy>& enemy : enemies)
 				{
-					if (enemy->GetIsGameOver())
+					if (!enemy->GetIsGameOver())
 					{
-						isFadeOut_ = true;
-						nextScene_ = kOver;
-
+						isOver = false;
 					}
-					if (enemy->GetIsActive())
+					
+					
+					if (!enemy->GetIsResult())
 					{
 						isClear = false;
 					}
@@ -197,8 +198,14 @@ void GamePlayScene::Update()
 				if (isClear)
 				{
 					isFadeOut_ = true;
-					nextScene_ = kOver;
+					nextScene_ = kClear;
 					GameClearScene::SetTimeCount(int(dislikes_));
+				}
+
+				if (isOver)
+				{
+					isFadeOut_ = true;
+					nextScene_ = kOver;
 				}
 			}
 
@@ -547,7 +554,7 @@ void GamePlayScene::Transition() {
 				sceneManager_->ChangeScene("StageSelectScene");
 			}
 			if (nextScene_ == kClear) {
-				sceneManager_->ChangeScene("GameOverScene");
+				sceneManager_->ChangeScene("GameClearScene");
 			}
 			if (nextScene_ == kOver) {
 				sceneManager_->ChangeScene("GameOverScene");

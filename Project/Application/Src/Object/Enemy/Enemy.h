@@ -35,6 +35,8 @@ public:
 
 	const bool GetIsCopied() const { return isCopied_; };
 
+	const bool GetIsResult() const { return isResult_; }
+
 	void SetIsCopied(const bool isCopied) { isCopied_ = isCopied; };
 
 	//プレイヤー関連
@@ -175,5 +177,7 @@ private:
 
 	//ジャンプする方向
 	int dir_ = 0;
+
+	bool isResult_ = false;
 };
 

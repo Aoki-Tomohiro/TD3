@@ -285,7 +285,7 @@ void EnemyManager::SetBlockData(const Vector3& position, const Vector3& size)
 			continue;
 		}
 
-		if (enemy->GetIsActive())
+		if (enemy->GetIsActive() && !enemy->GetIsGameOver())
 		{
 			enemy->SetBlockPosition(position);
 			enemy->SetBlockSize(size);

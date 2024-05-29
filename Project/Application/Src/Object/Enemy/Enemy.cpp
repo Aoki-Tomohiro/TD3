@@ -119,6 +119,7 @@ void Enemy::Update()
 	worldTransform_.UpdateMatrixFromQuaternion();
 	impactScopeWorldTransform_.UpdateMatrixFromEuler();
 
+	
 
 	//モデルの更新
 	model_->Update(worldTransform_, animationNumber_);
@@ -166,6 +167,9 @@ void Enemy::Draw(const Camera& camera)
 void Enemy::Reset()
 {
 	isActive_ = true;
+	isEscaping_ = false;
+	isResult_ = false;
+	isGameOver_ = false;
 	//worldTransform_.translation_ = startPosition_;
 }
 
@@ -819,6 +823,9 @@ void Enemy::OnCollision(Collider* collider)
 		particleSystem_->AddParticleEmitter(emitter);
 		isActive_ = false;
 		audio_->PlayAudio(attackAudioHandle_, false, 0.4f);
+	}
+	if (!isActive_ || isEscaping_) {
+		isResult_ = true;
 	}
 }
 const Vector3 Enemy::GetWorldPosition() const
