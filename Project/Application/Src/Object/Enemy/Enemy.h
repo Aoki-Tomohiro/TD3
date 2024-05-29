@@ -129,6 +129,7 @@ private:
 
 	//ジャンプの情報
 	bool jump_ = false;
+	
 
 	//逃げるフラグと時間
 	bool isEscaping_ = false;
@@ -171,5 +172,8 @@ private:
 	bool isEdit_ = false;
 
 	uint32_t attackAudioHandle_ = 0;
+
+	//ジャンプする方向
+	int dir_ = 0;
 };
 
