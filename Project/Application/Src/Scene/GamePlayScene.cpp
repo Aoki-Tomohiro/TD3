@@ -79,15 +79,6 @@ void GamePlayScene::Initialize()
 	TextureManager::Load("yaji.png");
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
 
-	//FollowCameraの生成
-	followCamera_ = std::make_unique<FollowCamera>();
-	followCamera_->Initialize();
-	followCamera_->SetTarget(&player_->GetWorldTransform());
-
-	//スプライトの生成
-	TextureManager::Load("cont.png");
-	contSprite_.reset(Sprite::Create("cont.png", spritePosition_));
-
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
@@ -230,129 +221,127 @@ void GamePlayScene::Update()
 	//パーティクルの更新
 	particleManager_->Update();
 
-		//ゲームクリア
-			bool isClear = true;
-			bool isOver = true;
-			const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
-			if (enemies.size() != 0)
-			{
-				for (const std::unique_ptr<Enemy>& enemy : enemies)
-				{
-					if (!enemy->GetIsGameOver())
-					{
-						isOver = false;
-					}
-					
-					
-					if (!enemy->GetIsResult())
-					{
-						isClear = false;
-					}
-				}
-				if (isClear)
-				{
-					isFadeOut_ = true;
-					nextScene_ = kClear;
-					GameClearScene::SetTimeCount(int(dislikes_));
-				}
-
-				if (isOver)
-				{
-					isFadeOut_ = true;
-					nextScene_ = kOver;
-				}
-			}
-
-			//ゲームオーバー
-			if (dislikes_ >= 99) {
-				isFadeOut_ = true;
-				nextScene_ = kOver;
-			}
-
-		//ゲームーオーバー
-		int time = 60 - int(dislikes_);
-		if (time < 0)
+	//ゲームクリア
+	bool isClear = true;
+	bool isOver = true;
+	if (enemies.size() != 0)
+	{
+		for (const std::unique_ptr<Enemy>& enemy : enemies)
 		{
-			sceneManager_->ChangeScene("GameOverScene");
+			if (!enemy->GetIsGameOver())
+			{
+				isOver = false;
+			}
+			
+			
+			if (!enemy->GetIsResult())
+			{
+				isClear = false;
+			}
+		}
+		if (isClear)
+		{
+			isFadeOut_ = true;
+			nextScene_ = kClear;
+			GameClearScene::SetTimeCount(int(dislikes_));
+		}
+
+		if (isOver)
+		{
+			isFadeOut_ = true;
+			nextScene_ = kOver;
+		}
+	}
+
+	//ゲームオーバー
+	if (dislikes_ >= 99) {
+		isFadeOut_ = true;
+		nextScene_ = kOver;
+	}
+
+	//ゲームーオーバー
+	int time = 60 - int(dislikes_);
+	if (time < 0)
+	{
+		sceneManager_->ChangeScene("GameOverScene");
+	}
+	else
+	{
+		if (time > 99)
+		{
+			timeCountSprites_[0]->SetTexture("Numbers/9.png");
+			timeCountSprites_[1]->SetTexture("Numbers/9.png");
 		}
 		else
 		{
-			if (time > 99)
-			{
-				timeCountSprites_[0]->SetTexture("Numbers/9.png");
-				timeCountSprites_[1]->SetTexture("Numbers/9.png");
-			}
-			else
-			{
-				timeCountSprites_[0]->SetTexture("Numbers/" + std::to_string(time / 10) + ".png");
-				time %= 10;
-				timeCountSprites_[1]->SetTexture("Numbers/" + std::to_string(time) + ".png");
-			}
-
-			//スプライトの座標を設定
-			for (uint32_t i = 0; i < 2; i++)
-			{
-				timeCountSprites_[i]->SetPosition(timeCountSpritePositions_[i]);
-				timeCountSprites_[i]->SetScale(SpriteSize_[i]);
-			}
+			timeCountSprites_[0]->SetTexture("Numbers/" + std::to_string(time / 10) + ".png");
+			time %= 10;
+			timeCountSprites_[1]->SetTexture("Numbers/" + std::to_string(time) + ".png");
 		}
 
-		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
-		if (player_->GetIsStop())
+		//スプライトの座標を設定
+		for (uint32_t i = 0; i < 2; i++)
 		{
-			if (!isDoubleSpeed_)
-			{
-				if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
-				{
-					isDoubleSpeed_ = true;
-					copyManager_->SetIsDoubleSpeed(true);
-					enemyManager_->SetIsDoubleSpeed(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
-				}
+			timeCountSprites_[i]->SetPosition(timeCountSpritePositions_[i]);
+			timeCountSprites_[i]->SetScale(SpriteSize_[i]);
+		}
+	}
 
-				if (input_->IsPushKeyEnter(DIK_F))
-				{
-					isDoubleSpeed_ = true;
-					copyManager_->SetIsDoubleSpeed(true);
-					enemyManager_->SetIsDoubleSpeed(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
-				}
+	//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
+	if (player_->GetIsStop())
+	{
+		if (!isDoubleSpeed_)
+		{
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+			{
+				isDoubleSpeed_ = true;
+				copyManager_->SetIsDoubleSpeed(true);
+				enemyManager_->SetIsDoubleSpeed(true);
+				PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+				PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 			}
+
+			if (input_->IsPushKeyEnter(DIK_F))
+			{
+				isDoubleSpeed_ = true;
+				copyManager_->SetIsDoubleSpeed(true);
+				enemyManager_->SetIsDoubleSpeed(true);
+				PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+				PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
+			}
+		}
       }
 
-		//リセットのフラグ
-		bool isReset = true;
-		if (isClear)
-		{
-      		isReset = false;
-		}
-		if (!player_->GetIsStop())
+	//リセットのフラグ
+	bool isReset = true;
+	if (isClear)
+	{
+      	isReset = false;
+	}
+	if (!player_->GetIsStop())
+	{
+		isReset = false;
+     }
+	for (const std::unique_ptr<Copy>& copy : copies)
+	{
+      if (copy->GetIsActive())
 		{
 			isReset = false;
-     }
-		for (const std::unique_ptr<Copy>& copy : copies)
-		{
-      	if (copy->GetIsActive())
-			{
-				isReset = false;
-			}
 		}
+	}
 
-		//プレイヤーの攻撃が終了したらリセット
-		if (isReset)
-		{
-			//逆再生のフラグを立てる
-			isReversed_ = true;
-			//アニメーションを停止
-			player_->StopAnimation();
-			//リセット
-			Reset();
-			//ノイズエフェクトを有効化
-			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
-		}
+	//プレイヤーの攻撃が終了したらリセット
+	if (isReset)
+	{
+		//逆再生のフラグを立てる
+		isReversed_ = true;
+		//アニメーションを停止
+		player_->StopAnimation();
+		//リセット
+		Reset();
+		//ノイズエフェクトを有効化
+		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+		PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 	}
 
 	//ポーズ

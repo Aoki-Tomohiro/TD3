@@ -212,11 +212,11 @@ void TutorialScene2::Update()
 			}
 		}
 		//ゲームクリアのフラグが立っていたらシーンを変える
-			if (isClear)
-			{
-				isFadeOut_ = true;
-				
-			}
+		if (isClear)
+		{
+			isFadeOut_ = true;
+
+		}
 
 		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
 		if (player_->GetIsStop())
@@ -234,49 +234,49 @@ void TutorialScene2::Update()
 
 			}
 
-				if (input_->IsPushKeyEnter(DIK_F))
-				{
-					isDoubleSpeed_ = true;
-					copyManager_->SetIsDoubleSpeed(true);
-					enemyManager_->SetIsDoubleSpeed(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
-				}
-			}
-		}
-
-		//リセットのフラグ
-		bool isReset = true;
-		if (isClear)
-		{
-			isReset = false;
-		}
-		if (!player_->GetIsStop())
-		{
-			isReset = false;
-		}
-		for (const std::unique_ptr<Copy>& copy : copies)
-		{
-			if (copy->GetIsActive())
+			if (input_->IsPushKeyEnter(DIK_F))
 			{
-				isReset = false;
+				isDoubleSpeed_ = true;
+				copyManager_->SetIsDoubleSpeed(true);
+				enemyManager_->SetIsDoubleSpeed(true);
+				PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+				PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 			}
-		}
-
-		//プレイヤーの攻撃が終了したらリセット
-		if (isReset)
-		{
-			//逆再生のフラグを立てる
-			isReversed_ = true;
-			//アニメーションを停止
-			player_->StopAnimation();
-			//リセット
-			Reset();
-			//ノイズエフェクトを有効化
-			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
 	}
+
+	//リセットのフラグ
+	bool isReset = true;
+	if (isClear)
+	{
+		isReset = false;
+	}
+	if (!player_->GetIsStop())
+	{
+		isReset = false;
+	}
+	for (const std::unique_ptr<Copy>& copy : copies)
+	{
+		if (copy->GetIsActive())
+		{
+			isReset = false;
+		}
+	}
+
+	//プレイヤーの攻撃が終了したらリセット
+	if (isReset)
+	{
+		//逆再生のフラグを立てる
+		isReversed_ = true;
+		//アニメーションを停止
+		player_->StopAnimation();
+		//リセット
+		Reset();
+		//ノイズエフェクトを有効化
+		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+		PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
+	}
+
 
 	ImGui::Begin("TutorialScene2");
 	ImGui::DragFloat2("TutorialSpritePosition", &tutorialSpritePosition_.x);
