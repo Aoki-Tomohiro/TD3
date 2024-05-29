@@ -27,10 +27,23 @@ void CopyManager::Initialize()
 		}
 		maxCopySprites_[i].reset(Sprite::Create("Numbers/0.png", { 0.0f,0.0f }));
 	}
+
+	//コピーの色の初期化
+	copyColors_.push_back(Vector4{ 0.0f, 0.333f, 0.0f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.0f, 0.667f, 0.0f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.0f, 1.0f, 0.0f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.333f, 1.0f, 0.333f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.667f, 1.0f, 0.667f, 1.0f });
 }
 
 void CopyManager::Update()
 {
+	//コピーの色を変更
+	for (uint32_t i = 0; i < copies_.size(); i++)
+	{
+		copies_[i]->SetColor(copyColors_[i]);
+	}
+
 	//コピーの更新
 	for (std::unique_ptr<Copy>& copy : copies_)
 	{
@@ -105,6 +118,7 @@ void CopyManager::AddCopy()
 	copies_.push_back(std::unique_ptr<Copy>(copy));
 	playerPositions_.clear();
 }
+
 void CopyManager::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();

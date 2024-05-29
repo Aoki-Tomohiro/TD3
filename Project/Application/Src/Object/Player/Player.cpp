@@ -31,6 +31,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	movementRestrictionSprite_->SetSize(movementRestrictionSpriteSize_);
 
 	//音声データの読み込み
+	whiffAudioHandle_ = audio_->LoadAudioFile("Whiff.wav");
 	moveAudioHandle_ = audio_->LoadAudioFile("Move.wav");
 
 	//パーティルの作成
@@ -67,6 +68,13 @@ void Player::Update()
 
 		//移動制限の処理
 		UpdateMovementRestriction();
+	}
+
+	//プレイヤーの攻撃が当たっていなかったら
+	if (weapon_->GetIsAttack() && !weapon_->GetIsHit())
+	{
+		//空振りのSEを再生
+		audio_->PlayAudio(whiffAudioHandle_, 0, 0.4f);
 	}
 
 	//ヒットフラグをfalseにする
@@ -231,6 +239,7 @@ void Player::DrawUI(const Camera& camera)
 void Player::Reset()
 {
 	isMove_ = true;
+	isStop_ = false;
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 	models_[0]->GetMaterial(0)->SetColor(color);
@@ -453,7 +462,7 @@ void Player::BehaviorRootUpdate()
 		}
 
 		//攻撃行動に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X))
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X) && isMove_)
 		{
 			behaviorRequest_ = Behavior::kAttack;
 		}
@@ -466,7 +475,7 @@ void Player::BehaviorRootUpdate()
 		worldTransform_.translation_.y += jumpFirstSpeed_;
 	}
 
-	if (input_->IsPushKeyEnter(DIK_E))
+	if (input_->IsPushKeyEnter(DIK_E) && isMove_)
 	{
 		behaviorRequest_ = Behavior::kAttack;
 	}
@@ -576,21 +585,19 @@ void Player::BehaviorAttackUpdate()
 		//通常状態に戻る
 		behaviorRequest_ = Behavior::kRoot;
 		models_[0]->GetAnimation()->PlayAnimation();
+		//動けないようにする
+		isMove_ = false;
 	}
 }
 
 void Player::UpdateMovementRestriction()
 {
-	//移動ベクトルが0ではないとき
-	//if (velocity_ != Vector3(0.0f, 0.0f, 0.0f) && isMove_)
-	//{
 	//移動制限のタイマーが0以下になったときに動けないようにする
-	if (--movementRestrictionTimer_ < 0)
+	if (--movementRestrictionTimer_ < 0 || isStop_)
 	{
 		isMove_ = false;
-		
+		movementRestrictionTimer_ = 0;
 	}
-	//}
 
 	//移動制限時間が短くなったら
 	const int divisor = 4;
@@ -598,13 +605,22 @@ void Player::UpdateMovementRestriction()
 	{
 		//モデルの色を変更
 		Vector4 color{};
-		if (movementRestrictionTimer_ % 2 == 0)
+		//動ける状態の時は点滅させる
+		if (!isStop_)
 		{
-			color = { 1.0f, 0.0f, 0.0f, 1.0f };
+			if (movementRestrictionTimer_ % 4 == 0)
+			{
+				color = { 1.0f, 0.0f, 0.0f, 1.0f };
+			}
+			else
+			{
+				color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			}
 		}
+		//動けない状態の時は白固定
 		else
 		{
-			color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			color = { 1.0f,1.0f,1.0f,1.0f };
 		}
 		models_[0]->GetMaterial(0)->SetColor(color);
 	}

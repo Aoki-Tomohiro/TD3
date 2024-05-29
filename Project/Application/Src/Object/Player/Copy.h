@@ -24,6 +24,12 @@ public:
 
 	void Reverse(const uint32_t stepSize);
 
+	const bool GetIsActive() const { return isActive_; };
+
+	void SetColor(const Vector4& color) { model_->GetMaterial(0)->SetColor(color); };
+
+	const bool GetIsEnemyDefeated() const { return isEnemyDefeated_; };
+
 private:
 	std::unique_ptr<Model> model_ = nullptr;
 	//std::unique_ptr<Model>impactScopeModel_ = nullptr;
@@ -44,5 +50,9 @@ private:
 	std::unique_ptr<Weapon> weapon_ = nullptr;
 
 	bool isReverse_ = false;
+
+	bool isActive_ = true;
+
+	bool isEnemyDefeated_ = false;
 };
 

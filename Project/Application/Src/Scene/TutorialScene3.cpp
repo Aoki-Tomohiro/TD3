@@ -43,7 +43,7 @@ void TutorialScene3::Initialize()
 	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize();
-	copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+	copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 
 	//背景の生成
 	backGroundGenkoModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
@@ -92,15 +92,15 @@ void TutorialScene3::Update()
 		//過去のプレイヤーの情報がなくなったら
 		else
 		{
-			//最初の情報を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
-			enemyManager_->SaveReverseData();
 			//逆再生のフラグを折る
 			isReversed_ = false;
 			//コピーを出す
 			copyManager_->AddCopy();
 			//プレイヤーのアニメーションを再生
 			player_->PlayAnimation();
+			//最初の情報を保存
+			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+			enemyManager_->SaveReverseData();
 			//ノイズエフェクト無効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 		}
@@ -163,7 +163,8 @@ void TutorialScene3::Update()
 		collisionManager_->SetColliderList(block.get());
 	}
 	//コピー
-	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	for (const std::unique_ptr<Copy>& copy : copies)
 	{
 		collisionManager_->SetColliderList(copy.get());
 		collisionManager_->SetColliderList(copy->GetWeapon());
@@ -175,8 +176,11 @@ void TutorialScene3::Update()
 	if (!player_->GetIsStop())
 	{
 		//プレイヤーの座標を保存
-		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+		copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 	}
+
+	//逆再生に必要なプレイヤーのデータを保存
+	reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
 
 	//敵の逆再生時に必要なデータを保存
 	enemyManager_->SaveReverseData();
@@ -203,19 +207,29 @@ void TutorialScene3::Update()
 			sceneManager_->ChangeScene("StageSelectScene");
 		}
 
-		//プレイヤーの攻撃が終了したらリセット
-		if ((player_->GetWeapon()->GetIsAttack() || !player_->GetIsMove()) && !isClear)
+		//リセットのフラグ
+		bool isReset = true;
+		if (isClear)
 		{
-			//プレイヤーの攻撃が当たっていなかったら
-			if (!player_->GetWeapon()->GetIsHit())
+			isReset = false;
+		}
+		if (!player_->GetIsStop())
+		{
+			isReset = false;
+		}
+		for (const std::unique_ptr<Copy>& copy : copies)
+		{
+			if (copy->GetIsActive())
 			{
-				//空振りのSEを再生
-				audio_->PlayAudio(whiffAudioHandle_, 0, 0.4f);
+				isReset = false;
 			}
+		}
+
+		//プレイヤーの攻撃が終了したらリセット
+		if (isReset)
+		{
 			//逆再生のフラグを立てる
 			isReversed_ = true;
-			//逆再生のプレイヤーのデータを取得
-			reversePlayerPositions = copyManager_->GetPlayerPositions();
 			//アニメーションを停止
 			player_->StopAnimation();
 			//リセット

@@ -57,7 +57,7 @@ void GamePlayScene::Initialize()
 	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize();
-	copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+	copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 
 	//背景の生成
 	backGroundGenkoModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
@@ -72,9 +72,6 @@ void GamePlayScene::Initialize()
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
-
-	//音声データ読み込み
-	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
 }
 
 void GamePlayScene::Finalize()
@@ -99,15 +96,15 @@ void GamePlayScene::Update()
 		//過去のプレイヤーの情報がなくなったら
 		else
 		{
-			//最初の情報を保存
-			copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
-			enemyManager_->SaveReverseData();
 			//逆再生のフラグを折る
 			isReversed_ = false;
 			//コピーを出す
 			copyManager_->AddCopy();
 			//プレイヤーのアニメーションを再生
 			player_->PlayAnimation();
+			//最初の情報を保存
+			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+			enemyManager_->SaveReverseData();
 			//ノイズエフェクト無効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 		}
@@ -170,7 +167,8 @@ void GamePlayScene::Update()
 		collisionManager_->SetColliderList(block.get());
 	}
 	//コピー
-	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
+	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	for (const std::unique_ptr<Copy>& copy : copies)
 	{
 		collisionManager_->SetColliderList(copy.get());
 		collisionManager_->SetColliderList(copy->GetWeapon());
@@ -178,12 +176,15 @@ void GamePlayScene::Update()
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
 
-	//プレイヤーが動けるときに逆再生時のデータを保存
+	//プレイヤーが動いているときののデータを保存
 	if (!player_->GetIsStop())
 	{
 		//プレイヤーの座標を保存
-		copyManager_->SetPlayerPosition(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
+		copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 	}
+
+	//逆再生に必要なプレイヤーのデータを保存
+	reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
 
 	//敵の逆再生時に必要なデータを保存
 	enemyManager_->SaveReverseData();
@@ -246,19 +247,41 @@ void GamePlayScene::Update()
 			}
 		}
 
-		//プレイヤーの攻撃が終了したらリセット
-		if ((player_->GetWeapon()->GetIsAttack() || !player_->GetIsMove()) && !isClear)
+		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
+		if (player_->GetIsStop())
 		{
-			//プレイヤーの攻撃が当たっていなかったら
-			if (!player_->GetWeapon()->GetIsHit())
+			if (!isDoubleSpeed_)
 			{
-				//空振りのSEを再生
-				audio_->PlayAudio(whiffAudioHandle_, 0, 0.4f);
+				if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+				{
+					isDoubleSpeed_ = true;
+				}
 			}
+		}
+
+		//リセットのフラグ
+		bool isReset = true;
+		if (isClear)
+		{
+			isReset = false;
+		}
+		if (!player_->GetIsStop())
+		{
+			isReset = false;
+		}
+		for (const std::unique_ptr<Copy>& copy : copies)
+		{
+			if (copy->GetIsActive())
+			{
+				isReset = false;
+			}
+		}
+
+		//プレイヤーの攻撃が終了したらリセット
+		if (isReset)
+		{
 			//逆再生のフラグを立てる
 			isReversed_ = true;
-			//逆再生のプレイヤーのデータを取得
-			reversePlayerPositions = copyManager_->GetPlayerPositions();
 			//アニメーションを停止
 			player_->StopAnimation();
 			//リセット
@@ -402,65 +425,34 @@ void GamePlayScene::Reset()
 }
 
 void GamePlayScene::CalculateRating() {
-	//毎秒今いる敵の数*1ずつ減っていく
-	dislikes_ += (1.0f / 60.0f);
+	//加算される基本のポイント
+	const float point = 100.0f;
+	//倍率
+	float multiplier = 1.0f;
 
-	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
-	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
+	//プレイヤーが倒した時
+	if ((player_->GetWeapon()->GetIsAttack() || !player_->GetIsMove()))
 	{
-		if (copyManager_->GetCopies()[i]->GetWeapon()->GetIsAttack() && !player_->GetWeapon()->GetIsAttack()) {
-			num_ = 0;
-			
-			for (int i = 0; i < enemies.size(); ++i)
-			{
-				if (!enemies[i].get()->GetIsActive()) {
-					num_++;
-				}
-			}
-
-			if (defeatedEnemyCount - num_ <= -2) {
-				likes_ += 50 * (num_ - defeatedEnemyCount);
-			}
-			else {
-				if (defeatedEnemyCount - num_ != 0) {
-					likes_ += 25;
-				}
-				
-			}
-
-			
-			defeatedEnemyCount = num_;
-
-			enemyNum_ = enemyNum_ - defeatedEnemyCount;
-		}
-
-	}
-
-
-	if (player_->GetWeapon()->GetIsAttack())
-	{
-		num_ = 0;
-		for (int i = 0; i < enemies.size(); ++i)
+		//プレイヤーの攻撃が当たっていなかったら
+		if (player_->GetWeapon()->GetIsHit())
 		{
-			if (!enemies[i].get()->GetIsActive()) {
-				num_++;
+			totaScore_ += int(point * multiplier);
+		}
+	}
+
+	//コピーが倒した時
+	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	for (const std::unique_ptr<Copy>& copy : copies)
+	{
+		if (copy->GetIsActive())
+		{
+			if (copy->GetIsEnemyDefeated())
+			{
+				totaScore_ += int(point * multiplier);
 			}
 		}
-
-		if (defeatedEnemyCount - num_ <= -2) {
-			likes_ += 100 * (num_ - defeatedEnemyCount);
-		}
-
-		if (defeatedEnemyCount - num_ == -1) {
-			likes_ += 50;
-		}
-		
-
-
-		defeatedEnemyCount = 0;
-		enemyNum_ = int(enemies.size());
+		multiplier += 0.5f;
 	}
-	totaScore_ = likes_ - int(dislikes_);
 }
 
 void GamePlayScene::Reverse()

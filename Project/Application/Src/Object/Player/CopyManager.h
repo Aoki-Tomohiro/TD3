@@ -22,7 +22,7 @@ public:
 
 	const std::vector<std::unique_ptr<Copy>>& GetCopies() const { return copies_; };
 
-	void SetPlayerPosition(const Vector3& playerPosition, const bool isAttack, const uint32_t animationNumber, const float animationTime) { playerPositions_.push_back({ playerPosition, isAttack,animationNumber,animationTime }); };
+	void SetPlayerData(const Vector3& playerPosition, const bool isAttack, const uint32_t animationNumber, const float animationTime) { playerPositions_.push_back({ playerPosition, isAttack,animationNumber,animationTime }); };
 
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>>& GetPlayerPositions() { return playerPositions_; };
 
@@ -39,6 +39,8 @@ private:
 	int copyCount_ = 0;
 
 	int maxCopyCount_ = 5;
+
+	std::vector<Vector4> copyColors_{};
 
 	//コピーの上限のスプライト
 	std::array<std::unique_ptr<Sprite>, 3> maxCopySprites_{};

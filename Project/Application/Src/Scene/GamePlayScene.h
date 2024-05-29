@@ -100,8 +100,8 @@ private:
 	bool isReversed_ = false;
 	std::vector<std::tuple<Vector3, bool, uint32_t, float>> reversePlayerPositions{};
 
-	//オーディオハンドル
-	uint32_t whiffAudioHandle_ = 0;
+	//倍速中か
+	bool isDoubleSpeed_ = false;
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;
