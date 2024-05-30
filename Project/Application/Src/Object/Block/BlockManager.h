@@ -11,7 +11,7 @@ public:
 
 	void Draw(const Camera& camera);
 
-	void AddBlock(const Vector3& position, const Vector3& scale);
+	void AddBlock(const Vector3& position, const Vector3& scale, const bool isGround);
 
 	const std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; };
 
