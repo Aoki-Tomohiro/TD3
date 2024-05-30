@@ -98,7 +98,7 @@ void Enemy::Update()
 
 	//画面端に行ったら逃げる
 	if (isEscaping_) {
-		animationNumber_ = 3;
+		animationNumber_ = 4;
 		if (int(enemyPosition_.x) <= 0) {
 			worldTransform_.translation_.x -= 0.3f;
 		}
@@ -317,7 +317,7 @@ void Enemy::BehaviorRootUpdate() {
 
 		if (velocity_.x != 0.0f)
 		{
-			animationNumber_ = 3;
+			animationNumber_ = 4;
 			if (velocity_.x == speed)
 			{
 				destinationQuaternion_ = { 0.0f,0.707f,0.0f,0.707f };
@@ -387,7 +387,7 @@ void Enemy::BehaviorJumpInitialize()
 	velocity_.y = kJumpFirstSpeed;
 	model_->GetAnimation()->SetAnimationTime(0.0f);
 	model_->GetAnimation()->SetLoop(false);
-	animationNumber_ = 2;
+	animationNumber_ = 3;
 	float speed = 0.3f;
 	if (isDoubleSpeed_)
 	{
@@ -427,7 +427,7 @@ void Enemy::BehaviorJumpUpdate()
 {
 	//velocity_.x = 0.0f;
 	worldTransform_.translation_ += velocity_;
-	float kGravityAcceleration = 0.06f;
+	float kGravityAcceleration = 0.055f;
 	if (isDoubleSpeed_)
 	{
 		kGravityAcceleration *= 4.0f;

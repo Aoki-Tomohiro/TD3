@@ -112,7 +112,7 @@ void Player::Update()
 			if (isLanded_)
 			{
 				//走りアニメーション
-				animationNumber_ = 3;
+				animationNumber_ = 4;
 			}
 		}
 		//移動していないときは直立アニメーション
@@ -121,14 +121,14 @@ void Player::Update()
 			//着地しているとき
 			if (isLanded_)
 			{
-				animationNumber_ = 1;
+				animationNumber_ = 2;
 			}
 		}
 		break;
 	case Behavior::kJump:
 		BehaviorJumpUpdate();
 		//ジャンプアニメーション
-		animationNumber_ = 2;
+		animationNumber_ = 3;
 		break;
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();
