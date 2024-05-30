@@ -140,10 +140,12 @@ private:
 	bool pause_ = false;
 	bool rule_;
 	//カーソルの座標
-	Vector2 cursorPosition_{ 0.0f,0.0f };
-	Vector2 cursorVelocity_{ 50.0f,100.0f };
+	Vector2 cursorPosition_{ -15.0f,-40.0f };
+	Vector2 cursorVelocity_{ 40.0f,100.0f };
 	//カーソルの移動のフラグ
 	bool isCursorMovementEnabled_ = true;
 	uint32_t cursorMovementEnableTimer_ = 0;
+
+	Vector2 a = { 0.0f,0.0f };
 };
 

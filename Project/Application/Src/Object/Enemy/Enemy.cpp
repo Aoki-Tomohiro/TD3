@@ -640,7 +640,7 @@ void Enemy::DistanceFunction() {
 						if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10 || int(enemyPosition_.y) == 23) {
 
 							if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
-								if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 5)] == 0 && map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 3 ) {
+								if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 5)] == 0 && map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 3 && map[int(enemyPosition_.x)][int(enemyPosition_.y) - 1] != 3) {
 									jump_ = true;
 									dir_ = 1;
 								}

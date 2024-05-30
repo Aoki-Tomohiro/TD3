@@ -79,8 +79,7 @@ void GamePlayScene::Initialize()
 	TextureManager::Load("pause.png");
 	pauseSprite_.reset(Sprite::Create("pause.png", { 0.0f,0.0f }));
 	TextureManager::Load("pauseUI.png");
-	pauseUISprite_.reset(Sprite::Create("pauseUI.png", { 10.0f,50.0f }));
-
+	pauseUISprite_.reset(Sprite::Create("pauseUI.png", { 80.0f,600.0f }));
 	TextureManager::Load("yaji.png");
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
 
@@ -96,6 +95,8 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
+	
+
 	//ポーズメニュ
 	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_P))
 	{
@@ -388,7 +389,8 @@ void GamePlayScene::Update()
 		ImGui::Text("totalScore %d", totaScore_);
 		ImGui::TreePop();
 	}
-
+	ImGui::DragFloat2("A", &a.x);
+	ImGui::Text("%f", cursorPosition_.y);
 	ImGui::DragFloat2("SpritePositon[0]", &timeCountSpritePositions_[0].x);
 	ImGui::DragFloat2("SpritePositon[1]", &timeCountSpritePositions_[1].x);
 	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x,1.0f,1.0f,3.0f);
@@ -709,18 +711,22 @@ void GamePlayScene::Pause() {
 			}
 		}
 
-		if (input_->IsPushKeyEnter(DIK_S)) {
-			cursorPosition_.y += cursorVelocity_.y;
-			//isCursorMovementEnabled_ = false;
-		}
-		else if (input_->IsPushKeyEnter(DIK_W))
-		{
-			cursorPosition_.y -= cursorVelocity_.y;
-			//isCursorMovementEnabled_ = false;
+		if (isCursorMovementEnabled_) {
+			if (input_->IsPushKeyEnter(DIK_S)) {
+				cursorPosition_.y += cursorVelocity_.y;
+				isCursorMovementEnabled_ = false;
+			}
+			else if (input_->IsPushKeyEnter(DIK_W))
+			{
+				cursorPosition_.y -= cursorVelocity_.y;
+				isCursorMovementEnabled_ = false;
+			}
 		}
 
-		const float kPosMinY = 0.0f;
-		const float kPosMaxY = 200.0f;
+		
+
+		const float kPosMinY = -40.0f;
+		const float kPosMaxY = 160.0f;
 
 		cursorPosition_.y = std::clamp(cursorPosition_.y, kPosMinY, kPosMaxY);
 
@@ -728,14 +734,14 @@ void GamePlayScene::Pause() {
 		yajiSprite_->SetPosition(cursorPosition_);
 
 		//ゲームタイトル画面
-		if (cursorPosition_.y == 0.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE)))
+		if (cursorPosition_.y == -40.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE)))
 		{
 			isFadeOut_ = true;
 			nextScene_ = kTitle;
 		}
 
 		//セレクト画面
-		if (cursorPosition_.y == 100.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE))) {
+		if (cursorPosition_.y == 60.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE))) {
 			isFadeOut_ = true;
 			nextScene_ = kSelect;
 		}
@@ -744,12 +750,12 @@ void GamePlayScene::Pause() {
 		if (rule_ && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
 			rule_ = false;
 		}
-		else if (cursorPosition_.y == 200.0f && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+		else if (cursorPosition_.y == 120.0f && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
 			rule_ = true;
 		}
 
 	}
 	else {
-		cursorPosition_.y = 0.0f;
+		cursorPosition_.y = -40.0f;
 	}
 }
