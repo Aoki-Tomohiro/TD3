@@ -16,7 +16,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = -10.0f;
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.UpdateMatrixFromQuaternion();
 
@@ -42,7 +42,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,2.0f,1.0f}
+	.max{1.0f,3.0f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);
@@ -112,7 +112,7 @@ void Player::Update()
 			if (isLanded_)
 			{
 				//走りアニメーション
-				animationNumber_ = 3;
+				animationNumber_ = 4;
 			}
 		}
 		//移動していないときは直立アニメーション
@@ -121,14 +121,14 @@ void Player::Update()
 			//着地しているとき
 			if (isLanded_)
 			{
-				animationNumber_ = 1;
+				animationNumber_ = 2;
 			}
 		}
 		break;
 	case Behavior::kJump:
 		BehaviorJumpUpdate();
 		//ジャンプアニメーション
-		animationNumber_ = 2;
+		animationNumber_ = 3;
 		break;
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();

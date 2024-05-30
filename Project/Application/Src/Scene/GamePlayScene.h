@@ -111,8 +111,14 @@ private:
 	std::unique_ptr<Sprite> yajiSprite_ = nullptr;
 	
 	//ポーズ用スプライト
+	std::unique_ptr<Sprite> backSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseUISprite_ = nullptr;
+
+	//倍速の時のスプライト
+	std::unique_ptr<Sprite> doubleSprite_ = nullptr;
+	//巻き戻し時のスプライト
+	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
 
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;
@@ -140,13 +146,15 @@ private:
 	bool pause_ = false;
 	bool rule_;
 	//カーソルの座標
-	Vector2 cursorPosition_{ 0.0f,0.0f };
-	Vector2 cursorVelocity_{ 50.0f,100.0f };
+	Vector2 cursorPosition_{ -15.0f,-40.0f };
+	Vector2 cursorVelocity_{ 40.0f,100.0f };
 	//カーソルの移動のフラグ
 	bool isCursorMovementEnabled_ = true;
 	uint32_t cursorMovementEnableTimer_ = 0;
 
 	//スイッチ
 	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
+
+	Vector2 a = { 0.0f,0.0f };
 };
 
