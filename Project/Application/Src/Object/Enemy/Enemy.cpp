@@ -21,13 +21,13 @@ void Enemy::Initialize(Model* model, const Vector3& position)
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.quaternion_ = destinationQuaternion_;
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,2.0f,1.0f}
+	.max{1.0f,3.0f,1.0f}
 	};
 	//衝突属性を設定
 	SetAABB(aabb);
@@ -137,7 +137,7 @@ void Enemy::Update()
 	}
 	
 	ImGui::Text("MapEnemyPos %d", map[int(enemyPosition_.x)][int(enemyPosition_.y)]);
-	ImGui::Text("MapEnemyPos-1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) - 1]);
+	ImGui::Text("MapEnemyPos+1 %d", map[int(enemyPosition_.x)][int(enemyPosition_.y) +1]);
 	ImGui::DragFloat3("worldPos", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("velocity", &velocity_.x, 0.1f);
 	ImGui::Text("%d", blockHit_);
@@ -383,7 +383,7 @@ void Enemy::BehaviorRootUpdate() {
 
 void Enemy::BehaviorJumpInitialize()
 {
-	const float kJumpFirstSpeed = 0.8f;
+	const float kJumpFirstSpeed =1.0f;
 	velocity_.y = kJumpFirstSpeed;
 	model_->GetAnimation()->SetAnimationTime(0.0f);
 	model_->GetAnimation()->SetLoop(false);
@@ -427,7 +427,7 @@ void Enemy::BehaviorJumpUpdate()
 {
 	//velocity_.x = 0.0f;
 	worldTransform_.translation_ += velocity_;
-	float kGravityAcceleration = 0.05f;
+	float kGravityAcceleration = 0.06f;
 	if (isDoubleSpeed_)
 	{
 		kGravityAcceleration *= 4.0f;
@@ -636,10 +636,11 @@ void Enemy::DistanceFunction() {
 
 				
 
-					for (int x = 1; x <= 3; x++) {
-						if (playerPosition_.y <= enemyPosition_.y) {
-							if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 ) {
-								if (map[int(enemyPosition_.x) + 2][int(enemyPosition_.y - 3)] == 0) {
+					for (int x = 1; x < 5; x++) {
+						if (map[int(enemyPosition_.x)][int(enemyPosition_.y) + 1] == 10 || int(enemyPosition_.y) == 23) {
+
+							if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
+								if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 5)] == 0 && map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 3 ) {
 									jump_ = true;
 									dir_ = 1;
 								}
@@ -648,25 +649,23 @@ void Enemy::DistanceFunction() {
 									dir_ = 0;
 								}
 								break;
-								
+
 							}
-							if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
-								if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0) {
+							if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
+								if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 5)] == 0 && map[int(enemyPosition_.x)][int(enemyPosition_.y)] != 3 && map[int(enemyPosition_.x)][int(enemyPosition_.y) - 1] != 3) {
 									jump_ = true;
 									dir_ = 2;
-									
+
 								}
 								else {
 									jump_ = false;
 									dir_ = 0;
-									
+
 								}
 								break;
 							}
+
 						}
-
-						
-
 
 					}
 

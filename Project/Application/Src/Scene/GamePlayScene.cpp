@@ -94,7 +94,7 @@ void GamePlayScene::Finalize()
 void GamePlayScene::Update()
 {
 	//ポーズメニュ
-	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_0))
+	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_P))
 	{
 		if (!pause_) {
 			pause_ = true;
@@ -354,6 +354,7 @@ void GamePlayScene::Update()
 		}
 
 		//プレイヤーの攻撃が終了したらリセット
+		
 		if (isReset)
 		{
 			//逆再生のフラグを立てる
@@ -366,7 +367,7 @@ void GamePlayScene::Update()
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
-
+		
 	}
   	
 	//ポーズ

@@ -109,7 +109,7 @@ private:
 	float gravity_ = 0.05f;
 
 	//ジャンプの初速度
-	float jumpFirstSpeed_ = 0.8f;
+	float jumpFirstSpeed_ = 1.0f;
 
 	//武器
 	std::unique_ptr<Weapon> weapon_ = nullptr;

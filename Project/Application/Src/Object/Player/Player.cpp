@@ -16,7 +16,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_.y = -10.0f;
-	worldTransform_.scale_ = { 2.0f,2.0f,2.0f };
+	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.UpdateMatrixFromQuaternion();
 
@@ -42,7 +42,7 @@ void Player::Initialzie(std::vector<Model*> models)
 	//衝突判定の初期化
 	AABB aabb = {
 	.min{-1.0f,-1.0f,-1.0f},
-	.max{1.0f,2.0f,1.0f}
+	.max{1.0f,3.0f,1.0f}
 	};
 	SetAABB(aabb);
 	SetCollisionAttribute(kCollisionAttributePlayer);
