@@ -84,6 +84,10 @@ void GamePlayScene::Initialize()
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
+
+	//Switchの生成
+	switchManager_ = std::make_unique<SwitchManager>();
+	switchManager_->Initialize(currentStageNumber);
 }
 
 void GamePlayScene::Finalize()
@@ -151,6 +155,9 @@ void GamePlayScene::Update()
 		//ブロックの更新
 		blockManager_->Update();
 
+		//スイッチの更新
+		switchManager_->Update();
+
 		//敵にブロックの情報を渡す
 		const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 		for (const std::unique_ptr<Block>& block : blocks)
@@ -199,6 +206,17 @@ void GamePlayScene::Update()
 		for (const std::unique_ptr<Block>& block : blocks)
 		{
 			collisionManager_->SetColliderList(block.get());
+		}
+		//スイッチ
+		const std::vector<std::unique_ptr<Switch>>& switches = switchManager_->GetSwitches();
+		for (const std::unique_ptr<Switch>& Switch : switches)
+		{
+			collisionManager_->SetColliderList(Switch.get());
+			Wall* wall = Switch->GetWall();
+			if (wall->GetIsActive())
+			{
+				collisionManager_->SetColliderList(wall);
+			}
 		}
 		//コピー
 		const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
@@ -419,6 +437,9 @@ void GamePlayScene::Draw()
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
+
+	//スイッチの描画
+	switchManager_->Draw(camera_);
 
 	//コピーの描画
 	copyManager_->Draw(camera_);

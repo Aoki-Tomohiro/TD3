@@ -24,12 +24,28 @@ void Wall::Initialize(const Vector3& position, const Vector3& scale)
 
 void Wall::Update()
 {
-	//衝突判定の初期化
+	//衝突判定の設定
 	AABB aabb = {
 	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
 	.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z},
 	};
 	SetAABB(aabb);
+
+	//色を変える
+	if (isActive_)
+	{
+		model_->GetMaterial(1)->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	}
+	else
+	{
+		model_->GetMaterial(1)->SetColor({ 1.0f,1.0f,1.0f,0.25f });
+	}
+
+	//編集中なら
+	if (isEdit_)
+	{
+		model_->GetMaterial(1)->SetColor({ 1.0f,0.5f,0.0f,1.0f });
+	}
 
 	//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
@@ -37,11 +53,8 @@ void Wall::Update()
 
 void Wall::Draw(const Camera& camera)
 {
-	if (isActive_)
-	{
-		//モデルの描画
-		model_->Draw(worldTransform_, camera);
-	}
+	//モデルの描画
+	model_->Draw(worldTransform_, camera);
 }
 
 void Wall::OnCollision(Collider* collider)

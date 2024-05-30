@@ -51,13 +51,21 @@ void SwitchManager::Update()
 			//壁のスケールを取得
 			Vector3 wallScale = Switch->GetWallScale();
 
+			//スイッチのタイプを取得
+			Switch::Type type = Switch->GetType();
+
 			//座標とスケールを変更
 			ImGui::DragFloat3("SwitchPosition", &switchPosition.x, 0.1f);
 			ImGui::DragFloat3("WallPosition", &wallPosition.x, 0.1f);
 			ImGui::DragFloat3("WallScale", &wallScale.x, 0.1f);
+			//スイッチのタイプを選択するコンボボックス
+			const char* types[] = { "Appearance", "Disappearance" };
+			static int selectedItem = static_cast<int>(type);
+			ImGui::Combo("Type", &selectedItem, types, IM_ARRAYSIZE(types));
+			type = static_cast<Switch::Type>(selectedItem);
 
-			//色を変更
-			Switch->SetColor({ 1.0f,0.5f,0.0f,1.0f }, { 1.0f,0.5f,0.0f,1.0f });
+			//編集中にする
+			Switch->SetIsEdit(true);
 
 			//座標を設定
 			Switch->SetSwitchPosition(switchPosition);
@@ -67,6 +75,9 @@ void SwitchManager::Update()
 
 			//壁のスケールを設定
 			Switch->SetWallScale(wallScale);
+
+			//スイッチのタイプを設定
+			Switch->SetType(type);
 
 			// 削除ボタンを追加
 			if (ImGui::Button("Delete"))
@@ -78,8 +89,8 @@ void SwitchManager::Update()
 		}
 		else
 		{
-			//色を変更
-			Switch->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f }, { 1.0f,0.5f,0.0f,1.0f });
+			//編集解除
+			Switch->SetIsEdit(false);
 		}
 
 		//IDをインクリメント
@@ -95,7 +106,7 @@ void SwitchManager::Update()
 	//ブロックの追加
 	if (ImGui::Button("AddSwitch"))
 	{
-		AddSwitch({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f });
+		AddSwitch({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f }, Switch::Type::APPEARANCE);
 	}
 
 	//保存
@@ -116,10 +127,10 @@ void SwitchManager::Draw(const Camera& camera)
 	}
 }
 
-void SwitchManager::AddSwitch(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale)
+void SwitchManager::AddSwitch(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Switch::Type type)
 {
 	Switch* newSwitch = new Switch();
-	newSwitch->Initialize(switchPosition, wallPosition, wallScale);
+	newSwitch->Initialize(switchPosition, wallPosition, wallScale, type);
 	switches_.push_back(std::unique_ptr<Switch>(newSwitch));
 }
 
@@ -140,6 +151,10 @@ void SwitchManager::SaveData()
 		//jsonオブジェクトの登録
 		const std::string ItemName = "Switch" + std::to_string(id);
 		root[groupName][ItemName] = nlohmann::json::object();
+
+		//スイッチのタイプ
+		Switch::Type type = Switch->GetType();
+		root[groupName][ItemName]["Type"] = type;
 
 		//スイッチの座標
 		Vector3 switchPosition = Switch->GetSwitchPosition();
@@ -238,18 +253,19 @@ void SwitchManager::LoadFile()
 	assert(itGroup != root.end());
 
 	// 各ブロックデータの処理
-	for (auto& [blockName, blockData] : itGroup->items())
+	for (auto& [switchName, switchData] : itGroup->items())
 	{
 		// ブロック名が"Block"で始まることを確認
-		if (blockName.find("Switch") == 0)
+		if (switchName.find("Switch") == 0)
 		{
 			// ブロックの位置とスケールを取得
-			Vector3 switchPosition = Vector3(blockData["SwitchPosition"][0], blockData["SwitchPosition"][1], blockData["SwitchPosition"][2]);
-			Vector3 wallPosition = Vector3(blockData["WallPosition"][0], blockData["WallPosition"][1], blockData["WallPosition"][2]);
-			Vector3 wallScale = Vector3(blockData["WallScale"][0], blockData["WallScale"][1], blockData["WallScale"][2]);
+			Switch::Type type = static_cast<Switch::Type>(switchData["Type"]);
+			Vector3 switchPosition = Vector3(switchData["SwitchPosition"][0], switchData["SwitchPosition"][1], switchData["SwitchPosition"][2]);
+			Vector3 wallPosition = Vector3(switchData["WallPosition"][0], switchData["WallPosition"][1], switchData["WallPosition"][2]);
+			Vector3 wallScale = Vector3(switchData["WallScale"][0], switchData["WallScale"][1], switchData["WallScale"][2]);
 
 			// ブロックの追加
-			AddSwitch(switchPosition, wallPosition, wallScale);
+			AddSwitch(switchPosition, wallPosition, wallScale, type);
 		}
 	}
 }

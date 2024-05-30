@@ -243,6 +243,7 @@ void Player::Reset()
 	movementRestrictionTimer_ = movementRestrictionTime_;
 	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
 	models_[0]->GetMaterial(0)->SetColor(color);
+	behaviorRequest_ = Behavior::kRoot;
 }
 
 void Player::OnCollision(Collider* collider)

@@ -1,6 +1,7 @@
 #include "Switch.h"
+#include "Engine/Math/MathFunction.h"
 
-void Switch::Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale)
+void Switch::Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Type type)
 {
 	//モデルの生成
 	model_.reset(ModelManager::Create());
@@ -13,6 +14,9 @@ void Switch::Initialize(const Vector3& switchPosition, const Vector3& wallPositi
 	//壁の生成
 	wall_ = std::make_unique<Wall>();
 	wall_->Initialize(wallPosition, wallScale);
+
+	//スイッチの種類を設定
+	type_ = type;
 
 	//衝突判定の初期化
 	AABB aabb = {
@@ -34,14 +38,46 @@ void Switch::Update()
 	//壁の更新
 	wall_->Update();
 
-	//押されていたら壁を出す
-	if (isPressed_)
+	switch (type_)
 	{
-		wall_->SetIsActive(true);
+	//出現壁の場合
+	case Type::APPEARANCE:
+		if (isPressed_)
+		{
+			wall_->SetIsActive(true);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.0f, 0.1f);
+		}
+		else
+		{
+			wall_->SetIsActive(false);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.2f, 0.1f);
+		}
+		break;
+	//消失壁の場合
+	case Type::DISAPPEARANCE:
+		if (isPressed_)
+		{
+			wall_->SetIsActive(false);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.0f, 0.1f);
+		}
+		else
+		{
+			wall_->SetIsActive(true);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.2f, 0.1f);
+		}
+		break;
+	}
+
+	//色を変更
+	if (isEdit_)
+	{
+		model_->GetMaterial(1)->SetColor({ 1.0f,0.5f,0.0f,1.0f });
+		wall_->SetIsEdit(true);
 	}
 	else
 	{
-		wall_->SetIsActive(false);
+		model_->GetMaterial(1)->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+		wall_->SetIsEdit(false);
 	}
 
 	//フラグを初期化
@@ -70,10 +106,4 @@ const Vector3 Switch::GetWorldPosition() const
 	worldPosition.y = worldTransform_.matWorld_.m[3][1];
 	worldPosition.z = worldTransform_.matWorld_.m[3][2];
 	return worldPosition;
-}
-
-void Switch::SetColor(const Vector4& switchColor, const Vector4& wallColor)
-{
-	model_->GetMaterial(0)->SetColor(switchColor);
-	wall_->SetColor(wallColor);
 }

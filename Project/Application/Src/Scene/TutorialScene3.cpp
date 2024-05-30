@@ -73,6 +73,10 @@ void TutorialScene3::Initialize()
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
 	numberSprite_.reset(Sprite::Create("Numbers/3.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
+
+	//Switchの生成
+	switchManager_ = std::make_unique<SwitchManager>();
+	switchManager_->Initialize(2);
 }
 
 void TutorialScene3::Finalize()
@@ -124,6 +128,9 @@ void TutorialScene3::Update()
 	//ブロックの更新
 	blockManager_->Update();
 
+	//スイッチの更新
+	switchManager_->Update();
+
 	//敵にブロックの情報を渡す
 	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 	for (const std::unique_ptr<Block>& block : blocks)
@@ -172,6 +179,17 @@ void TutorialScene3::Update()
 	for (const std::unique_ptr<Block>& block : blocks)
 	{
 		collisionManager_->SetColliderList(block.get());
+	}
+	//スイッチ
+	const std::vector<std::unique_ptr<Switch>>& switches = switchManager_->GetSwitches();
+	for (const std::unique_ptr<Switch>& Switch : switches)
+	{
+		collisionManager_->SetColliderList(Switch.get());
+		Wall* wall = Switch->GetWall();
+		if (wall->GetIsActive())
+		{
+			collisionManager_->SetColliderList(wall);
+		}
 	}
 	//コピー
 	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
@@ -342,6 +360,9 @@ void TutorialScene3::Draw()
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
+
+	//スイッチの描画
+	switchManager_->Draw(camera_);
 
 	//コピーの描画
 	copyManager_->Draw(camera_);

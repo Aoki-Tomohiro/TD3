@@ -26,11 +26,11 @@ public:
 
 	const Vector3& GetScale() const { return worldTransform_.scale_; };
 
-	void SetColor(const Vector4& color) { model_->GetMaterial(0)->SetColor(color); };
-
 	const bool GetIsActive() const { return isActive_; };
 
 	void SetIsActive(const bool isActive) { isActive_ = isActive; };
+
+	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
 
 private:
 	std::unique_ptr<Model> model_ = nullptr;
@@ -38,5 +38,7 @@ private:
 	WorldTransform worldTransform_{};
 
 	bool isActive_ = false;
+
+	bool isEdit_ = false;
 };
 

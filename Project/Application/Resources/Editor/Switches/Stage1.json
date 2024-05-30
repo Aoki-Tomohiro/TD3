@@ -1,21 +1,3 @@
 {
-    "Stage1": {
-        "Switch0": {
-            "SwitchPosition": [
-                5.0,
-                -10.0,
-                0.0
-            ],
-            "WallPosition": [
-                22.0,
-                -10.0,
-                0.0
-            ],
-            "WallScale": [
-                1.0,
-                10.0,
-                1.0
-            ]
-        }
-    }
+    "Stage1": {}
 }

@@ -10,7 +10,7 @@ public:
 
 	void Draw(const Camera& camera);
 
-	void AddSwitch(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale);
+	void AddSwitch(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Switch::Type type);
 
 	const std::vector<std::unique_ptr<Switch>>& GetSwitches() { return switches_; };
 

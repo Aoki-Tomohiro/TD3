@@ -8,6 +8,7 @@
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
 #include "Application/Src/Object/Score/Score.h"
+#include "Application/Src/Object/Switch/SwitchManager.h"
 
 class TutorialScene3 : public IScene
 {
@@ -99,4 +100,7 @@ private:
 	bool isFadeOut_ = false;
 	bool over_ = false;
 	float timer_ = 0.0f;
+
+	//スイッチ
+	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
 };

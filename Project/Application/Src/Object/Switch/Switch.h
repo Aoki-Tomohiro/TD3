@@ -6,7 +6,12 @@
 class Switch : public Collider
 {
 public:
-	void Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale);
+	enum class Type {
+		APPEARANCE,
+		DISAPPEARANCE,
+	};
+
+	void Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Type type);
 
 	void Update();
 
@@ -30,7 +35,11 @@ public:
 
 	void SetWallScale(const Vector3& scale) { wall_->SetScale(scale); };
 
-	void SetColor(const Vector4& switchColor, const Vector4& wallColor);
+	const Type GetType() const { return type_; };
+
+	void SetType(const Type switchType) { type_ = switchType; }
+
+	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
 
 	Wall* GetWall() const { return wall_.get(); };
 
@@ -41,7 +50,13 @@ private:
 
 	std::unique_ptr<Wall> wall_ = nullptr;
 
+	//スイッチのタイプ
+	Type type_ = Type::APPEARANCE;
+
 	//踏まれているか
 	bool isPressed_ = false;
+
+	//編集中か
+	bool isEdit_ = false;
 };
 
