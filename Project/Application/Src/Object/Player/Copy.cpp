@@ -150,7 +150,7 @@ void Copy::Draw(const Camera& camera)
 	}
 	
 	//武器の描画
-	weapon_->Draw(camera);
+	//weapon_->Draw(camera);
 }
 
 void Copy::Reset()
