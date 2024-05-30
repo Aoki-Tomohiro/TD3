@@ -9,6 +9,7 @@
 #include "Application/Src/Object/BackGround/BackGround.h"
 #include "Application/Src/Object/FollowCamera/FollowCamera.h"
 #include "Application/Src/Object/Score/Score.h"
+#include "Application/Src/Object/Switch/SwitchManager.h"
 
 class TutorialScene1 : public IScene
 {
@@ -83,5 +84,8 @@ private:
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
 	float timer_ = 0.0f;
+
+	//スイッチ
+	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
 };
 

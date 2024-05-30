@@ -74,6 +74,10 @@ void TutorialScene1::Initialize()
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
 	numberSprite_.reset(Sprite::Create("Numbers/1.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
+
+	//Switchの生成
+	switchManager_ = std::make_unique<SwitchManager>();
+	switchManager_->Initialize(0);
 }
 
 void TutorialScene1::Finalize()
@@ -87,6 +91,9 @@ void TutorialScene1::Update()
 
 	//ブロックの更新
 	blockManager_->Update();
+
+	//スイッチの更新
+	switchManager_->Update();
 
 	//敵の更新
 	enemyManager_->Update();
@@ -128,6 +135,17 @@ void TutorialScene1::Update()
 	for (const std::unique_ptr<Block>& block : blockManager_->GetBlocks())
 	{
 		collisionManager_->SetColliderList(block.get());
+	}
+	//スイッチ
+	const std::vector<std::unique_ptr<Switch>>& switches = switchManager_->GetSwitches();
+	for (const std::unique_ptr<Switch>& Switch : switches)
+	{
+		collisionManager_->SetColliderList(Switch.get());
+		Wall* wall = Switch->GetWall();
+		if (wall->GetIsActive())
+		{
+			collisionManager_->SetColliderList(wall);
+		}
 	}
 	//衝突判定
 	collisionManager_->CheckAllCollisions();
@@ -203,6 +221,9 @@ void TutorialScene1::Draw()
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
+
+	//スイッチの描画
+	switchManager_->Draw(camera_);
 
 	//背景の描画
 	backGround_->Draw(camera_);

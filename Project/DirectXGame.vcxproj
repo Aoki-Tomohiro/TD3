@@ -32,6 +32,9 @@
     <ClCompile Include="Application\Src\Object\Player\Copy.cpp" />
     <ClCompile Include="Application\Src\Object\Player\Weapon.cpp" />
     <ClCompile Include="Application\Src\Object\Score\Score.cpp" />
+    <ClCompile Include="Application\Src\Object\Switch\Switch.cpp" />
+    <ClCompile Include="Application\Src\Object\Switch\SwitchManager.cpp" />
+    <ClCompile Include="Application\Src\Object\Switch\Wall.cpp" />
     <ClCompile Include="Application\Src\Scene\GameClearScene.cpp" />
     <ClCompile Include="Application\Src\Scene\GameOverScene.cpp" />
     <ClCompile Include="Application\Src\Scene\GamePlayScene.cpp" />
@@ -133,6 +136,9 @@
     <ClInclude Include="Application\Src\Object\Player\Copy.h" />
     <ClInclude Include="Application\Src\Object\Player\Weapon.h" />
     <ClInclude Include="Application\Src\Object\Score\Score.h" />
+    <ClInclude Include="Application\Src\Object\Switch\Switch.h" />
+    <ClInclude Include="Application\Src\Object\Switch\SwitchManager.h" />
+    <ClInclude Include="Application\Src\Object\Switch\Wall.h" />
     <ClInclude Include="Application\Src\Scene\GameClearScene.h" />
     <ClInclude Include="Application\Src\Scene\GameOverScene.h" />
     <ClInclude Include="Application\Src\Scene\GamePlayScene.h" />

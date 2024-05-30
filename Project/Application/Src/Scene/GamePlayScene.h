@@ -15,6 +15,7 @@
 #include "Application/Src/Object/Player/CopyManager.h"
 #include "Application/Src/Object/BackGround/BackGround.h"
 #include "Application/Src/Object/Score/Score.h"
+#include "Application/Src/Object/Switch/SwitchManager.h"
 
 enum changeScene
 {
@@ -150,6 +151,9 @@ private:
 	//カーソルの移動のフラグ
 	bool isCursorMovementEnabled_ = true;
 	uint32_t cursorMovementEnableTimer_ = 0;
+
+	//スイッチ
+	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
 
 	Vector2 a = { 0.0f,0.0f };
 };

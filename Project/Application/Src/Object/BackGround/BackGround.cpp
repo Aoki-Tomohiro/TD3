@@ -60,8 +60,9 @@ void BackGround::Update()
 	//スプライトの座標を計算
 	float currentPlayerPosition = playerPosition_.x + 36.0f;
 	float easingParameter = 1.0f / (72.0f / currentPlayerPosition);
-	backGroundSpritePosition_[2].x = Mathf::Lerp(0.0f, -80.0f, easingParameter);
-	backGroundSpritePosition_[3].x = Mathf::Lerp(0.0f, -160.0f, easingParameter);
+	backGroundSpritePosition_[1].x = Mathf::Lerp(0.0f, -10.0f, easingParameter);
+	backGroundSpritePosition_[2].x = Mathf::Lerp(-30.0f, -50.0f, easingParameter);
+	backGroundSpritePosition_[3].x = Mathf::Lerp(-70.0f, -150.0f, easingParameter);
 	for (uint32_t i = 0; i < backGroundSprite_.size(); i++)
 	{
 		backGroundSprite_[i]->SetPosition(backGroundSpritePosition_[i]);
