@@ -34,6 +34,8 @@ public:
 
 	void SetIsHit(const bool isHit) { isHit_ = isHit; };
 
+	const uint32_t GetHitCount() const { return hitCount_; };
+
 private:
 	void ApplyGlobalVariables();
 
@@ -53,5 +55,7 @@ private:
 	Vector3 offset_{ 0.0f,1.0f,3.0f };
 
 	bool isHit_ = false;
+
+	uint32_t hitCount_ = 0;
 };
 

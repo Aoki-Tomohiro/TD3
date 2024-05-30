@@ -258,13 +258,18 @@ void GamePlayScene::Update()
 			{
 				isFadeOut_ = true;
 				nextScene_ = kClear;
+				copyManager_->SetIsDoubleSpeed(false);
+				enemyManager_->SetIsDoubleSpeed(false);
 				GameClearScene::SetTimeCount(int(dislikes_));
+				GameClearScene::SetScore(score_->GetScore());
 			}
 
 			if (isOver)
 			{
 				isFadeOut_ = true;
 				nextScene_ = kOver;
+				copyManager_->SetIsDoubleSpeed(false);
+				enemyManager_->SetIsDoubleSpeed(false);
 			}
 		}
 

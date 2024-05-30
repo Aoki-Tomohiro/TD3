@@ -15,6 +15,8 @@ public:
 
 	void Reset() { score_ = 0; };
 
+	const int GetScore() const { return score_; };
+
 private:
 	std::array<std::unique_ptr<Sprite>, 5> scoreSprites_{};
 
