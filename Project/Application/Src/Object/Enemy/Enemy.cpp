@@ -270,7 +270,7 @@ void Enemy::BehaviorRootUpdate() {
 	moveCount_--;
 	// エネミーの移動
 	if (velocity_.x == 0.0f &&path_.size() > 1) {
-
+		waitAnimationCoolTimer_ = 0;
 		//目的地の位置を次のノードの位置に
 		nextPosition_.x = float(path_[1]->x - 18) * 2;
 		nextPosition_.y = float(path_[1]->y - 18) * -2;
@@ -357,6 +357,11 @@ void Enemy::BehaviorRootUpdate() {
 	else
 	{
 		animationNumber_ = 1;
+		if (++waitAnimationCoolTimer_ > 60)
+		{
+			animationNumber_ = 0;
+			destinationQuaternion_ = { 0.0f,1.0f,0.0f,0.0f };
+		}
 	}
 
 	
@@ -387,7 +392,7 @@ void Enemy::BehaviorJumpInitialize()
 	velocity_.y = kJumpFirstSpeed;
 	model_->GetAnimation()->SetAnimationTime(0.0f);
 	model_->GetAnimation()->SetLoop(false);
-	animationNumber_ = 3;
+	animationNumber_ = 2;
 	float speed = 0.3f;
 	if (isDoubleSpeed_)
 	{

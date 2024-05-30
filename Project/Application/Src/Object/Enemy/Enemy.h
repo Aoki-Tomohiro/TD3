@@ -168,7 +168,8 @@ private:
 	//チュートリアルか
 	bool isTutorial_ = false;
 
-	uint32_t animationNumber_ = 1;
+	uint32_t animationNumber_ = 0;
+	uint32_t waitAnimationCoolTimer_ = 0;
 
 	//クォータニオン
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
