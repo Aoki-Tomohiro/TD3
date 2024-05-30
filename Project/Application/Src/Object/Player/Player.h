@@ -50,6 +50,8 @@ public:
 
 	bool GetIsMove() { return isMove_; }
 
+	void SetCutIn(bool flag) { cutIn_ = flag; }
+
 private:
 	enum class Behavior
 	{
@@ -161,5 +163,8 @@ private:
 	float DeleteTime = 1.0f;
 	std::unique_ptr <Model> particleModel_;
 	bool landing_;
+
+	//カットインフラグ
+	bool cutIn_;
 };
 

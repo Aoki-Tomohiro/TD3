@@ -94,6 +94,11 @@ void GamePlayScene::Initialize()
 	reversedSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
 	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
 
+	//スターとスプライト
+	TextureManager::Load("Tutorial.png");
+	stertSprite_.reset(Sprite::Create("Tutorial.png", { 1280.0f,360.0f }));
+	stertSprite_->SetAnchorPoint({ 0.5f,0.5f });
+
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
@@ -110,18 +115,22 @@ void GamePlayScene::Finalize()
 
 void GamePlayScene::Update()
 {
-	
+	//カットイン
+	CutIn();
 
 	//ポーズメニュ
 	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_P))
 	{
-		if (!pause_) {
-			pause_ = true;
+		if (!cutIn_) {
+			if (!pause_) {
+				pause_ = true;
+			}
+			else {
+				pause_ = false;
+				rule_ = false;
+			}
 		}
-		else {
-			pause_ = false;
-			rule_ = false;
-		}
+		
 
 
 	}
@@ -403,6 +412,8 @@ void GamePlayScene::Update()
 		
 	}
   	
+	
+	
 	//ポーズ
 	Pause();
 
@@ -418,12 +429,13 @@ void GamePlayScene::Update()
 		ImGui::Text("totalScore %d", totaScore_);
 		ImGui::TreePop();
 	}
-	ImGui::DragFloat2("A", &a.x);
+
 	ImGui::Text("%f", cursorPosition_.y);
 	ImGui::DragFloat2("SpritePositon[0]", &timeCountSpritePositions_[0].x);
 	ImGui::DragFloat2("SpritePositon[1]", &timeCountSpritePositions_[1].x);
 	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x,1.0f,1.0f,3.0f);
 	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x,1.0f,1.0f,3.0f);
+	ImGui::Text("stertSpritePos%f", stertPos_.x);
 	ImGui::End();
 }
 
@@ -435,8 +447,6 @@ void GamePlayScene::Draw()
 
 	//背景の描画
 	backGround_->DrawSprite();
-
-	
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -505,10 +515,12 @@ void GamePlayScene::Draw()
 		yajiSprite_->Draw();
 		pauseSprite_->Draw();
 	}
-	else {
-
-	}
+	
 	pauseUISprite_->Draw();
+
+	//スターとスプライト
+	stertSprite_->Draw();
+
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
@@ -583,7 +595,10 @@ void GamePlayScene::Reset()
 
 void GamePlayScene::CalculateRating() {
 	//毎秒今いる敵の数*1ずつ減っていく
-	dislikes_ += (1.0f / 60.0f);
+	if (!cutIn_) {
+		dislikes_ += (1.0f / 60.0f);
+	}
+	
 
 	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
@@ -799,4 +814,22 @@ void GamePlayScene::Pause() {
 	else {
 		cursorPosition_.y = -40.0f;
 	}
+}
+
+void GamePlayScene::CutIn() {
+
+	if (stertPos_.x > 641) {
+		stertPos_.x = Mathf::Lerp(stertPos_.x, 640.0f, 0.1f);
+	}
+	else {
+		stertPos_.x = Mathf::Lerp(stertPos_.x, -640.0f, 0.1f);
+	}
+	
+	stertSprite_->SetPosition(stertPos_);
+
+	if (stertPos_.x < -600) {
+		cutIn_ = false;
+	}
+
+	player_->SetCutIn(cutIn_);
 }

@@ -237,40 +237,25 @@ void StageSelectScene::Update() {
 		}
 	}
 
-	if (input_->IsControllerConnected())
-	{
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
+	if (!isFadeOut_ && !isFadeIn_) {
+		if (input_->IsControllerConnected())
 		{
-			if (selectNumber_ == 0)
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A))
 			{
-				sceneManager_->ChangeScene("TutorialScene1");
+
+				isFadeOut_ = true;
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			}
-			else
-			{
-				preSelectNumber_ = selectNumber_;
-				StageSelectScene::stageNumber_ = selectNumber_ + 2;
-				sceneManager_->ChangeScene("GamePlayScene");
-			}
+		}
+
+		if (input_->IsPushKeyEnter(DIK_SPACE))
+		{
+
 			isFadeOut_ = true;
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
-
-	if (input_->IsPushKeyEnter(DIK_SPACE))
-	{
-		if (selectNumber_ == 0)
-		{
-			sceneManager_->ChangeScene("TutorialScene1");
-		}
-		else
-		{
-			preSelectNumber_ = selectNumber_;
-			StageSelectScene::stageNumber_ = selectNumber_ + 2;;
-			sceneManager_->ChangeScene("GamePlayScene");
-		}
-		isFadeOut_ = true;
-		audio_->PlayAudio(decisionHandle_, false, 0.4f);
-	}
+	
 
 
 	ImGui::Begin("SelectScene");
@@ -434,7 +419,7 @@ void StageSelectScene::Transition() {
 			else
 			{
 				preSelectNumber_ = selectNumber_;
-				StageSelectScene::stageNumber_ = selectNumber_ + 1;
+				StageSelectScene::stageNumber_ = selectNumber_ + 2;
 				sceneManager_->ChangeScene("GamePlayScene");
 			}
 			timer_ = 0.0f;
