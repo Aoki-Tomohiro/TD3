@@ -92,6 +92,7 @@ void TutorialScene1::Update()
 	enemyManager_->Update();
 
 	//背景の更新
+	backGround_->SetPlayerPosition(player_->GetWorldPosition());
 	backGround_->Update();
 
 	//FollowCameraの更新

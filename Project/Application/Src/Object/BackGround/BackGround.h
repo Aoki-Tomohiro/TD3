@@ -21,14 +21,18 @@ public:
 
 	void DrawSprite();
 
+	void SetPlayerPosition(const Vector3& playerPosition) { playerPosition_ = playerPosition; };
+
 private:
 	std::vector<Model*> models_{};
 
-	std::unique_ptr<Sprite> sprite_ = nullptr;
+	static const int kMaxBackGround = 4;
 
-	Vector2 spritePosition_{ 0.0f,-112.0f };
+	std::array<std::unique_ptr<Sprite>, kMaxBackGround> backGroundSprite_{};
 
-	Vector2 spriteScale_{1.0f,1.0f};
+	std::array<Vector2, kMaxBackGround> backGroundSpritePosition_{};
+
+	Vector3 playerPosition_{};
 
 	WorldTransform worldTransforms_[kCountOfParts]{};
 };
