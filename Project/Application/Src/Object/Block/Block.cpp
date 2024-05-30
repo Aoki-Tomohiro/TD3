@@ -1,21 +1,37 @@
 #include "Block.h"
+#include <numbers>
 
-void Block::Initialize(const Vector3& position, const Vector3& scale)
+void Block::Initialize(const Vector3& position, const Vector3& scale, const bool isGround)
 {
-	//モデルの初期化
-	model_.reset(ModelManager::Create());
+	isGround_ = isGround;
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.scale_ = scale;
 
-	//衝突判定の初期化
-	AABB aabb = {
-	.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
-	.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z},
-	};
-	SetAABB(aabb);
+	//モデルの初期化
+	if (isGround)
+	{
+		model_.reset(ModelManager::CreateFromModelFile("asiba.gltf", Opaque));
+		worldTransform_.rotation_.y = std::numbers::pi_v<float>;
+		//衝突判定の初期化
+		AABB aabb = {
+		.min{-50.0f,-5.0f,-8.0f},
+		.max{50.0f,5.0f,8.0f},
+		};
+		SetAABB(aabb);
+	}
+	else
+	{
+		model_.reset(ModelManager::Create());
+		//衝突判定の初期化
+		AABB aabb = {
+		.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
+		.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z},
+		};
+		SetAABB(aabb);
+	}
 
 	SetCollisionAttribute(kCollisionAttributeBlock);
 	SetCollisionMask(kCollisionMaskBlock);

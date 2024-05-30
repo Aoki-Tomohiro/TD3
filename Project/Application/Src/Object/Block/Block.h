@@ -6,7 +6,7 @@
 class Block : public Collider
 {
 public:
-	void Initialize(const Vector3& position, const Vector3& scale);
+	void Initialize(const Vector3& position, const Vector3& scale, const bool isGround);
 
 	void Update();
 
@@ -28,11 +28,23 @@ public:
 
 	const Vector3 GetWorldPosition() const override;
 
-	void SetColor(const Vector4& color) { model_->GetMaterial(1)->SetColor(color); };
+	void SetColor(const Vector4& color) { 
+		if (!isGround_)
+		{
+			model_->GetMaterial(1)->SetColor(color);
+		}
+		else
+		{
+			model_->GetMaterial(0)->SetColor(color);
+			model_->GetMaterial(1)->SetColor(color);
+		}
+	};
 
 private:
 	std::unique_ptr<Model> model_ = nullptr;
 
 	WorldTransform worldTransform_{};
+
+	bool isGround_ = false;
 };
 

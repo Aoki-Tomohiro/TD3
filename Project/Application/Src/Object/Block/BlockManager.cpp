@@ -16,7 +16,7 @@ void BlockManager::Initialize(Model* model, uint32_t stageNumber)
 	stageNumber_ = stageNumber;
 
 	//地面の追加
-	AddBlock({ 0.0f,-16.0f,0.0f }, { 50.0f,5.0f,8.0f });
+	AddBlock({ 0.0f,-16.0f,0.0f }, { 1.0f,1.0f,1.0f }, true);
 
 	//ファイル読み込み
 	LoadFile();
@@ -78,7 +78,9 @@ void BlockManager::Update()
 		else
 		{
 			//色を変更
-			block->SetColor({ 0.196f,0.196f,0.196f,1.0f });
+			/*block->SetColor({ 0.196f,0.196f,0.196f,1.0f });*/
+			/*block->SetColor({ 0.0f, 0.1059f, 0.4039f, 1.0f });*/
+			block->SetColor({ 0.0f, 0.047f, 0.196f, 1.0f });
 		}
 
 		//IDをインクリメント
@@ -94,7 +96,7 @@ void BlockManager::Update()
 	//ブロックの追加
 	if (ImGui::Button("AddBlock"))
 	{
-		AddBlock({ 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f });
+		AddBlock({ 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f }, false);
 	}
 
 	//保存
@@ -115,10 +117,10 @@ void BlockManager::Draw(const Camera& camera)
 	}
 }
 
-void BlockManager::AddBlock(const Vector3& position, const Vector3& scale)
+void BlockManager::AddBlock(const Vector3& position, const Vector3& scale, const bool isGround)
 {
 	Block* block = new Block();
-	block->Initialize(position, scale);
+	block->Initialize(position, scale, isGround);
 	blocks_.push_back(std::unique_ptr<Block>(block));
 	blockNum++;
 }
@@ -250,7 +252,7 @@ void BlockManager::LoadFile()
 			Vector3 scale = Vector3(blockData["Scale"][0], blockData["Scale"][1], blockData["Scale"][2]);
 
 			// ブロックの追加
-			AddBlock(position, scale);
+			AddBlock(position, scale, false);
 		}
 	}
 }
