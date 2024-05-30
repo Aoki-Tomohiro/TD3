@@ -365,7 +365,7 @@ void Player::BehaviorRootUpdate()
 	}
 
 	//スティックの入力が閾値を超えていたら速度を設定
-	if (std::abs(velocity_.x) > threshold && isMove_)
+	if (std::abs(velocity_.x) > threshold && isMove_ && !cutIn_)
 	{
 		//速度を設定
 		velocity_.x = Mathf::Normalize(velocity_).x * speed_;
@@ -456,27 +456,27 @@ void Player::BehaviorRootUpdate()
 	if (input_->IsControllerConnected())
 	{
 		//ジャンプ状態に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_ && isMove_)
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_ && isMove_ && !cutIn_)
 		{
 			behaviorRequest_ = Behavior::kJump;
 			worldTransform_.translation_.y += jumpFirstSpeed_;
 		}
 
 		//攻撃行動に変更
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X) && isLanded_ && isMove_)
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X) && isLanded_ && isMove_ && !cutIn_)
 		{
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
 
 	//キーボード入力
-	if (input_->IsPushKeyEnter(DIK_SPACE) && isLanded_ && isMove_)
+	if (input_->IsPushKeyEnter(DIK_SPACE) && isLanded_ && isMove_ && !cutIn_)
 	{
 		behaviorRequest_ = Behavior::kJump;
 		worldTransform_.translation_.y += jumpFirstSpeed_;
 	}
 
-	if (input_->IsPushKeyEnter(DIK_E) && isMove_)
+	if (input_->IsPushKeyEnter(DIK_E) && isMove_ && !cutIn_)
 	{
 		behaviorRequest_ = Behavior::kAttack;
 	}

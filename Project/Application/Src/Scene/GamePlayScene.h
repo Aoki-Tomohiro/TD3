@@ -50,6 +50,8 @@ public:
 
 	void Pause();
 
+	void CutIn();
+
 private:
 	
 	void CalculateRating();
@@ -119,6 +121,9 @@ private:
 	std::unique_ptr<Sprite> doubleSprite_ = nullptr;
 	//巻き戻し時のスプライト
 	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
+	//スタートスプライト
+	std::unique_ptr<Sprite> stertSprite_ = nullptr;
+	Vector2 stertPos_ = { 1920.0f,360.0f };
 
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;
@@ -152,6 +157,10 @@ private:
 	bool isCursorMovementEnabled_ = true;
 	uint32_t cursorMovementEnableTimer_ = 0;
 
+	//カットインフラグ
+	bool cutIn_ = true;
+
+	
 	//スイッチ
 	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
 
