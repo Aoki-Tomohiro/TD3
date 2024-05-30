@@ -2,6 +2,7 @@
 #include "Engine/Base/Renderer.h"
 #include "Engine/Base/TextureManager.h"
 #include "Engine/Base/ImGuiManager.h"
+#include "Engine/Math/MathFunction.h"
 #include <numbers>
 
 void BackGround::Initialize(std::vector<Model*> models)
@@ -9,9 +10,22 @@ void BackGround::Initialize(std::vector<Model*> models)
 	//モデルの初期化
 	models_ = models;
 
-	//スプライトの生成
-	TextureManager::Load("BackGround.png");
-	sprite_.reset(Sprite::Create("BackGround.png", { 0.0f,0.0f }));
+	//背景スプライトの作成
+	for (uint32_t i = 0; i < backGroundSprite_.size(); i++)
+	{
+		std::string textureName = "Back" + std::to_string(i + 1) + ".png";
+		if (i == 2)
+		{
+			backGroundSpritePosition_[i].x = -40.0f;
+		}
+		else if (i == 3)
+		{
+			backGroundSpritePosition_[i].x = -80.0f;
+		}
+		backGroundSpritePosition_[i].y = -140.0f;
+		TextureManager::Load(textureName);
+		backGroundSprite_[i].reset(Sprite::Create(textureName, backGroundSpritePosition_[i]));
+	}
 
 	//ワールドトランスフォームの初期化
 	for (uint32_t i = 0; i < kCountOfParts; ++i)
@@ -43,10 +57,15 @@ void BackGround::Update()
 	{
 		worldTransforms_[i].UpdateMatrixFromEuler();
 	}
-
-	//スプライトの座標を設定
-	sprite_->SetPosition(spritePosition_);
-	sprite_->SetScale(spriteScale_);
+	//スプライトの座標を計算
+	float currentPlayerPosition = playerPosition_.x + 36.0f;
+	float easingParameter = 1.0f / (72.0f / currentPlayerPosition);
+	backGroundSpritePosition_[2].x = Mathf::Lerp(0.0f, -80.0f, easingParameter);
+	backGroundSpritePosition_[3].x = Mathf::Lerp(0.0f, -160.0f, easingParameter);
+	for (uint32_t i = 0; i < backGroundSprite_.size(); i++)
+	{
+		backGroundSprite_[i]->SetPosition(backGroundSpritePosition_[i]);
+	}
 
 	ImGui::Begin("BackGround");
 	ImGui::DragFloat3("FrameTranslate", &worldTransforms_[kFrame].translation_.x, 0.1f);
@@ -55,8 +74,10 @@ void BackGround::Update()
 	ImGui::DragFloat3("MovieTranslate", &worldTransforms_[kMovie].translation_.x, 0.1f);
 	ImGui::DragFloat3("MovieRotate", &worldTransforms_[kMovie].rotation_.x, 0.01f);
 	ImGui::DragFloat3("MovieScale", &worldTransforms_[kMovie].scale_.x, 0.01f);
-	ImGui::DragFloat2("SpritePosition", &spritePosition_.x);
-	ImGui::DragFloat2("SpriteScale", &spriteScale_.x, 0.01f);
+	ImGui::DragFloat2("BackGroundPosition0", &backGroundSpritePosition_[0].x);
+	ImGui::DragFloat2("BackGroundPosition1", &backGroundSpritePosition_[1].x);
+	ImGui::DragFloat2("BackGroundPosition2", &backGroundSpritePosition_[2].x);
+	ImGui::DragFloat2("BackGroundPosition3", &backGroundSpritePosition_[3].x);
 	ImGui::End();
 }
 
@@ -70,5 +91,8 @@ void BackGround::Draw(const Camera& camera)
 
 void BackGround::DrawSprite()
 {
-	sprite_->Draw();
+	for (uint32_t i = 0; i < backGroundSprite_.size(); ++i)
+	{
+		backGroundSprite_[i]->Draw();
+	}
 }
