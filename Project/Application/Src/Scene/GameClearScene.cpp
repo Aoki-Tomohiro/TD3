@@ -6,6 +6,7 @@
 #include <Engine/Components/PostEffects/PostEffects.h>
 
 int GameClearScene::timeCount_ = 0;
+int GameClearScene::score_ = 0;
 
 void GameClearScene::Initialize() 
 {
@@ -26,18 +27,26 @@ void GameClearScene::Initialize()
 	TextureManager::Load("Scores/C.png");
 	scoreSprite_.reset(Sprite::Create("Scores/S.png", scoreSpritePosition_));
 
-	/*/数字のテクスチャの読み込み
+	//数字のテクスチャの読み込み
 	for (uint32_t i = 0; i < 10; i++)
 	{
 		std::string textureName = "Numbers/" + std::to_string(i) + ".png";
 		TextureManager::Load(textureName);
-	}*/
+	}
 	//コピーの数のスプライトの生成
 	timeCountSprites_[0].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[0]));
 	timeCountSprites_[1].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[1]));
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
+
+	//リザルトのスプライトの生成
+	for (uint32_t i = 0; i < resultSprites_.size(); i++)
+	{
+		resultSprites_[i].reset(Sprite::Create("Numbers/0.png", { 0.0f,0.0f }));
+		resultSprites_[i]->SetPosition({ -20.0f + float(i * 110.0f),100.0f });
+		resultSprites_[i]->SetScale({ 1.4f,1.4f });
+	}
 }
 
 void GameClearScene::Finalize() 
@@ -47,6 +56,19 @@ void GameClearScene::Finalize()
 
 void GameClearScene::Update() 
 {
+	//スコアのテクスチャを設定
+	int currentScore = score_;
+	resultSprites_[0]->SetTexture("Numbers/" + std::to_string(currentScore / 10000) + ".png");
+	currentScore %= 10000;
+	resultSprites_[1]->SetTexture("Numbers/" + std::to_string(currentScore / 1000) + ".png");
+	currentScore %= 1000;
+	resultSprites_[2]->SetTexture("Numbers/" + std::to_string(currentScore / 100) + ".png");
+	currentScore %= 100;
+	resultSprites_[3]->SetTexture("Numbers/" + std::to_string(currentScore / 10) + ".png");
+	currentScore %= 10;
+	resultSprites_[4]->SetTexture("Numbers/" + std::to_string(currentScore) + ".png");
+
+
 	//コピーの数のテクスチャを設定
 	int score = timeCount_;
 	if (score > 99)
@@ -120,6 +142,15 @@ void GameClearScene::Update()
 	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x);
 	ImGui::DragFloat2("ScoreSpritePosition", &scoreSpritePosition_.x);
 	ImGui::DragFloat2("ScoreSpriteSize", &scoreSpriteSize_.x);
+	//for (uint32_t i = 0; i < resultSprites_.size(); i++)
+	//{
+	//	std::string positionName = "ScorePosition" + std::to_string(i);
+	//	std::string scaleName = "ScoreScale" + std::to_string(i);
+	//	ImGui::DragFloat2(positionName.c_str(), &position_[i].x);
+	//	ImGui::DragFloat2(scaleName.c_str(), &scale_[i].x);
+	//	resultSprites_[i]->SetPosition(position_[i]);
+	//	resultSprites_[i]->SetScale(scale_[i]);
+	//}
 	ImGui::End();
 }
 
@@ -135,10 +166,15 @@ void GameClearScene::Draw()
 	//スコアのスプライトの描画
 	scoreSprite_->Draw();
 
-	//コピーの数の描画
-	for (uint32_t i = 0; i < 2; i++)
+	////コピーの数の描画
+	//for (uint32_t i = 0; i < 2; i++)
+	//{
+	//	timeCountSprites_[i]->Draw();
+	//}
+
+	for (uint32_t i = 0; i < resultSprites_.size(); i++)
 	{
-		timeCountSprites_[i]->Draw();
+		resultSprites_[i]->Draw();
 	}
 
 	//背景スプライト描画後処理

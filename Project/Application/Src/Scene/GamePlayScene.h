@@ -111,6 +111,7 @@ private:
 	
 	//ポーズ用スプライト
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
+	std::unique_ptr<Sprite> pauseUISprite_ = nullptr;
 
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;

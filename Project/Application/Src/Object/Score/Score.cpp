@@ -35,7 +35,7 @@ void Score::Update(Player* player, const std::vector<std::unique_ptr<Copy>>& cop
 		//プレイヤーの攻撃が当たっていなかったら
 		if (player->GetWeapon()->GetIsHit())
 		{
-			score_ += int(point * multiplier);
+			score_ += int(point * multiplier) * player->GetWeapon()->GetHitCount();
 		}
 	}
 	multiplier += 0.2f;
@@ -47,7 +47,7 @@ void Score::Update(Player* player, const std::vector<std::unique_ptr<Copy>>& cop
 		{
 			if (copy->GetIsEnemyDefeated())
 			{
-				score_ += int(point * multiplier);
+				score_ += int(point * multiplier) * copy->GetWeapon()->GetHitCount();
 			}
 		}
 		multiplier += 0.2f;

@@ -97,5 +97,6 @@ private:
 	//トランジションのフラグ
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
+	bool over_ = false;
 	float timer_ = 0.0f;
 };

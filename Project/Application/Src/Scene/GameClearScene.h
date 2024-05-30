@@ -25,6 +25,8 @@ public:
 
 	static void SetTimeCount(const int copyCount) { timeCount_ = copyCount; };
 
+	static void SetScore(const int score) { score_ = score; };
+
 	void Transition();
 private:
 	Renderer* renderer_ = nullptr;
@@ -50,6 +52,14 @@ private:
 	uint32_t decisionHandle_ = 0;
 
 	static int timeCount_;
+
+	static int score_;
+
+	std::array<std::unique_ptr<Sprite>, 5> resultSprites_{};
+
+	std::array<Vector2, 5> position_{};
+
+	std::array<Vector2, 5> scale_{};
 
 	//トランジションのフラグ
 	bool isFadeIn_ = true;

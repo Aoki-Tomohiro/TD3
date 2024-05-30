@@ -75,6 +75,8 @@ void GamePlayScene::Initialize()
 
 	TextureManager::Load("pause.png");
 	pauseSprite_.reset(Sprite::Create("pause.png", { 0.0f,0.0f }));
+	TextureManager::Load("pauseUI.png");
+	pauseUISprite_.reset(Sprite::Create("pauseUI.png", { 10.0f,50.0f }));
 
 	TextureManager::Load("yaji.png");
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
@@ -259,13 +261,18 @@ void GamePlayScene::Update()
 			{
 				isFadeOut_ = true;
 				nextScene_ = kClear;
+				copyManager_->SetIsDoubleSpeed(false);
+				enemyManager_->SetIsDoubleSpeed(false);
 				GameClearScene::SetTimeCount(int(dislikes_));
+				GameClearScene::SetScore(score_->GetScore());
 			}
 
 			if (isOver)
 			{
 				isFadeOut_ = true;
 				nextScene_ = kOver;
+				copyManager_->SetIsDoubleSpeed(false);
+				enemyManager_->SetIsDoubleSpeed(false);
 			}
 		}
 
@@ -453,9 +460,14 @@ void GamePlayScene::Draw()
 	//スコアの描画
 	score_->Draw();
 
+	pauseUISprite_->Draw();
+
 	if (pause_) {
 		yajiSprite_->Draw();
 		pauseSprite_->Draw();
+	}
+	else {
+
 	}
 
 	//前景スプライト描画後処理

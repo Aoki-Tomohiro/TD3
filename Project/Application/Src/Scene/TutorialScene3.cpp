@@ -211,12 +211,18 @@ void TutorialScene3::Update()
 
 	//ゲームクリアのフラグ
 	bool isClear = true;
+	bool isOver = true;
 	//敵が存在するとき
 	if (enemies.size() != 0)
 	{
 		//生きている敵がいるか確認する
 		for (const std::unique_ptr<Enemy>& enemy : enemies)
 		{
+			if (!enemy->GetIsGameOver())
+			{
+				isOver = false;
+			}
+
 			if (enemy->GetIsActive())
 			{
 				isClear = false;
@@ -226,6 +232,14 @@ void TutorialScene3::Update()
 		if (isClear)
 		{
 			isFadeOut_ = true;
+			copyManager_->SetIsDoubleSpeed(false);
+			enemyManager_->SetIsDoubleSpeed(false);
+		}
+
+		if (isOver)
+		{
+			isFadeOut_ = true;
+			over_ = true;
 		}
 
 		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
@@ -468,7 +482,14 @@ void TutorialScene3::Transition() {
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{
-			sceneManager_->ChangeScene("StageSelectScene");
+			if (over_) {
+				sceneManager_->ChangeScene("TutorialScene3");
+
+			}
+			else {
+				sceneManager_->ChangeScene("StageSelectScene");
+			}
+			
 			timer_ = 0.0f;
 		}
 	}

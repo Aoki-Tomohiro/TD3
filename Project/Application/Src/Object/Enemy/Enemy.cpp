@@ -98,7 +98,7 @@ void Enemy::Update()
 
 	//画面端に行ったら逃げる
 	if (isEscaping_) {
-
+		animationNumber_ = 3;
 		if (int(enemyPosition_.x) <= 0) {
 			worldTransform_.translation_.x -= 0.3f;
 		}
@@ -170,6 +170,10 @@ void Enemy::Reset()
 	isEscaping_ = false;
 	isResult_ = false;
 	isGameOver_ = false;
+	blockHit_ = false;
+	search_ = false;
+	jump_ = false;
+	velocity_.y = 0;
 	//worldTransform_.translation_ = startPosition_;
 }
 
