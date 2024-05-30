@@ -35,6 +35,7 @@ void Weapon::Update()
 {
 	//Xボタンのスプライトをみえないようにする
 	xButtonSpriteVisible_ = false;
+	hitCount_ = 0;
 
 	//AABBのサイズを設定
 	worldTransformCollision_.scale_ = { worldTransform_.scale_.z,worldTransform_.scale_.y,worldTransform_.scale_.x };
@@ -106,6 +107,7 @@ void Weapon::OnCollision(Collider* collider)
 	{
 		xButtonSpriteVisible_ = true;
 		isHit_ = true;
+		hitCount_++;
 	}
 }
 

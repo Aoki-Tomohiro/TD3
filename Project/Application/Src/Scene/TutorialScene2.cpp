@@ -215,7 +215,8 @@ void TutorialScene2::Update()
 		if (isClear)
 		{
 			isFadeOut_ = true;
-
+			copyManager_->SetIsDoubleSpeed(false);
+			enemyManager_->SetIsDoubleSpeed(false);
 		}
 
 		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
