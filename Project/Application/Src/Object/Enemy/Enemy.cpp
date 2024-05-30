@@ -349,23 +349,11 @@ void Enemy::BehaviorJumpInitialize()
 	animationNumber_ = 2;
 
 	
-	
-	if (playerPosition_.x < enemyPosition_.x) {
+	if (dir_ == 1) {
 		velocity_.x = 0.3f;
 	}
-	else {
+	else if (dir_ == 2) {
 		velocity_.x = -0.3f;
-	}
-
-
-	if (rightJump_ != 0) {
-		velocity_.x = 0.3f;
-		rightJump_ = false;
-	}
-
-	if (leftJump_ != 0) {
-		velocity_.x = -0.3f;
-		leftJump_ = false;
 	}
 
 	blockHit_ = false;
@@ -586,83 +574,32 @@ void Enemy::DistanceFunction() {
 						
 						if (playerPosition_.y <= enemyPosition_.y+3) {
 							//プレイヤーから逃げる処理
-							if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x < enemyPosition_.x) {
+							if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
 								if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 5)] == 0 && velocity_.x != 0.0f) {
 									jump_ = true;
-									
+									dir_ = 1;
 								}
 								else {
 									jump_ = false;
+									dir_ = 0;
 								}
 								break;
 							}
-							if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && playerPosition_.x >= enemyPosition_.x) {
+							if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10) {
 								if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 5)] == 0 && velocity_.x != 0.0f) {
 									jump_ = true;
-									
+									dir_ = 2;
 								}
 								else {
 									jump_ = false;
+									dir_ = 0;
 								}
 								break;
 							}
 						}
 
-						for (int i = 0; i < copy_.size(); ++i) {
-							if (copy_[i]->GetWorldPosition().y <= enemyPosition_.y) {
-								if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) + 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) + 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && copy_[i]->GetWorldPosition().x < enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 5)] == 0 && velocity_.x != 0.0f) {
-										jump_ = true;
-										rightJump_ = true;
-									}
-									else {
-										jump_ = false;
-									}
-									break;
-								}
-								if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y) - x] == 10 && map[int(enemyPosition_.x) - 2][int(enemyPosition_.y) - x] != 10 && map[int(enemyPosition_.x) - 1][int(enemyPosition_.y - x)] != 10 && map[int(enemyPosition_.x)][int(enemyPosition_.y - x)] != 10 && copy_[i]->GetWorldPosition().x >= enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 5)] == 0 && velocity_.x != 0.0f) {
-										jump_ = true;
-										leftJump_ = true;
-									}
-									else {
-										jump_ = false;
-									}
-									break;
-								}
-							
-							}
-						}
 						
-
-					
-
-						/*
-						for (int i = 0; i < copy_.size(); ++i){							
-							if (copy_[i]->GetWorldPosition().y <= enemyPosition_.y) {
-								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 3][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) + 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x < enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 5)] == 0 && (map[int(enemyPosition_.x) + 3][int(enemyPosition_.y - 4)] == 10 || map[int(enemyPosition_.x) + 4][int(enemyPosition_.y - 4)] == 10) && velocity_.x != 0.0f) {
-										jump_ = true;
-									}
-									else {
-										jump_ = false;
-									}
-
-									break;
-								}
-								if (map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 3][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] == 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f) - 2][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && map[int((36 + copy_[i]->GetWorldPosition().x) / 2.0f)][int((36 - copy_[i]->GetWorldPosition().y) / 2.0f) - x] != 10 && copy_[i]->GetWorldPosition().x >= enemyPosition_.x) {
-									if (map[int(enemyPosition_.x) - 2][int(enemyPosition_.y - 3)] == 0 && (map[int(enemyPosition_.x) - 3][int(enemyPosition_.y - 5)] == 10 || map[int(enemyPosition_.x) - 4][int(enemyPosition_.y - 5)] == 10) && velocity_.x != 0.0f) {
-										jump_ = true;
-									}
-									else {
-										jump_ = false;
-									}
-									break;
-								}
-							}
-
-						}
-						*/
+						
 						
 						
 

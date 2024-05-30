@@ -126,8 +126,6 @@ private:
 
 	//ジャンプの情報
 	bool jump_ = false;
-	bool leftJump_;
-	bool rightJump_;
 
 	//マップチップ
 	int map[36][36] = {};
@@ -167,5 +165,8 @@ private:
 	bool isEdit_ = false;
 
 	uint32_t attackAudioHandle_ = 0;
+
+	//ジャンプする方向
+	int dir_ = 0;
 };
 
