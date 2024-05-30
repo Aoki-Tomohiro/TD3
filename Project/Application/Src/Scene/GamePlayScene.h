@@ -110,6 +110,7 @@ private:
 	std::unique_ptr<Sprite> yajiSprite_ = nullptr;
 	
 	//ポーズ用スプライト
+	std::unique_ptr<Sprite> backSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseUISprite_ = nullptr;
 

@@ -73,6 +73,9 @@ void GamePlayScene::Initialize()
 	score_ = std::make_unique<Score>();
 	score_->Initialize();
 
+	TextureManager::Load("back.png");
+	backSprite_.reset(Sprite::Create("back.png", { 0.0f,0.0f }));
+	backSprite_->SetColor({ 1.0f,1.0f,1.0f,0.8f });
 	TextureManager::Load("pause.png");
 	pauseSprite_.reset(Sprite::Create("pause.png", { 0.0f,0.0f }));
 	TextureManager::Load("pauseUI.png");
@@ -461,16 +464,17 @@ void GamePlayScene::Draw()
 	//スコアの描画
 	score_->Draw();
 
-	pauseUISprite_->Draw();
+	
 
 	if (pause_) {
+		backSprite_->Draw();
 		yajiSprite_->Draw();
 		pauseSprite_->Draw();
 	}
 	else {
 
 	}
-
+	pauseUISprite_->Draw();
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
