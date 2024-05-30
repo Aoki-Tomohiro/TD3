@@ -83,6 +83,17 @@ void GamePlayScene::Initialize()
 	TextureManager::Load("yaji.png");
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
 
+
+	//倍速スプライト
+	TextureManager::Load("yajirusiz.png");
+	doubleSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
+	doubleSprite_->SetAnchorPoint({ 0.5f,0.5f });
+
+	//巻き戻しスプライト
+	//TextureManager::Load("pause.png");
+	reversedSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
+	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
+
 	//パーティクルマネージャーのインスタンスを取得
 	particleManager_ = ParticleManager::GetInstance();
 	particleManager_->Clear();
@@ -487,6 +498,15 @@ void GamePlayScene::DrawUI()
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
+
+
+	if (isReversed_) {
+		reversedSprite_->Draw();
+	}
+
+	if (isDoubleSpeed_ && !isReversed_) {
+		doubleSprite_->Draw();
+	}
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

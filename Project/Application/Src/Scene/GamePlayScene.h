@@ -114,6 +114,11 @@ private:
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseUISprite_ = nullptr;
 
+	//倍速の時のスプライト
+	std::unique_ptr<Sprite> doubleSprite_ = nullptr;
+	//巻き戻し時のスプライト
+	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
+
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;
 
