@@ -340,6 +340,7 @@ void Player::BehaviorRootInitialize()
 	weapon_->SetIsAttack(false);
 	models_[0]->GetAnimation()->SetLoop(true);
 	models_[0]->GetAnimation()->SetSpeed(60.0f);
+	
 }
 
 void Player::BehaviorRootUpdate()
@@ -384,10 +385,10 @@ void Player::BehaviorRootUpdate()
 		destinationQuaternion_ = Mathf::MakeRotateAxisAngleQuaternion(cross, std::acos(dot));
 
 		//移動中に音声を再生する
-		if (++moveAudioTimer_ > moveAudioWaitTime_)
+		if (!audio_->isPlaying(moveAudioHandle_))
 		{
 			audio_->PlayAudio(moveAudioHandle_, false, 0.4f);
-			moveAudioTimer_ = 0;
+			//moveAudioTimer_ = 0;
 		}
 		
 		if (cross.y == 1)
@@ -435,7 +436,7 @@ void Player::BehaviorRootUpdate()
 		//速度を0で初期化
 		velocity_.x = 0.0f;
 		//移動中の音声のタイマーを初期化
-		moveAudioTimer_ = 0;
+		audio_->StopAudio(moveAudioHandle_);
 	}
 
 	//加速ベクトル
@@ -459,6 +460,7 @@ void Player::BehaviorRootUpdate()
 		//ジャンプ状態に変更
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) && isLanded_ && isMove_ && !cutIn_)
 		{
+			audio_->StopAudio(moveAudioHandle_);
 			behaviorRequest_ = Behavior::kJump;
 			worldTransform_.translation_.y += jumpFirstSpeed_;
 		}
@@ -466,6 +468,7 @@ void Player::BehaviorRootUpdate()
 		//攻撃行動に変更
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X) && isLanded_ && isMove_ && !cutIn_)
 		{
+			audio_->StopAudio(moveAudioHandle_);
 			behaviorRequest_ = Behavior::kAttack;
 		}
 	}
@@ -473,12 +476,14 @@ void Player::BehaviorRootUpdate()
 	//キーボード入力
 	if (input_->IsPushKeyEnter(DIK_SPACE) && isLanded_ && isMove_ && !cutIn_)
 	{
+		audio_->StopAudio(moveAudioHandle_);
 		behaviorRequest_ = Behavior::kJump;
 		worldTransform_.translation_.y += jumpFirstSpeed_;
 	}
 
 	if (input_->IsPushKeyEnter(DIK_E) && isMove_ && !cutIn_)
 	{
+		audio_->StopAudio(moveAudioHandle_);
 		behaviorRequest_ = Behavior::kAttack;
 	}
 }

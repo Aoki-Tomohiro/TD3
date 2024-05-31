@@ -22,7 +22,7 @@ void GamePlayScene::Initialize()
 	camera_.Initialize();
 	camera_.fov_ = 45.0f * 3.141592654f / 180.0f;
 
-	
+
 	//コピーの数のスプライトの生成
 	timeCountSprites_[0].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[0]));
 	timeCountSprites_[1].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[1]));
@@ -50,7 +50,7 @@ void GamePlayScene::Initialize()
 	blockModel_.reset(ModelManager::Create());
 	blockModel_->GetMaterial(1)->SetColor({ 0.196f,0.196f,0.196f,1.0f });
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get(),currentStageNumber);
+	blockManager_->Initialize(blockModel_.get(), currentStageNumber);
 
 	//コピーを生成
 	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
@@ -119,19 +119,19 @@ void GamePlayScene::Update()
 	CutIn();
 
 	//ポーズメニュ
-	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_P))
-	{
-		if (!cutIn_) {
-			if (!pause_) {
-				pause_ = true;
-			}
-			else {
-				pause_ = false;
-				rule_ = false;
+	if (!isFadeIn_ && !isFadeOut_) {
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_P))
+		{
+			if (!cutIn_) {
+				if (!pause_) {
+					pause_ = true;
+				}
+				else {
+					pause_ = false;
+					rule_ = false;
+				}
 			}
 		}
-		
-
 
 	}
 
@@ -396,7 +396,7 @@ void GamePlayScene::Update()
 		}
 
 		//プレイヤーの攻撃が終了したらリセット
-		
+
 		if (isReset)
 		{
 			//逆再生のフラグを立てる
@@ -409,13 +409,15 @@ void GamePlayScene::Update()
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 		}
-		
+
 	}
-  	
-	
-	
+
+
+
 	//ポーズ
 	Pause();
+
+
 
 	//トランジション
 	Transition();
@@ -433,8 +435,8 @@ void GamePlayScene::Update()
 	ImGui::Text("%f", cursorPosition_.y);
 	ImGui::DragFloat2("SpritePositon[0]", &timeCountSpritePositions_[0].x);
 	ImGui::DragFloat2("SpritePositon[1]", &timeCountSpritePositions_[1].x);
-	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x,1.0f,1.0f,3.0f);
-	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x,1.0f,1.0f,3.0f);
+	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x, 1.0f, 1.0f, 3.0f);
+	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x, 1.0f, 1.0f, 3.0f);
 	ImGui::Text("stertSpritePos%f", stertPos_.x);
 	ImGui::End();
 }
@@ -508,14 +510,14 @@ void GamePlayScene::Draw()
 	//スコアの描画
 	score_->Draw();
 
-	
+
 
 	if (pause_) {
 		backSprite_->Draw();
 		yajiSprite_->Draw();
 		pauseSprite_->Draw();
 	}
-	
+
 	pauseUISprite_->Draw();
 
 	//スターとスプライト
@@ -552,7 +554,7 @@ void GamePlayScene::DrawBackGround()
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	
+
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -585,7 +587,7 @@ void GamePlayScene::Reset()
 {
 	//プレイヤーをリセット
 	player_->Reset();
-	
+
 	//コピーをリセット
 	copyManager_->Reset();
 
@@ -598,7 +600,7 @@ void GamePlayScene::CalculateRating() {
 	if (!cutIn_) {
 		dislikes_ += (1.0f / 60.0f);
 	}
-	
+
 
 	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
@@ -716,8 +718,8 @@ void GamePlayScene::Transition() {
 			if (nextScene_ == kOver) {
 				sceneManager_->ChangeScene("GameOverScene");
 			}
-			
-			
+
+
 			timer_ = 0.0f;
 		}
 	}
@@ -729,7 +731,7 @@ void GamePlayScene::Transition() {
 void GamePlayScene::Pause() {
 
 
-	
+
 
 
 	if (pause_) {
@@ -779,7 +781,7 @@ void GamePlayScene::Pause() {
 			}
 		}
 
-		
+
 
 		const float kPosMinY = -40.0f;
 		const float kPosMaxY = 160.0f;
@@ -790,14 +792,14 @@ void GamePlayScene::Pause() {
 		yajiSprite_->SetPosition(cursorPosition_);
 
 		//ゲームタイトル画面
-		if (cursorPosition_.y == -40.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE)))
+		if (cursorPosition_.y == -40.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE)))
 		{
 			isFadeOut_ = true;
 			nextScene_ = kTitle;
 		}
 
 		//セレクト画面
-		if (cursorPosition_.y == 60.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)||input_->IsPushKeyEnter(DIK_SPACE))) {
+		if (cursorPosition_.y == 60.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE))) {
 			isFadeOut_ = true;
 			nextScene_ = kSelect;
 		}
@@ -824,7 +826,7 @@ void GamePlayScene::CutIn() {
 	else {
 		stertPos_.x = Mathf::Lerp(stertPos_.x, -640.0f, 0.1f);
 	}
-	
+
 	stertSprite_->SetPosition(stertPos_);
 
 	if (stertPos_.x < -600) {

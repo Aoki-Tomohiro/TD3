@@ -141,7 +141,7 @@ private:
 	uint32_t whiffAudioHandle_ = 0;
 	uint32_t moveAudioHandle_ = 0;
 	int moveAudioTimer_ = 0;
-	int moveAudioWaitTime_ = 20;
+	int moveAudioWaitTime_ = 340;
 
 	//チュートリアルかどうか
 	bool isTutorial_ = false;
