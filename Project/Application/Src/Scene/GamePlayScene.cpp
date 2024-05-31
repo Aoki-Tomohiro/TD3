@@ -243,7 +243,7 @@ void GamePlayScene::Update()
 			}
 		}
 		//コピー
-		const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+		const std::list<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
 		for (const std::unique_ptr<Copy>& copy : copies)
 		{
 			collisionManager_->SetColliderList(copy.get());
@@ -601,9 +601,9 @@ void GamePlayScene::CalculateRating() {
 	
 
 	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
-	for (int i = 0; i < copyManager_->GetCopies().size(); ++i)
+	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())
 	{
-		if (copyManager_->GetCopies()[i]->GetWeapon()->GetIsAttack() && !player_->GetWeapon()->GetIsAttack()) {
+		if (copy->GetWeapon()->GetIsAttack() && !player_->GetWeapon()->GetIsAttack()) {
 			num_ = 0;
 
 			for (int i = 0; i < enemies.size(); ++i)

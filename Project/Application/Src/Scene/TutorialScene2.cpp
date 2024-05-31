@@ -185,7 +185,7 @@ void TutorialScene2::Update()
 		}
 	}
 	//コピー
-	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	const std::list<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
 	for (const std::unique_ptr<Copy>& copy : copies)
 	{
 		collisionManager_->SetColliderList(copy.get());

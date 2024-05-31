@@ -317,7 +317,7 @@ void EnemyManager::SetPlayerPosition(const Vector3& position)
 	}
 }
 
-void EnemyManager::SetCopy(const std::vector<std::unique_ptr<Copy>>& copies)
+void EnemyManager::SetCopy(const std::list<std::unique_ptr<Copy>>& copies)
 {
 	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{

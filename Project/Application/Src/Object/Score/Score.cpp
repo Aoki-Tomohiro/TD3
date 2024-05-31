@@ -22,7 +22,7 @@ void Score::Initialize()
 	}
 }
 
-void Score::Update(Player* player, const std::vector<std::unique_ptr<Copy>>& copies)
+void Score::Update(Player* player, const std::list<std::unique_ptr<Copy>>& copies)
 {
 	//加算される基本のポイント
 	const float point = 500.0f;

@@ -20,7 +20,7 @@ public:
 
 	void SetPlayerPosition(const Vector3& position);
 
-	void SetCopy(const std::vector<std::unique_ptr<Copy>>& copies);
+	void SetCopy(const std::list<std::unique_ptr<Copy>>& copies);
 
 	void SaveReverseData();
 
