@@ -76,6 +76,7 @@ public:
 
 	void StopAudio(uint32_t voiceHandle);
 
+	const bool isPlaying(uint32_t voiceHandle);
 private:
 	Audio() = default;
 	~Audio() = default;

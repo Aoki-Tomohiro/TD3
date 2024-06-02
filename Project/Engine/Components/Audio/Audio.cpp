@@ -178,3 +178,30 @@ void Audio::StopAudio(uint32_t voiceHandle)
 		}
 	}
 }
+
+const bool Audio::isPlaying(uint32_t voiceHandle)
+{
+	XAUDIO2_VOICE_STATE state;
+	auto it = sourceVoices_.begin();
+	while (it != sourceVoices_.end())
+	{
+		if ((*it)->handle == voiceHandle)
+		{
+			(*it)->sourceVoice->GetState(&state);
+			if (state.BuffersQueued > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	return false;
+}
