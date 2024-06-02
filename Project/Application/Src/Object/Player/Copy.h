@@ -32,6 +32,8 @@ public:
 
 	void SetIsDoubleSpeed(const bool isDoubleSpeed) { isDoubleSpeed_ = isDoubleSpeed; };
 
+	const uint32_t GetID() const { return id_; };
+
 private:
 	Model* model_ = nullptr;
 	//std::unique_ptr<Model>impactScopeModel_ = nullptr;
@@ -58,5 +60,7 @@ private:
 	bool isEnemyDefeated_ = false;
 
 	bool isDoubleSpeed_ = false;
+
+	uint32_t id_ = 0;
 };
 

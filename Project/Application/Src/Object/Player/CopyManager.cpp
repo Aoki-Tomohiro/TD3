@@ -105,18 +105,19 @@ void CopyManager::Reverse(const uint32_t stepSize)
 
 void CopyManager::AddCopy()
 {
+	//新しいコピーの生成
+	Copy* copy = new Copy();
 	//コピーの最大数を超えていたら
 	if (copyCount_ >= maxCopyCount_)
 	{
+		copy->Initialize(playerPositions_, copies_.back()->GetID());
 		copies_.pop_back();
 	}
 	else
 	{
 		copyCount_++;
+		copy->Initialize(playerPositions_, copyCount_);
 	}
-	//新しいコピーの生成
-	Copy* copy = new Copy();
-	copy->Initialize(playerPositions_, copyCount_);
 	copies_.push_front(std::unique_ptr<Copy>(copy));
 	playerPositions_.clear();
 }

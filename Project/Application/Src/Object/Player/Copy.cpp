@@ -2,8 +2,11 @@
 
 void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions, const uint32_t id)
 {
+	//IDの初期化
+	id_ = id;
+
 	//モデルの初期化
-	model_ = ModelManager::CreateFromModelFile("Human.gltf", "Copy" + std::to_string(id), Opaque);
+	model_ = ModelManager::CreateFromModelFile("Human.gltf", "Copy" + std::to_string(id_), Opaque);
 	model_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 
 	//impactScopeModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
