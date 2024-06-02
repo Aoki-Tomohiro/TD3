@@ -96,6 +96,10 @@ void GamePlayScene::Initialize()
 	//Switchの生成
 	switchManager_ = std::make_unique<SwitchManager>();
 	switchManager_->Initialize(currentStageNumber);
+
+	//音声データの読み込み
+	reversePlayBackAudioHandle_ = audio_->LoadAudioFile("ReversePlayback.wav");
+	doubleSpeedAudioHandle_ = audio_->LoadAudioFile("DoubleSpeed.wav");
 }
 
 void GamePlayScene::Finalize()
@@ -158,6 +162,8 @@ void GamePlayScene::Update()
 				enemyManager_->SetIsDoubleSpeed(false);
 				//ノイズエフェクト無効化
 				PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
+				//逆再生のSEを止める
+				audio_->StopAudio(reversePlayBackAudioHandle_);
 			}
 			//後の処理を飛ばす
 			return;
@@ -350,19 +356,20 @@ void GamePlayScene::Update()
 				if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 				{
 					isDoubleSpeed_ = true;
-					copyManager_->SetIsDoubleSpeed(true);
-					enemyManager_->SetIsDoubleSpeed(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
-					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
 				}
 
 				if (input_->IsPushKeyEnter(DIK_F))
 				{
 					isDoubleSpeed_ = true;
+				}
+
+				if (isDoubleSpeed_)
+				{
 					copyManager_->SetIsDoubleSpeed(true);
 					enemyManager_->SetIsDoubleSpeed(true);
 					PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 					PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(1);
+					audio_->PlayAudio(doubleSpeedAudioHandle_, false, 0.2f);
 				}
 			}
 		}
@@ -398,6 +405,10 @@ void GamePlayScene::Update()
 			//ノイズエフェクトを有効化
 			PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
 			PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
+			//倍速のSEを止める
+			audio_->StopAudio(doubleSpeedAudioHandle_);
+			//逆再生のSEを再生
+			audio_->PlayAudio(reversePlayBackAudioHandle_, false, 0.2f);
 		}
 		
 	}
@@ -822,7 +833,7 @@ void GamePlayScene::CutIn() {
 
 	if (stertPos_.x < -600) {
 		cutIn_ = false;
-		backSprite_->SetColor({ 1.0f,1.0f,1.0f,0.8f });
+		//backSprite_->SetColor({ 1.0f,1.0f,1.0f,0.8f });
 	}
 
 	player_->SetCutIn(cutIn_);

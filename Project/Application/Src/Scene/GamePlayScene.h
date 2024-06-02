@@ -158,5 +158,9 @@ private:
 	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
 
 	Vector2 a = { 0.0f,0.0f };
+
+	//オーディオハンドル
+	uint32_t reversePlayBackAudioHandle_ = 0;
+	uint32_t doubleSpeedAudioHandle_ = 0;
 };
 
