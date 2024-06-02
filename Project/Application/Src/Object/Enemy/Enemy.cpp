@@ -12,9 +12,10 @@ void Enemy::Initialize(const Vector3& position, const uint32_t id)
 	model_->GetAnimation()->PlayAnimation();
 
 
-	impactScopeModel_ = ModelManager::CreateFromModelFile("Cube.obj", "EnemyImpactScope" + std::to_string(id), Transparent);
+	impactScopeModel_ = ModelManager::CreateFromModelFile("Light.gltf", "EnemyImpactScope" + std::to_string(id), Transparent);
 	impactScopeWorldTransform_.Initialize();
-	impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
+	//impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
+	impactScopeWorldTransform_.scale_ = { 4.0f,16.0f,0.3f };
 
 	startPosition_ = position;
 	worldTransform_.Initialize();
@@ -114,7 +115,7 @@ void Enemy::Update()
 
 	//ワールドトランスフォームの更新
 	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-	impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
+	impactScopeWorldTransform_.translation_ = worldTransform_.translation_ + impactScopeOffset_;
 	worldTransform_.UpdateMatrixFromQuaternion();
 	impactScopeWorldTransform_.UpdateMatrixFromEuler();
 
@@ -124,7 +125,7 @@ void Enemy::Update()
 	model_->Update(worldTransform_, animationNumber_);
 
 	//影響範囲
-	impactScopeModel_->GetMaterial(1)->SetColor(Vector4{ 1.0f,0.0f,0.0f,0.3f });
+	impactScopeModel_->GetMaterial(0)->SetColor(Vector4{ 1.0f,0.0f,0.0f,0.3f });
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
@@ -149,6 +150,8 @@ void Enemy::Update()
 
 		ImGui::EndGroup(); // グループ終了
 	}
+	ImGui::DragFloat3("ImpactScopeOffset", &impactScopeOffset_.x, 0.1f);
+	ImGui::DragFloat3("ImpactScopeScale", &impactScopeWorldTransform_.scale_.x, 0.1f);
 	ImGui::End();
 
 
@@ -741,7 +744,7 @@ void Enemy::Reverse(const uint32_t stepSize)
 
 		//ワールドトランスフォームの更新
 		worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-		impactScopeWorldTransform_.translation_ = worldTransform_.translation_;
+		impactScopeWorldTransform_.translation_ = worldTransform_.translation_ + impactScopeOffset_;
 		worldTransform_.UpdateMatrixFromQuaternion();
 		impactScopeWorldTransform_.UpdateMatrixFromEuler();
 

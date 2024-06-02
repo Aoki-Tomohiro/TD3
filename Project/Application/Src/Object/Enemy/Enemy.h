@@ -184,5 +184,7 @@ private:
 	int dir_ = 0;
 
 	bool isResult_ = false;
+
+	Vector3 impactScopeOffset_{ 0.0f,14.8f,0.0f };
 };
 
