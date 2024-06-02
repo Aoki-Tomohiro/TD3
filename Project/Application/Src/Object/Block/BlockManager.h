@@ -5,7 +5,7 @@
 class BlockManager
 {
 public:
-	void Initialize(Model* model, uint32_t stageNumber);
+	void Initialize(uint32_t stageNumber);
 
 	void Update();
 
@@ -21,8 +21,6 @@ private:
 	void LoadFile();
 
 private:
-	Model* model_ = nullptr;
-
 	std::vector<std::unique_ptr<Block>> blocks_{};
 
 	int blockNum = 0;

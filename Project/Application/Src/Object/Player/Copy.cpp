@@ -1,9 +1,9 @@
 #include "Copy.h"
 
-void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions)
+void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions, const uint32_t id)
 {
 	//モデルの初期化
-	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	model_ = ModelManager::CreateFromModelFile("Human.gltf", "Copy" + std::to_string(id), Opaque);
 	model_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 
 	//impactScopeModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
@@ -20,9 +20,9 @@ void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, floa
 	playerPositions_ = playerPositions;
 
 	//武器の生成
-	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
+	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "CopyWeapon" + std::to_string(id), Transparent);
 	weapon_ = std::make_unique<Weapon>();
-	weapon_->Initialize(weaponModel_.get());
+	weapon_->Initialize(weaponModel_);
 	weapon_->SetParent(worldTransform_);
 
 	//衝突判定の初期化

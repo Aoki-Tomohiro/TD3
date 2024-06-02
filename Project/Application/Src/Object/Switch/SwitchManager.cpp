@@ -130,8 +130,9 @@ void SwitchManager::Draw(const Camera& camera)
 void SwitchManager::AddSwitch(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Switch::Type type)
 {
 	Switch* newSwitch = new Switch();
-	newSwitch->Initialize(switchPosition, wallPosition, wallScale, type);
+	newSwitch->Initialize(switchPosition, wallPosition, wallScale, type, switchCount_);
 	switches_.push_back(std::unique_ptr<Switch>(newSwitch));
+	switchCount_++;
 }
 
 

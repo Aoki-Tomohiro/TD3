@@ -28,10 +28,8 @@ void GamePlayScene::Initialize()
 	timeCountSprites_[1].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[1]));
 
 	//敵の生成
-	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
-	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(enemyModel_.get(), currentStageNumber);
+	enemyManager_->Initialize(currentStageNumber);
 	enemyManager_->SaveReverseData();
 	enemyNum_ = int(enemyManager_->GetEnemies().size());
 
@@ -39,35 +37,25 @@ void GamePlayScene::Initialize()
 	collisionManager_ = std::make_unique<CollisionManager>();
 
 	//プレイヤーを生成
-	playerModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	playerModel_ = ModelManager::CreateFromModelFile("Human.gltf", "Player", Opaque);
 	playerModel_->GetMaterial(0)->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
-	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
+	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
+	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
 
 	//ブロックを生成
-	blockModel_.reset(ModelManager::Create());
-	blockModel_->GetMaterial(1)->SetColor({ 0.196f,0.196f,0.196f,1.0f });
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get(),currentStageNumber);
+	blockManager_->Initialize(currentStageNumber);
 
 	//コピーを生成
-	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
-	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize();
 	copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 
 	//背景の生成
-	backGroundGenkoModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
-	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
-	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
-	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
-	backGroundMovieModel_->GetMaterial(1)->SetEnableLighting(false);
-	std::vector<Model*> backGroundModels = { backGroundGenkoModel_.get(),backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
-	backGround_->Initialize(backGroundModels);
+	backGround_->Initialize();
 
 	//スコアの生成
 	score_ = std::make_unique<Score>();

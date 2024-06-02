@@ -116,7 +116,7 @@ void CopyManager::AddCopy()
 	}
 	//新しいコピーの生成
 	Copy* copy = new Copy();
-	copy->Initialize(playerPositions_);
+	copy->Initialize(playerPositions_, copyCount_);
 	copies_.push_front(std::unique_ptr<Copy>(copy));
 	playerPositions_.clear();
 }

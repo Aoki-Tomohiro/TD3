@@ -6,7 +6,7 @@
 class Copy : public Collider
 {
 public:
-	void Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions);
+	void Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, float>>& playerPositions, const uint32_t id);
 
 	void Update();
 
@@ -33,7 +33,7 @@ public:
 	void SetIsDoubleSpeed(const bool isDoubleSpeed) { isDoubleSpeed_ = isDoubleSpeed; };
 
 private:
-	std::unique_ptr<Model> model_ = nullptr;
+	Model* model_ = nullptr;
 	//std::unique_ptr<Model>impactScopeModel_ = nullptr;
 	WorldTransform worldTransform_{};
 	//WorldTransform impactScopeWorldTransform_{};
@@ -47,7 +47,7 @@ private:
 
 	int currentIndex_ = 0;
 
-	std::unique_ptr<Model> weaponModel_ = nullptr;
+	Model* weaponModel_ = nullptr;
 
 	std::unique_ptr<Weapon> weapon_ = nullptr;
 

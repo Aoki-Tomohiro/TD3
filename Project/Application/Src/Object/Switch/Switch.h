@@ -11,7 +11,7 @@ public:
 		DISAPPEARANCE,
 	};
 
-	void Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Type type);
+	void Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Type type, const uint32_t id);
 
 	void Update();
 
@@ -44,7 +44,7 @@ public:
 	Wall* GetWall() const { return wall_.get(); };
 
 private:
-	std::unique_ptr<Model> model_ = nullptr;
+	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 

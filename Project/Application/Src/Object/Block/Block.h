@@ -6,7 +6,7 @@
 class Block : public Collider
 {
 public:
-	void Initialize(const Vector3& position, const Vector3& scale, const bool isGround);
+	void Initialize(const Vector3& position, const Vector3& scale, const uint32_t id, const bool isGround);
 
 	void Update();
 
@@ -41,7 +41,7 @@ public:
 	};
 
 private:
-	std::unique_ptr<Model> model_ = nullptr;
+	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 

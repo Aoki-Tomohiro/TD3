@@ -3,17 +3,16 @@
 #include <Engine/3D/Model/ModelManager.h>
 #include <Application/Src/Scene/GamePlayScene.h>
 
-void Enemy::Initialize(Model* model, const Vector3& position)
+void Enemy::Initialize(const Vector3& position, const uint32_t id)
 {
 	audio_ = Audio::GetInstance();
 
-	assert(model);
-	model_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	model_ = ModelManager::CreateFromModelFile("Human.gltf", "Enemy" + std::to_string(id), Opaque);
 	model_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	model_->GetAnimation()->PlayAnimation();
 
 
-	impactScopeModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
+	impactScopeModel_ = ModelManager::CreateFromModelFile("Cube.obj", "EnemyImpactScope" + std::to_string(id), Transparent);
 	impactScopeWorldTransform_.Initialize();
 	impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
 

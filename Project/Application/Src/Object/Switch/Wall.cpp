@@ -1,9 +1,9 @@
 #include "Wall.h"
 
-void Wall::Initialize(const Vector3& position, const Vector3& scale)
+void Wall::Initialize(const Vector3& position, const Vector3& scale, const uint32_t id)
 {
 	//モデルの生成
-	model_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
+	model_ = ModelManager::CreateFromModelFile("Cube.obj", "Wall" + std::to_string(id), Transparent);
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();

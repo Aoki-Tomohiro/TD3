@@ -6,12 +6,8 @@
 #include <map>
 #include <Engine/Externals/nlohmann/json.hpp>
 
-void BlockManager::Initialize(Model* model, uint32_t stageNumber)
+void BlockManager::Initialize(uint32_t stageNumber)
 {
-	//モデルの初期化
-	assert(model);
-	model_ = model;
-
 	//ステージの設定
 	stageNumber_ = stageNumber;
 
@@ -120,7 +116,7 @@ void BlockManager::Draw(const Camera& camera)
 void BlockManager::AddBlock(const Vector3& position, const Vector3& scale, const bool isGround)
 {
 	Block* block = new Block();
-	block->Initialize(position, scale, isGround);
+	block->Initialize(position, scale, blockNum, isGround);
 	blocks_.push_back(std::unique_ptr<Block>(block));
 	blockNum++;
 }

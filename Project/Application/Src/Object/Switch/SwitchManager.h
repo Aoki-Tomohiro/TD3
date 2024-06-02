@@ -22,6 +22,8 @@ private:
 private:
 	std::vector<std::unique_ptr<Switch>> switches_{};
 
+	uint32_t switchCount_ = 0;
+
 	uint32_t stageNumber_ = 0;
 };
 

@@ -13,7 +13,7 @@ public:
 		kCountOfParts
 	};
 
-	void Initialize(std::vector<Model*> models);
+	void Initialize();
 
 	void Update();
 
@@ -24,8 +24,6 @@ public:
 	void SetPlayerPosition(const Vector3& playerPosition) { playerPosition_ = playerPosition; };
 
 private:
-	std::vector<Model*> models_{};
-
 	static const int kMaxBackGround = 4;
 
 	std::array<std::unique_ptr<Sprite>, kMaxBackGround> backGroundSprite_{};

@@ -42,16 +42,15 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
 	//プレイヤー
-	std::unique_ptr<Model> playerModel_ = nullptr;
-	std::unique_ptr<Model> weaponModel_ = nullptr;
+	Model* playerModel_ = nullptr;
+	Model* weaponModel_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 
 	//敵
-	std::unique_ptr<Model> enemyModel_ = nullptr;
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 
 	//ブロック
-	std::unique_ptr<Model> blockModel_ = nullptr;
+	Model* blockModel_ = nullptr;
 	std::unique_ptr<BlockManager> blockManager_ = nullptr;
 
 	//FollowCamera
