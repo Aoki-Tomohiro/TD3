@@ -10,7 +10,7 @@ public:
 	//パーティクルの最大数
 	const uint32_t kMaxInstance = 1000;
 
-	void Initialize();
+	void Initialize(const std::string& name);
 
 	void Update();
 
@@ -44,7 +44,7 @@ private:
 
 	std::list<std::unique_ptr<ParticleEmitter>> particleEmitters_{};
 
-	std::unique_ptr<Model> defaultModel_ = nullptr;
+	Model* defaultModel_ = nullptr;
 
 	Model* model_ = nullptr;
 

@@ -16,9 +16,9 @@ public:
 
 	static void Destroy();
 
-	static Model* Create();
+	static Model* Create(DrawPass drawPass);
 
-	static Model* CreateFromModelFile(const std::string& modelName, DrawPass drawPass);
+	static Model* CreateFromModelFile(const std::string& modelName, const std::string& objectName, DrawPass drawPass);
 
 	void Initialize();
 
@@ -28,7 +28,7 @@ private:
 	ModelManager(const ModelManager&) = delete;
 	ModelManager& operator=(const ModelManager&) = delete;
 
-	Model* CreateInternal(const std::string& modelName, DrawPass drawPass);
+	Model* CreateInternal(const std::string& modelName, const std::string& objectName, DrawPass drawPass);
 
 	Model::ModelData LoadModelFile(const std::string& directoryPath, const std::string& filename);
 
@@ -43,6 +43,10 @@ private:
 private:
 	static ModelManager* instance_;
 
-	std::unordered_map<std::string, std::pair<Model::ModelData, std::vector<Animation::AnimationData>>> modelDatas_;
+	std::map<std::string, std::unique_ptr<Model>> models_{};
+
+	static uint32_t cubeCount_;
+
+	//std::unordered_map<std::string, std::pair<Model::ModelData, std::vector<Animation::AnimationData>>> modelDatas_;
 };
 

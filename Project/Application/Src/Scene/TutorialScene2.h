@@ -46,26 +46,21 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
 	//プレイヤー
-	std::unique_ptr<Model> playerModel_ = nullptr;
-	std::unique_ptr<Model> weaponModel_ = nullptr;
+	Model* playerModel_ = nullptr;
+	Model* weaponModel_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 
 	//敵
-	std::unique_ptr<Model> enemyModel_ = nullptr;
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 
 	//ブロック
-	std::unique_ptr<Model> blockModel_ = nullptr;
+	Model* blockModel_ = nullptr;
 	std::unique_ptr<BlockManager> blockManager_ = nullptr;
 
 	//コピー
-	std::unique_ptr<Model> copyModel_ = nullptr;
 	std::unique_ptr<CopyManager> copyManager_ = nullptr;
 
 	//背景
-	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;
-	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
-	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
 
 	//スコア
@@ -102,5 +97,10 @@ private:
 
 	//スイッチ
 	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
+
+	//倍速の時のスプライト
+	std::unique_ptr<Sprite> doubleSprite_ = nullptr;
+	//巻き戻し時のスプライト
+	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
 };
 

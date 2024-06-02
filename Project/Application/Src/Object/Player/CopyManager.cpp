@@ -29,19 +29,21 @@ void CopyManager::Initialize()
 	}
 
 	//コピーの色の初期化
-	copyColors_.push_back(Vector4{ 0.0f, 0.333f, 0.0f, 1.0f });
-	copyColors_.push_back(Vector4{ 0.0f, 0.667f, 0.0f, 1.0f });
-	copyColors_.push_back(Vector4{ 0.0f, 1.0f, 0.0f, 1.0f });
-	copyColors_.push_back(Vector4{ 0.333f, 1.0f, 0.333f, 1.0f });
 	copyColors_.push_back(Vector4{ 0.667f, 1.0f, 0.667f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.333f, 1.0f, 0.333f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.0f, 1.0f, 0.0f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.0f, 0.667f, 0.0f, 1.0f });
+	copyColors_.push_back(Vector4{ 0.0f, 0.333f, 0.0f, 1.0f });
 }
 
 void CopyManager::Update()
 {
 	//コピーの色を変更
-	for (uint32_t i = 0; i < copies_.size(); i++)
+	int i = 0;
+	for (std::unique_ptr<Copy>& copy : copies_)
 	{
-		copies_[i]->SetColor(copyColors_[i]);
+		copy->SetColor(copyColors_[i]);
+		i++;
 	}
 
 	//コピーの更新
@@ -103,19 +105,20 @@ void CopyManager::Reverse(const uint32_t stepSize)
 
 void CopyManager::AddCopy()
 {
+	//新しいコピーの生成
+	Copy* copy = new Copy();
 	//コピーの最大数を超えていたら
 	if (copyCount_ >= maxCopyCount_)
 	{
-		copies_.erase(copies_.begin());
+		copy->Initialize(playerPositions_, copies_.back()->GetID());
+		copies_.pop_back();
 	}
 	else
 	{
 		copyCount_++;
+		copy->Initialize(playerPositions_, copyCount_);
 	}
-	//新しいコピーの生成
-	Copy* copy = new Copy();
-	copy->Initialize(playerPositions_);
-	copies_.push_back(std::unique_ptr<Copy>(copy));
+	copies_.push_front(std::unique_ptr<Copy>(copy));
 	playerPositions_.clear();
 }
 

@@ -1,6 +1,7 @@
 #include "TutorialScene3.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
+#include <numbers>
 
 void TutorialScene3::Initialize()
 {
@@ -18,42 +19,30 @@ void TutorialScene3::Initialize()
 	collisionManager_ = std::make_unique<CollisionManager>();
 
 	//プレイヤーを生成
-	playerModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
+	playerModel_ = ModelManager::CreateFromModelFile("Human.gltf", "Player", Opaque);
 	playerModel_->GetMaterial(0)->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-	weaponModel_.reset(ModelManager::CreateFromModelFile("Cube.obj", Transparent));
-	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
+	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
+	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
 
 	//敵の生成
-	enemyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
-	enemyModel_->GetMaterial(0)->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize(enemyModel_.get(), 2);
+	enemyManager_->Initialize(2);
 	enemyManager_->SaveReverseData();
 
 	//ブロックを生成
-	blockModel_.reset(ModelManager::Create());
-	blockModel_->GetMaterial(1)->SetColor({ 0.196f,0.196f,0.196f,1.0f });
 	blockManager_ = std::make_unique<BlockManager>();
-	blockManager_->Initialize(blockModel_.get(), 2);
+	blockManager_->Initialize(2);
 
 	//コピーを生成
-	copyModel_.reset(ModelManager::CreateFromModelFile("Human.gltf", Opaque));
-	copyModel_->GetMaterial(0)->SetColor({ 0.2118f, 0.8196f, 0.7137f, 1.0f });
 	copyManager_ = std::make_unique<CopyManager>();
 	copyManager_->Initialize();
 	copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 
 	//背景の生成
-	backGroundGenkoModel_.reset(ModelManager::CreateFromModelFile("genko.gltf", Opaque));
-	backGroundFrameModel_.reset(ModelManager::CreateFromModelFile("youtubes.gltf", Opaque));
-	backGroundMovieModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Opaque));
-	backGroundMovieModel_->GetMaterial(1)->SetTexture(Renderer::GetInstance()->GetBackGroundColorDescriptorHandle());
-	backGroundMovieModel_->GetMaterial(1)->SetEnableLighting(false);
-	std::vector<Model*> backGroundModels = { backGroundGenkoModel_.get(),backGroundFrameModel_.get(),backGroundMovieModel_.get() };
 	backGround_ = std::make_unique<BackGround>();
-	backGround_->Initialize(backGroundModels);
+	backGround_->Initialize();
 
 	//スコアの生成
 	score_ = std::make_unique<Score>();
@@ -77,6 +66,17 @@ void TutorialScene3::Initialize()
 	//Switchの生成
 	switchManager_ = std::make_unique<SwitchManager>();
 	switchManager_->Initialize(2);
+
+	//倍速スプライト
+	TextureManager::Load("yajirusiz.png");
+	doubleSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
+	doubleSprite_->SetAnchorPoint({ 0.5f,0.5f });
+
+	//巻き戻しスプライト
+	//TextureManager::Load("pause.png");
+	reversedSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
+	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	reversedSprite_->SetRotation(std::numbers::pi_v<float>);
 }
 
 void TutorialScene3::Finalize()
@@ -192,7 +192,7 @@ void TutorialScene3::Update()
 		}
 	}
 	//コピー
-	const std::vector<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
+	const std::list<std::unique_ptr<Copy>>& copies = copyManager_->GetCopies();
 	for (const std::unique_ptr<Copy>& copy : copies)
 	{
 		collisionManager_->SetColliderList(copy.get());
@@ -384,10 +384,7 @@ void TutorialScene3::Draw()
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
 #pragma endregion
-}
 
-void TutorialScene3::DrawUI()
-{
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
@@ -404,6 +401,25 @@ void TutorialScene3::DrawUI()
 
 	//スコアの描画
 	score_->Draw();
+
+	if (isReversed_) {
+		reversedSprite_->Draw();
+	}
+
+	if (isDoubleSpeed_ && !isReversed_) {
+		doubleSprite_->Draw();
+	}
+
+	//前景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+}
+
+void TutorialScene3::DrawUI()
+{
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

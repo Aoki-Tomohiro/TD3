@@ -81,9 +81,7 @@ private:
 	int num_;
 
 	//敵
-	std::unique_ptr<Model> enemyModel_ = nullptr;
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
-	//std::vector<std::unique_ptr<Enemy>> enemies_{};
 	int enemyNum_;//今の敵の数
 	int defeatedEnemyCount;//今倒している敵の数
 
@@ -91,22 +89,17 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
 	//プレイヤー
-	std::unique_ptr<Model> playerModel_ = nullptr;
-	std::unique_ptr<Model> weaponModel_ = nullptr;
+	Model* playerModel_ = nullptr;
+	Model* weaponModel_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 
 	//ブロック
-	std::unique_ptr<Model> blockModel_ = nullptr;
 	std::unique_ptr<BlockManager> blockManager_ = nullptr;
 
 	//コピー
-	std::unique_ptr<Model> copyModel_ = nullptr;
 	std::unique_ptr<CopyManager> copyManager_ = nullptr;
 
 	//背景
-	std::unique_ptr<Model> backGroundGenkoModel_ = nullptr;
-	std::unique_ptr<Model> backGroundMovieModel_ = nullptr;
-	std::unique_ptr<Model> backGroundFrameModel_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;	
 	
 	//矢印のテクスチャ
@@ -165,5 +158,9 @@ private:
 	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
 
 	Vector2 a = { 0.0f,0.0f };
+
+	//オーディオハンドル
+	uint32_t reversePlayBackAudioHandle_ = 0;
+	uint32_t doubleSpeedAudioHandle_ = 0;
 };
 

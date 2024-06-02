@@ -1,10 +1,10 @@
 #include "Switch.h"
 #include "Engine/Math/MathFunction.h"
 
-void Switch::Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Type type)
+void Switch::Initialize(const Vector3& switchPosition, const Vector3& wallPosition, const Vector3& wallScale, const Type type, const uint32_t id)
 {
 	//モデルの生成
-	model_.reset(ModelManager::Create());
+	model_ = ModelManager::CreateFromModelFile("Cube.obj", "Switch" + std::to_string(id), Opaque);
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -13,7 +13,7 @@ void Switch::Initialize(const Vector3& switchPosition, const Vector3& wallPositi
 
 	//壁の生成
 	wall_ = std::make_unique<Wall>();
-	wall_->Initialize(wallPosition, wallScale);
+	wall_->Initialize(wallPosition, wallScale, id);
 
 	//スイッチの種類を設定
 	type_ = type;

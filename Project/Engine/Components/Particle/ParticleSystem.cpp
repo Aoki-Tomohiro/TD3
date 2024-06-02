@@ -3,11 +3,11 @@
 #include "Engine/Math/MathFunction.h"
 #include <numbers>
 
-void ParticleSystem::Initialize()
+void ParticleSystem::Initialize(const std::string& name)
 {
 	if (!model_)
 	{
-		defaultModel_.reset(ModelManager::CreateFromModelFile("Plane.obj", Transparent));
+		defaultModel_ = ModelManager::CreateFromModelFile("Plane.obj", name, Transparent);
 	}
 
 	CreateInstancingResource();
@@ -38,7 +38,7 @@ void ParticleSystem::Draw(const Camera& camera)
 {
 	UpdateInstancingResource(camera);
 	CommandContext* commandContext = GraphicsCore::GetInstance()->GetCommandContext();
-	Model* model = model_ ? model_ : defaultModel_.get();
+	Model* model = model_ ? model_ : defaultModel_;
 	for (size_t i = 0; i < model->GetMeshCount(); ++i)
 	{
 		commandContext->SetVertexBuffer(model->GetMesh(0)->GetVertexBufferView());

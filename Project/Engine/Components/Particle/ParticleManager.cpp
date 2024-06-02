@@ -60,7 +60,7 @@ ParticleSystem* ParticleManager::CreateInternal(const std::string& name)
 	}
 
 	ParticleSystem* particleSystem = new ParticleSystem();
-	particleSystem->Initialize();
+	particleSystem->Initialize(name);
 	particleSystems_[name] = std::unique_ptr<ParticleSystem>(particleSystem);
 	return particleSystem;
 }

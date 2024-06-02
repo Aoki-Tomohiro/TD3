@@ -6,7 +6,7 @@
 class Wall : public Collider
 {
 public:
-	void Initialize(const Vector3& position, const Vector3& scale);
+	void Initialize(const Vector3& position, const Vector3& scale, const uint32_t id);
 
 	void Update();
 
@@ -33,7 +33,7 @@ public:
 	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
 
 private:
-	std::unique_ptr<Model> model_ = nullptr;
+	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 

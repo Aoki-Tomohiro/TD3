@@ -6,6 +6,7 @@
 
 //実体定義
 ModelManager* ModelManager::instance_ = nullptr;
+uint32_t ModelManager::cubeCount_ = 0;
 const std::string ModelManager::kBaseDirectory = "Application/Resources/Models";
 
 ModelManager* ModelManager::GetInstance()
@@ -26,29 +27,26 @@ void ModelManager::Destroy()
 	}
 }
 
-Model* ModelManager::Create()
+Model* ModelManager::Create(DrawPass drawPass)
 {
-	Model* model = ModelManager::GetInstance()->CreateInternal("Cube.obj", Opaque);
+	Model* model = ModelManager::GetInstance()->CreateInternal("Cube.obj", "Cube" + std::to_string(cubeCount_), drawPass);
+	cubeCount_++;
 	return model;
 }
 
-Model* ModelManager::CreateFromModelFile(const std::string& modelName, DrawPass drawPass)
+Model* ModelManager::CreateFromModelFile(const std::string& modelName, const std::string& objectName, DrawPass drawPass)
 {
-	Model* model = ModelManager::GetInstance()->CreateInternal(modelName, drawPass);
+	Model* model = ModelManager::GetInstance()->CreateInternal(modelName, objectName, drawPass);
 	return model;
 }
 
-Model* ModelManager::CreateInternal(const std::string& modelName, DrawPass drawPass)
+Model* ModelManager::CreateInternal(const std::string& modelName, const std::string& objectName, DrawPass drawPass)
 {
-	auto it = modelDatas_.find(modelName);
+	auto it = models_.find(objectName);
 
-	if (it != modelDatas_.end())
+	if (it != models_.end())
 	{
-		Model* model = new Model();
-		Model::ModelData modelData = std::get<Model::ModelData>(it->second);
-		std::vector<Animation::AnimationData> animationData = std::get<std::vector<Animation::AnimationData>>(it->second);
-		model->Create(modelData, animationData, drawPass);
-		return model;
+		return it->second.get();
 	}
 
 	//ファイルパスを設定
@@ -59,23 +57,26 @@ Model* ModelManager::CreateInternal(const std::string& modelName, DrawPass drawP
 	Model::ModelData modelData = LoadModelFile(directoryPath, modelName);
 	//アニメーションの読み込み
 	std::vector<Animation::AnimationData> animationData = LoadAnimationFile(directoryPath, modelName);
-	//モデルデータとアニメーションデータを保存
-	modelDatas_[modelName] = { modelData,animationData };
 
 	//モデルの生成
 	Model* model = new Model();
 	model->Create(modelData, animationData, drawPass);
+
+	//モデルデータとアニメーションデータを保存
+	models_[objectName] = std::unique_ptr<Model>(model);
 
 	return model;
 }
 
 void ModelManager::Initialize()
 {
+	Model* model = new Model();
 	Model::ModelData modelData = LoadModelFile("Application/Resources/Models/Cube", "Cube.obj");
 	std::vector<Animation::AnimationData> animationData = LoadAnimationFile("Application/Resources/Models/Cube", "Cube.obj");
-	modelDatas_["Cube.obj"] = { modelData,animationData };
+	model->Create(modelData, animationData, Opaque);
+	models_["Cube" + std::to_string(cubeCount_)] = std::unique_ptr<Model>(model);
+	cubeCount_++;
 }
-
 
 Model::ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {

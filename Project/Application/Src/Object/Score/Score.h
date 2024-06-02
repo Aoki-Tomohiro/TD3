@@ -9,7 +9,7 @@ class Score
 public:
 	void Initialize();
 
-	void Update(Player* player, const std::vector<std::unique_ptr<Copy>>& copies);
+	void Update(Player* player, const std::list<std::unique_ptr<Copy>>& copies);
 
 	void Draw();
 

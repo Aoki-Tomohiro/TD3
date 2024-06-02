@@ -14,7 +14,7 @@ class Enemy : public Collider
 public:
 	static const int kActiveTime = 60 * 10;
 
-	void Initialize(Model* model, const Vector3& position);
+	void Initialize(const Vector3& position, const uint32_t id);
 
 	void Update();
 
@@ -101,10 +101,10 @@ private:
 	//オーディオ
 	Audio* audio_ = nullptr;
 
-	std::unique_ptr<Model> model_ = nullptr;
+	Model* model_ = nullptr;
 
 
-	std::unique_ptr<Model>impactScopeModel_ = nullptr;
+	Model* impactScopeModel_ = nullptr;
 	WorldTransform worldTransform_{};
 	WorldTransform impactScopeWorldTransform_{};
 
@@ -184,5 +184,7 @@ private:
 	int dir_ = 0;
 
 	bool isResult_ = false;
+
+	Vector3 impactScopeOffset_{ 0.0f,14.8f,0.0f };
 };
 

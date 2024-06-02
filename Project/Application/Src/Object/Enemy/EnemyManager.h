@@ -6,7 +6,7 @@ class Copy;
 class EnemyManager
 {
 public:
-	void Initialize(Model* model, uint32_t stageNumber);
+	void Initialize(uint32_t stageNumber);
 
 	void Update();
 
@@ -20,7 +20,7 @@ public:
 
 	void SetPlayerPosition(const Vector3& position);
 
-	void SetCopy(const std::vector<std::unique_ptr<Copy>>& copies);
+	void SetCopy(const std::list<std::unique_ptr<Copy>>& copies);
 
 	void SaveReverseData();
 
@@ -38,9 +38,9 @@ private:
 	void LoadFile();
 
 private:
-	Model* model_ = nullptr;
-
 	std::vector<std::unique_ptr<Enemy>> enemies_{};
+
+	uint32_t enemyCount_ = 0;
 
 	uint32_t stageNumber_ = 0;
 };

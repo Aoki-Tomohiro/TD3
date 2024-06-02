@@ -6,12 +6,8 @@
 #include <map>
 #include <Engine/Externals/nlohmann/json.hpp>
 
-void EnemyManager::Initialize(Model* model, uint32_t stageNumber)
+void EnemyManager::Initialize(uint32_t stageNumber)
 {
-	//モデルの初期化
-	assert(model);
-	model_ = model;
-
 	//ステージの設定
 	stageNumber_ = stageNumber;
 
@@ -135,8 +131,9 @@ void EnemyManager::SetIsTutorial(const bool isTutorial)
 void EnemyManager::AddEnemy(const Vector3& position)
 {
 	Enemy* enemy = new Enemy();
-	enemy->Initialize(model_, position);
+	enemy->Initialize(position, enemyCount_);
 	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+	enemyCount_++;
 }
 
 void EnemyManager::SetIsDoubleSpeed(const bool isDoubleSpeed)
@@ -317,7 +314,7 @@ void EnemyManager::SetPlayerPosition(const Vector3& position)
 	}
 }
 
-void EnemyManager::SetCopy(const std::vector<std::unique_ptr<Copy>>& copies)
+void EnemyManager::SetCopy(const std::list<std::unique_ptr<Copy>>& copies)
 {
 	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{

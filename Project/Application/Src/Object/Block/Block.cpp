@@ -1,7 +1,7 @@
 #include "Block.h"
 #include <numbers>
 
-void Block::Initialize(const Vector3& position, const Vector3& scale, const bool isGround)
+void Block::Initialize(const Vector3& position, const Vector3& scale, const uint32_t id, const bool isGround)
 {
 	isGround_ = isGround;
 
@@ -13,7 +13,7 @@ void Block::Initialize(const Vector3& position, const Vector3& scale, const bool
 	//モデルの初期化
 	if (isGround)
 	{
-		model_.reset(ModelManager::CreateFromModelFile("asiba.gltf", Opaque));
+		model_ = ModelManager::CreateFromModelFile("asiba.gltf", "Ground", Opaque);
 		worldTransform_.rotation_.y = std::numbers::pi_v<float>;
 		//衝突判定の初期化
 		AABB aabb = {
@@ -24,7 +24,7 @@ void Block::Initialize(const Vector3& position, const Vector3& scale, const bool
 	}
 	else
 	{
-		model_.reset(ModelManager::Create());
+		model_ = ModelManager::CreateFromModelFile("Cube.obj", "Block" + std::to_string(id), Opaque);
 		//衝突判定の初期化
 		AABB aabb = {
 		.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},

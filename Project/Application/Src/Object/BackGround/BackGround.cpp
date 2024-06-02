@@ -5,11 +5,8 @@
 #include "Engine/Math/MathFunction.h"
 #include <numbers>
 
-void BackGround::Initialize(std::vector<Model*> models)
+void BackGround::Initialize()
 {
-	//モデルの初期化
-	models_ = models;
-
 	//背景スプライトの作成
 	for (uint32_t i = 0; i < backGroundSprite_.size(); i++)
 	{
