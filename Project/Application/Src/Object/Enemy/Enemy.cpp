@@ -15,7 +15,7 @@ void Enemy::Initialize(const Vector3& position, const uint32_t id)
 	impactScopeModel_ = ModelManager::CreateFromModelFile("Light.gltf", "EnemyImpactScope" + std::to_string(id), Transparent);
 	impactScopeWorldTransform_.Initialize();
 	//impactScopeWorldTransform_.scale_ = { 4.0f,4.0f,0.3f };
-	impactScopeWorldTransform_.scale_ = { 4.0f,16.0f,0.3f };
+	impactScopeWorldTransform_.scale_ = { 4.0f,16.0f,4.0f };
 
 	startPosition_ = position;
 	worldTransform_.Initialize();
@@ -125,7 +125,7 @@ void Enemy::Update()
 	model_->Update(worldTransform_, animationNumber_);
 
 	//影響範囲
-	impactScopeModel_->GetMaterial(0)->SetColor(Vector4{ 1.0f,0.0f,0.0f,0.3f });
+	impactScopeModel_->GetMaterial(0)->SetColor(Vector4{ 1.0f,1.0f,0.0f,0.3f });
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));
