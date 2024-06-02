@@ -1,6 +1,7 @@
 #include "TutorialScene3.h"
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
+#include <numbers>
 
 void TutorialScene3::Initialize()
 {
@@ -65,6 +66,17 @@ void TutorialScene3::Initialize()
 	//Switchの生成
 	switchManager_ = std::make_unique<SwitchManager>();
 	switchManager_->Initialize(2);
+
+	//倍速スプライト
+	TextureManager::Load("yajirusiz.png");
+	doubleSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
+	doubleSprite_->SetAnchorPoint({ 0.5f,0.5f });
+
+	//巻き戻しスプライト
+	//TextureManager::Load("pause.png");
+	reversedSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
+	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	reversedSprite_->SetRotation(std::numbers::pi_v<float>);
 }
 
 void TutorialScene3::Finalize()
@@ -372,10 +384,7 @@ void TutorialScene3::Draw()
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
 #pragma endregion
-}
 
-void TutorialScene3::DrawUI()
-{
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
@@ -392,6 +401,25 @@ void TutorialScene3::DrawUI()
 
 	//スコアの描画
 	score_->Draw();
+
+	if (isReversed_) {
+		reversedSprite_->Draw();
+	}
+
+	if (isDoubleSpeed_ && !isReversed_) {
+		doubleSprite_->Draw();
+	}
+
+	//前景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+}
+
+void TutorialScene3::DrawUI()
+{
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

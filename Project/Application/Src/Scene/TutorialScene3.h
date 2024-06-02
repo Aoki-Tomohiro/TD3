@@ -98,4 +98,9 @@ private:
 
 	//スイッチ
 	std::unique_ptr<SwitchManager> switchManager_ = nullptr;
+
+	//倍速の時のスプライト
+	std::unique_ptr<Sprite> doubleSprite_ = nullptr;
+	//巻き戻し時のスプライト
+	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
 };

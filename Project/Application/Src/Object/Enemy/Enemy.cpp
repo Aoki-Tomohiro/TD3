@@ -125,7 +125,7 @@ void Enemy::Update()
 	model_->Update(worldTransform_, animationNumber_);
 
 	//影響範囲
-	impactScopeModel_->GetMaterial(0)->SetColor(Vector4{ 1.0f,1.0f,0.0f,0.3f });
+	impactScopeModel_->GetMaterial(0)->SetColor(Vector4{ 1.0f,1.0f,0.0f,0.15f });
 
 	ImGui::Begin("Enemy");
 	ImGui::Text("PlayerPos X%d,Y%d", int(playerPosition_.x), int(playerPosition_.y));

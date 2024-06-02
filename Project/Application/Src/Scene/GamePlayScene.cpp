@@ -4,6 +4,7 @@
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include "Application/Src/Scene/GameClearScene.h"
 #include "Application/Src/Scene/StageSelectScene.h"
+#include <numbers>
 
 uint32_t GamePlayScene::currentStageNumber = StageSelectScene::stageNumber_;
 
@@ -63,7 +64,7 @@ void GamePlayScene::Initialize()
 
 	TextureManager::Load("back.png");
 	backSprite_.reset(Sprite::Create("back.png", { 0.0f,0.0f }));
-	backSprite_->SetColor({ 1.0f,1.0f,1.0f,0.8f });
+	backSprite_->SetColor({ 0.0f,0.5f,1.0f,0.8f });
 	TextureManager::Load("pause.png");
 	pauseSprite_.reset(Sprite::Create("pause.png", { 0.0f,0.0f }));
 	TextureManager::Load("pauseUI.png");
@@ -81,6 +82,7 @@ void GamePlayScene::Initialize()
 	//TextureManager::Load("pause.png");
 	reversedSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
 	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	reversedSprite_->SetRotation(std::numbers::pi_v<float>);
 
 	//スターとスプライト
 	TextureManager::Load("Tutorial.png");
@@ -496,7 +498,18 @@ void GamePlayScene::Draw()
 	//スコアの描画
 	score_->Draw();
 
-	
+	if (isReversed_) {
+		reversedSprite_->Draw();
+	}
+
+	if (isDoubleSpeed_ && !isReversed_) {
+		doubleSprite_->Draw();
+	}
+
+	if (cutIn_)
+	{
+		backSprite_->Draw();
+	}
 
 	if (pause_) {
 		backSprite_->Draw();
@@ -520,14 +533,6 @@ void GamePlayScene::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-
-	if (isReversed_) {
-		reversedSprite_->Draw();
-	}
-
-	if (isDoubleSpeed_ && !isReversed_) {
-		doubleSprite_->Draw();
-	}
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -817,6 +822,7 @@ void GamePlayScene::CutIn() {
 
 	if (stertPos_.x < -600) {
 		cutIn_ = false;
+		backSprite_->SetColor({ 1.0f,1.0f,1.0f,0.8f });
 	}
 
 	player_->SetCutIn(cutIn_);
