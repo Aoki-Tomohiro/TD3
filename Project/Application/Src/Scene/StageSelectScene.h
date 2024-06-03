@@ -23,6 +23,8 @@ public:
 
 	void Transition();
 
+	static const uint32_t GetMaxStageCount(){ return kMaxStageCount; };
+
 	static uint32_t stageNumber_;
 	static uint32_t preSelectNumber_;
 private:
@@ -44,6 +46,9 @@ private:
 
 	//ステージ数
 	static const uint32_t kMaxStages = 8;
+
+	//ステージの最大数
+	static const uint32_t kMaxStageCount = kMaxTutorial + kMaxStages + 2;
 
 	//背景スプライト
 	std::unique_ptr<Sprite> backGroundSprite_ = nullptr;

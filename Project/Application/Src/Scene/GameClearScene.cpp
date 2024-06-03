@@ -1,5 +1,6 @@
 #include "GameClearScene.h"
 #include "Engine/Framework/Scene/SceneManager.h"
+#include "Application/Src/Scene/StageSelectScene.h"
 #include "Application/Src/Scene/GamePlayScene.h"
 #include "Application/Src/Scene/StageSelectScene.h"
 #include "Engine/Base/ImGuiManager.h"
@@ -238,7 +239,7 @@ void GameClearScene::Transition() {
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{
-			if (GamePlayScene::currentStageNumber == GamePlayScene::kMaxStageCount - 1)
+			if (GamePlayScene::currentStageNumber == StageSelectScene::GetMaxStageCount() - 1)
 			{
 				sceneManager_->ChangeScene("GameTitleScene");
 				StageSelectScene::preSelectNumber_ = 0;

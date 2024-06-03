@@ -58,7 +58,7 @@ void StageSelectScene::Initialize() {
 	{
 		stageSprites_[i].reset(Sprite::Create("Stage.png", { 0.0f,0.0f }));
 		numberSprites_[i].reset(Sprite::Create("Numbers/" + std::to_string(i + 1) + ".png", { 0.0f,0.0f }));
-		stageSpriteTargetPosition_[i] = { 430.0f + (tutorialSprites_.size() + i) * delta_,142.0f};
+		stageSpriteTargetPosition_[i] = { 430.0f + (tutorialSprites_.size() + i) * delta_,142.0f };
 		stageSpritePosition_[i] = stageSpriteTargetPosition_[i];
 		numberSpriteTargetPosition_[i] = { 760.0f + (tutorialSprites_.size() + i) * delta_,142.0f };
 		numberSpritePosition_[i] = numberSpriteTargetPosition_[i];
@@ -132,23 +132,41 @@ void StageSelectScene::Update() {
 				float delta = 0.0f;
 				//左右にカーソルを動かす
 				if (stickTilt.x < -threshold) {
-					--selectNumber_;
 					isMovementEnabled_ = false;
-					delta = delta_;
+					//チュートリアルを選択しているときに左入力した場合最後のステージに飛ばす
+					if (selectNumber_ == 0)
+					{
+						delta = -delta_ * kMaxStages;
+						selectNumber_ = kMaxStages;
+					}
+					else
+					{
+						--selectNumber_;
+						delta = delta_;
+					}
 				}
 				else if (stickTilt.x > threshold) {
-					++selectNumber_;
 					isMovementEnabled_ = false;
-					delta = -delta_;
+					//最後のステージを選択しているときに右入力をした場合チュートリアルに戻す
+					if (selectNumber_ == kMaxStages)
+					{
+						delta = delta_ * kMaxStages;
+						selectNumber_ = 0;
+					}
+					else
+					{
+						++selectNumber_;
+						delta = -delta_;
+					}
 				}
 				//ステージ上限を超えないようにする
 				if (selectNumber_ < 0)
 				{
 					selectNumber_ = 0;
 				}
-				else if (selectNumber_ > kMaxTutorial + kMaxStages - 1)
+				else if (selectNumber_ > kMaxStages)
 				{
-					selectNumber_ = kMaxTutorial + kMaxStages - 1;
+					selectNumber_ = kMaxStages;
 				}
 				//ステージ上限を超えていなかったらスプライトをずらす
 				else
@@ -191,9 +209,9 @@ void StageSelectScene::Update() {
 		{
 			selectNumber_ = 0;
 		}
-		else if (selectNumber_ > kMaxTutorial + kMaxStages - 1)
+		else if (selectNumber_ > kMaxStages)
 		{
-			selectNumber_ = kMaxTutorial + kMaxStages - 1;
+			selectNumber_ = kMaxStages;
 		}
 		else
 		{
@@ -216,7 +234,7 @@ void StageSelectScene::Update() {
 
 	if (!isMovementEnabled_)
 	{
-		easingParameter_ += 1.0f / 20.0f;
+		easingParameter_ += 1.0f / 15.0f;
 		//チュートリアル
 		for (uint32_t i = 0; i < tutorialSprites_.size(); ++i)
 		{
@@ -259,7 +277,7 @@ void StageSelectScene::Update() {
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 		}
 	}
-	
+
 
 
 	ImGui::Begin("SelectScene");
@@ -321,7 +339,7 @@ void StageSelectScene::Update() {
 	ImGui::End();
 }
 
-void StageSelectScene::Draw(){
+void StageSelectScene::Draw() {
 #pragma region 背景スプライト描画
 	//背景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
@@ -387,7 +405,7 @@ void StageSelectScene::DrawUI() {
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	
+
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion

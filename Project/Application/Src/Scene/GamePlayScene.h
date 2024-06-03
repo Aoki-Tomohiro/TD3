@@ -28,8 +28,6 @@ enum changeScene
 class GamePlayScene : public IScene
 {
 public:
-	static const uint32_t kMaxStageCount = 11;
-
 	static uint32_t currentStageNumber;
 
 	void Initialize() override;
