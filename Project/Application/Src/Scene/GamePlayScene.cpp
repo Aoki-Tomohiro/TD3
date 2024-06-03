@@ -44,7 +44,14 @@ void GamePlayScene::Initialize()
 	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
 	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
-	player_->Initialzie(playerModels, { 0.0f,-10.0f,0.0f });
+	if (currentStageNumber == 8)
+	{
+		player_->Initialzie(playerModels, { 0.0f,4.3f,0.0f });
+	}
+	else
+	{
+		player_->Initialzie(playerModels, { 0.0f,-10.0f,0.0f });
+	}
 
 	//ブロックを生成
 	blockManager_ = std::make_unique<BlockManager>();
@@ -461,6 +468,7 @@ void GamePlayScene::Update()
 	ImGui::Text("cursorPosition_%f", cursorPosition_.y);
 	ImGui::DragFloat2("RulePosition", &rulePos_.x);
 	ImGui::DragFloat2("RuleScale", &ruleSize_.x, 0.1f, 1.0f);
+	ImGui::Text("CurrentStageNumber : %d", currentStageNumber);
 	ImGui::End();
 	
 }

@@ -50,7 +50,7 @@ private:
 	static const uint32_t kMaxTutorial = 1;
 
 	//ステージ数
-	static const uint32_t kMaxStages = 8;
+	static const uint32_t kMaxStages = 7;
 
 	//ステージの最大数
 	static const uint32_t kMaxStageCount = kMaxTutorial + kMaxStages + 2;
