@@ -69,7 +69,8 @@ void StageSelectScene::Initialize() {
 	//ステージ画面のスプライトの作成
 	for (uint32_t i = 0; i < stageScreenSprites_.size(); ++i)
 	{
-		stageScreenSprites_[i].reset(Sprite::Create("white.png", { 0.0f,0.0f }));
+		TextureManager::Load("serekuto" + std::to_string(i) + ".png");
+		stageScreenSprites_[i].reset(Sprite::Create("serekuto" + std::to_string(i) + ".png", { 0.0f,0.0f }));
 		stageScreenSpriteTargetPosition_[i] = { 418.0f + delta_ * i,300.0f };
 		stageScreenSpritePosition_[i] = stageScreenSpriteTargetPosition_[i];
 		stageScreenSpriteSize_[i] = { 500.0f,280.0f };
