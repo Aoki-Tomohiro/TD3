@@ -103,6 +103,10 @@ private:
 	//矢印のテクスチャ
 	std::unique_ptr<Sprite> yajiSprite_ = nullptr;
 	
+	//UI
+	std::unique_ptr<Sprite> botanUI_ = nullptr;
+	std::unique_ptr<Sprite> rbUI_ = nullptr;
+
 	//ポーズ用スプライト
 	std::unique_ptr<Sprite> backSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;

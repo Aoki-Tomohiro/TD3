@@ -50,6 +50,10 @@ private:
 	//敵
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 
+	//UI
+	std::unique_ptr<Sprite> botanUI_ = nullptr;
+	std::unique_ptr<Sprite> rbUI_ = nullptr;
+
 	//ブロック
 	Model* blockModel_ = nullptr;
 	std::unique_ptr<BlockManager> blockManager_ = nullptr;

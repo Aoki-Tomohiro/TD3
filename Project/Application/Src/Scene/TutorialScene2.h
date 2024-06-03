@@ -103,5 +103,9 @@ private:
 	std::unique_ptr<Sprite> doubleSprite_ = nullptr;
 	//巻き戻し時のスプライト
 	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
+
+	//UI
+	std::unique_ptr<Sprite> botanUI_ = nullptr;
+	std::unique_ptr<Sprite> rbUI_ = nullptr;
 };
 

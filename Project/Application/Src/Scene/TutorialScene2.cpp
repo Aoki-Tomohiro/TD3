@@ -81,6 +81,12 @@ void TutorialScene2::Initialize()
 	reversedSprite_.reset(Sprite::Create("yajirusiz.png", { 640.0f,360.0f }));
 	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
 	reversedSprite_->SetRotation(std::numbers::pi_v<float>);
+
+	//UI
+	TextureManager::Load("botan.png");
+	TextureManager::Load("rb.png");
+	botanUI_.reset(Sprite::Create("botan.png", { 800.0f,580.0f }));
+	rbUI_.reset(Sprite::Create("rb.png", { 1050.0f,610.0f }));
 }
 
 void TutorialScene2::Finalize()
@@ -394,6 +400,11 @@ void TutorialScene2::Draw()
 		doubleSprite_->Draw();
 	}
 
+	botanUI_->Draw();
+	if (player_->GetIsStop()) {
+		rbUI_->Draw();
+	}
+
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion
@@ -504,6 +515,8 @@ void TutorialScene2::Transition() {
 	//フェードアウトの処理
 	if (isFadeOut_)
 	{
+		//ノイズエフェクト無効化
+		PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{

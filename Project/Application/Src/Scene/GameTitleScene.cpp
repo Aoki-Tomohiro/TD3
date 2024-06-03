@@ -264,15 +264,6 @@ void GameTitleScene::DrawUI()
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
 
-	////背景のスプライトの描画
-	//backGroundSprite_->Draw();
-
-	////タイトルのスプライトの描画
-	//titleSprite_->Draw();
-
-	////PushAのスプライトの描画
-	//pushASprite_->Draw();
-
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
 #pragma endregion

@@ -69,7 +69,10 @@ void TutorialScene1::Initialize()
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
 	numberSprite_.reset(Sprite::Create("Numbers/1.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
-
+	//UI
+	TextureManager::Load("botan.png");
+	botanUI_.reset(Sprite::Create("botan.png", { 1000.0f,580.0f }));;
+	
 	//Switchの生成
 	switchManager_ = std::make_unique<SwitchManager>();
 	switchManager_->Initialize(0);
@@ -251,6 +254,9 @@ void TutorialScene1::Draw()
 
 	//スコアの描画
 	score_->Draw();
+
+	botanUI_->Draw();
+	
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
