@@ -54,6 +54,10 @@ public:
 
 	void SetCutIn(bool flag) { cutIn_ = flag; }
 
+	void TitleUpdate();
+
+	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
+
 private:
 	enum class Behavior
 	{

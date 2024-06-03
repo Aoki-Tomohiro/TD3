@@ -7,6 +7,8 @@
 #include "Engine/Components/Audio/Audio.h"
 #include "Engine/3D/Model/ModelManager.h"
 #include "Engine/2D/Sprite.h"
+#include "Application/Src/Object/Player/Player.h"
+#include "Application/Src/Object/Enemy/Enemy.h"
 
 class GameTitleScene : public IScene
 {
@@ -58,5 +60,17 @@ private:
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
 	float timer_ = 0.0f;
+
+	Camera camera_{};
+
+	//
+	Model* wallModel_ = nullptr;
+	WorldTransform wallWorldTransform_{};
+	Model* groundModel_ = nullptr;
+	std::array<WorldTransform, 2> groundWorldTransforms_{};
+	Model* playerModel_ = nullptr;
+	Model* weaponModel_ = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
+	std::unique_ptr<Enemy> enemy_ = nullptr;
 };
 

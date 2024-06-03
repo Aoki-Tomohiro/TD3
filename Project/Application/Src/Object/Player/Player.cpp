@@ -342,6 +342,23 @@ void Player::SetPositions(const Vector3& position, const bool isAttack, const ui
 	weapon_->Update();
 }
 
+void Player::TitleUpdate()
+{
+	const float kMoveSpeed = 0.3f;
+	worldTransform_.translation_.x += kMoveSpeed;
+	if (worldTransform_.translation_.x > 80.0f)
+	{
+		worldTransform_.translation_.x = -80.0f;
+	}
+	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+	worldTransform_.UpdateMatrixFromQuaternion();
+	models_[0]->Update(worldTransform_, 4);
+
+	ImGui::Begin("TitlePlayer");
+	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x, 0.1f);
+	ImGui::End();
+}
+
 void Player::BehaviorRootInitialize()
 {
 	//当たり判定をなくす

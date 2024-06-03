@@ -55,6 +55,11 @@ void Enemy::Initialize(const Vector3& position, const uint32_t id)
 	attackAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Attack.wav");
 }
 
+void Enemy::TitleUpdate()
+{
+
+}
+
 void Enemy::Update()
 {
 	if (!isTutorial_)
