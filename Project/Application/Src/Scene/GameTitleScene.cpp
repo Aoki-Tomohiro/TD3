@@ -149,17 +149,17 @@ void GameTitleScene::Update()
 		}
 	}
 	
-	
+	LightManager::GetInstance()->GetDirectionalLight(0).SetDirection(direction_);
+	LightManager::GetInstance()->GetDirectionalLight(0).SetIntensity(intensity_);
 
 	if (input_->IsPushKeyEnter(DIK_S))
 	{
 		sceneManager_->ChangeScene("StageSelectScene");
 		audio_->StopAudio(titleBgmHandle_);
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
+		LightManager::GetInstance()->GetDirectionalLight(0).SetDirection({ 0.0f,-1.0f,0.0f });
+		LightManager::GetInstance()->GetDirectionalLight(0).SetIntensity(1.0f);
 	}
-
-	LightManager::GetInstance()->GetDirectionalLight(0).SetDirection(direction_);
-	LightManager::GetInstance()->GetDirectionalLight(0).SetIntensity(intensity_);
 
 	Transition();
 
