@@ -771,10 +771,12 @@ void GamePlayScene::Pause() {
 
 				//上下にカーソルを動かす
 				if (stickTilt.y < -threshold) {
+					audio_->PlayAudio(decisionHandle_, false, 0.4f);
 					cursorPosition_.y += cursorVelocity_.y;
 					isCursorMovementEnabled_ = false;
 				}
 				else if (stickTilt.y > threshold) {
+					audio_->PlayAudio(decisionHandle_, false, 0.4f);
 					cursorPosition_.y -= cursorVelocity_.y;
 					isCursorMovementEnabled_ = false;
 				}
@@ -783,11 +785,13 @@ void GamePlayScene::Pause() {
 
 		if (isCursorMovementEnabled_) {
 			if (input_->IsPushKeyEnter(DIK_S)) {
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
 				cursorPosition_.y += cursorVelocity_.y;
 				isCursorMovementEnabled_ = false;
 			}
 			else if (input_->IsPushKeyEnter(DIK_W))
 			{
+				audio_->PlayAudio(decisionHandle_, false, 0.4f);
 				cursorPosition_.y -= cursorVelocity_.y;
 				isCursorMovementEnabled_ = false;
 			}
