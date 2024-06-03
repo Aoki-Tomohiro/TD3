@@ -37,6 +37,9 @@ public:
 		{
 			model_->GetMaterial(0)->SetColor(color);
 			model_->GetMaterial(1)->SetColor(color);
+			model_->GetMaterial(2)->SetColor(color);
+			model_->GetMaterial(3)->SetColor(color);
+			model_->GetMaterial(4)->SetColor(color);
 		}
 	};
 
