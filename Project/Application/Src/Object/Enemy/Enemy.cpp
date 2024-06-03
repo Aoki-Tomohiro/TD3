@@ -2,6 +2,7 @@
 #include "Engine/Base/ImGuiManager.h"
 #include <Engine/3D/Model/ModelManager.h>
 #include <Application/Src/Scene/GamePlayScene.h>
+#include <Application/Src/Scene/StageSelectScene.h>
 
 void Enemy::Initialize(const Vector3& position, const uint32_t id)
 {
@@ -656,7 +657,7 @@ void Enemy::DistanceFunction() {
 					}
 				}
 				
-				if (differenceX <= 5 && differenceY <= 5 && y > 16) {
+				if (differenceX <= 5 && differenceY <= 5 && y > 16 && StageSelectScene::stageNumber_ != 0) {
 
 				
 

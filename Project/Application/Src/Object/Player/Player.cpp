@@ -27,6 +27,8 @@ void Player::Initialzie(std::vector<Model*> models)
 	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.UpdateMatrixFromQuaternion();
+	
+
 
 	//武器の生成
 	weapon_ = std::make_unique<Weapon>();
@@ -506,7 +508,7 @@ void Player::BehaviorRootUpdate()
 		worldTransform_.translation_.y += jumpFirstSpeed_;
 	}
 
-	if (input_->IsPushKeyEnter(DIK_E) && isMove_ && !cutIn_)
+	if (input_->IsPushKeyEnter(DIK_E) && isLanded_ && isMove_ && !cutIn_)
 	{
 		audio_->StopAudio(moveAudioHandle_);
 		behaviorRequest_ = Behavior::kAttack;
