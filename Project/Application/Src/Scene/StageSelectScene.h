@@ -43,7 +43,7 @@ private:
 	static const uint32_t kMaxTutorial = 1;
 
 	//ステージ数
-	static const uint32_t kMaxStages = 3;
+	static const uint32_t kMaxStages = 8;
 
 	//背景スプライト
 	std::unique_ptr<Sprite> backGroundSprite_ = nullptr;
