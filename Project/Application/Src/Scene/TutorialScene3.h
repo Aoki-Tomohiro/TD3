@@ -108,4 +108,14 @@ private:
 	//UI
 	std::unique_ptr<Sprite> botanUI_ = nullptr;
 	std::unique_ptr<Sprite> rbUI_ = nullptr;
+
+	//敵の逃げるチュートリアルのスプライト
+	std::unique_ptr<Sprite> runAwayTutorialSprite_{};
+	std::unique_ptr<Sprite> crossMarkSprite_{};
+	uint32_t runAwayAnimationNumber_ = 0;
+	uint32_t runAwayFrameCounter_ = 0;
+	Vector2 runAwayTranslation_ = { 150.0f,430.0f };
+	Vector2 runAwayScale_ = { 0.6f,0.6f };
+	Vector2 crossMarkTranslation_ = { 200.0f,345.0f };
+	Vector2 crossMarkScale_ = { 0.6f,0.6f };
 };

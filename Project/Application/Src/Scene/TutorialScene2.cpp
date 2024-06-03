@@ -88,6 +88,14 @@ void TutorialScene2::Initialize()
 	botanUI_.reset(Sprite::Create("botan.png", { 900.0f,600.0f }));
 	rbUI_.reset(Sprite::Create("rb.png", { 1100.0f,610.0f }));
 	botanUI_->SetScale({ 0.8f,0.8f });
+
+	//敵を倒すスプライトの生成
+	for (uint32_t i = 0; i < 3; i++)
+	{
+		TextureManager::Load("KnockDown" + std::to_string(i + 1) + ".png");
+	}
+	knockDownsprite_.reset(Sprite::Create("KnockDown1.png", { 0.0f,0.0f }));
+	knockDownsprite_->SetAnchorPoint({ 0.5f,0.5f });
 }
 
 void TutorialScene2::Finalize()
@@ -307,12 +315,28 @@ void TutorialScene2::Update()
 		PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 	}
 
+	//敵を倒すチュートリアルの画像を変更
+		//チュートリアルの画像の切り替え
+	if (++knockDownFrameCounter_ > 10)
+	{
+		knockDownFrameCounter_ = 0;
+		knockDownAnimationNumber_++;
+		if (knockDownAnimationNumber_ >= 3)
+		{
+			knockDownAnimationNumber_ = 0;
+		}
+		knockDownsprite_->SetTexture("KnockDown" + std::to_string(knockDownAnimationNumber_ + 1) + ".png");
+	}
+	knockDownsprite_->SetPosition(knockDownPosition_);
+	knockDownsprite_->SetScale(knockDownScale_);
 
 	ImGui::Begin("TutorialScene2");
 	ImGui::DragFloat2("TutorialSpritePosition", &tutorialSpritePosition_.x);
 	ImGui::DragFloat2("TutorialSpriteScale", &tutorialSpriteScale_.x);
 	ImGui::DragFloat2("NumberSpritePosition", &numberSpritePosition_.x);
 	ImGui::DragFloat2("NumberSpriteScale", &numberSpriteScale_.x);
+	ImGui::DragFloat2("KnockDownSpritePosition", &knockDownPosition_.x);
+	ImGui::DragFloat2("KnockDownSpriteScale", &knockDownScale_.x);
 	ImGui::End();
 	tutorialSprite_->SetPosition(tutorialSpritePosition_);
 	tutorialSprite_->SetScale(tutorialSpriteScale_);
@@ -334,6 +358,9 @@ void TutorialScene2::Draw()
 
 	//背景の描画
 	backGround_->DrawSprite();
+
+	//敵を倒すチュートリアルのスプライトの描画
+	knockDownsprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();

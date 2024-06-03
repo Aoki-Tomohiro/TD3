@@ -87,6 +87,17 @@ void TutorialScene3::Initialize()
 	botanUI_.reset(Sprite::Create("botan.png", { 900.0f,600.0f }));
 	rbUI_.reset(Sprite::Create("rb.png", { 1100.0f,610.0f }));
 	botanUI_->SetScale({ 0.8f,0.8f });
+
+	//敵が逃げるチュートリアルのスプライトの生成
+	for (uint32_t i = 0; i < 4; ++i)
+	{
+		TextureManager::Load("RunAway" + std::to_string(i + 1) + ".png");
+	}
+	runAwayTutorialSprite_.reset(Sprite::Create("RunAway1.png", runAwayTranslation_));
+	runAwayTutorialSprite_->SetAnchorPoint({ 0.5f,0.5f });
+	TextureManager::Load("CrossMark.png");
+	crossMarkSprite_.reset(Sprite::Create("CrossMark.png", runAwayTranslation_));
+	crossMarkSprite_->SetAnchorPoint({ 0.5f,0.5f });
 }
 
 void TutorialScene3::Finalize()
@@ -328,11 +339,31 @@ void TutorialScene3::Update()
 		PostEffects::GetInstance()->GetGlitchNoise()->SetNoiseType(0);
 	}
 
+	//チュートリアルの画像の切り替え
+	if (++runAwayFrameCounter_ > 5)
+	{
+		runAwayFrameCounter_ = 0;
+		runAwayAnimationNumber_++;
+		if (runAwayAnimationNumber_ >= 4)
+		{
+			runAwayAnimationNumber_ = 0;
+		}
+		runAwayTutorialSprite_->SetTexture("RunAway" + std::to_string(runAwayAnimationNumber_ + 1) + ".png");
+	}
+	runAwayTutorialSprite_->SetPosition(runAwayTranslation_);
+	runAwayTutorialSprite_->SetScale(runAwayScale_);
+	crossMarkSprite_->SetPosition(crossMarkTranslation_);
+	crossMarkSprite_->SetScale(crossMarkScale_);
+
 	ImGui::Begin("TutorialScene3");
 	ImGui::DragFloat2("TutorialSpritePosition", &tutorialSpritePosition_.x);
 	ImGui::DragFloat2("TutorialSpriteScale", &tutorialSpriteScale_.x);
 	ImGui::DragFloat2("NumberSpritePosition", &numberSpritePosition_.x);
 	ImGui::DragFloat2("NumberSpriteScale", &numberSpriteScale_.x);
+	ImGui::DragFloat2("RunAwaySpritePosition", &runAwayTranslation_.x);
+	ImGui::DragFloat2("RunAwaySpriteScale", &runAwayScale_.x);
+	ImGui::DragFloat2("CrossMarkSpritePosition", &crossMarkTranslation_.x);
+	ImGui::DragFloat2("CrossMarkSpriteScale", &crossMarkScale_.x);
 	ImGui::End();
 	tutorialSprite_->SetPosition(tutorialSpritePosition_);
 	tutorialSprite_->SetScale(tutorialSpriteScale_);
@@ -353,6 +384,12 @@ void TutorialScene3::Draw()
 
 	//背景の描画
 	backGround_->DrawSprite();
+
+	//チュートリアルの画像
+	runAwayTutorialSprite_->Draw();
+
+	//罰マークの描画
+	crossMarkSprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();

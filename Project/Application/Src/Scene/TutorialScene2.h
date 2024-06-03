@@ -107,5 +107,12 @@ private:
 	//UI
 	std::unique_ptr<Sprite> botanUI_ = nullptr;
 	std::unique_ptr<Sprite> rbUI_ = nullptr;
+
+	//敵を倒すチュートリアルのスプライト
+	std::unique_ptr<Sprite> knockDownsprite_ = nullptr;
+	uint32_t knockDownAnimationNumber_ = 0;
+	uint32_t knockDownFrameCounter_ = 0;
+	Vector2 knockDownPosition_{ 1022.0f,415.0f};
+	Vector2 knockDownScale_{ 0.6f,0.6f };
 };
 
