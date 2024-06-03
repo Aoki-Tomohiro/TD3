@@ -2,6 +2,7 @@
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include <numbers>
+#include "TutorialScene1.h"
 
 void TutorialScene3::Initialize()
 {
@@ -54,6 +55,9 @@ void TutorialScene3::Initialize()
 
 	//音声データ読み込み
 	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
+	tutorialBGMHandle_ = audio_->LoadAudioFile("tutorialBGM.wav");
+	//audio_->PlayAudio(tutorialBGMHandle_, true, 0.5f);
+
 
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
@@ -525,8 +529,9 @@ void TutorialScene3::Transition() {
 			}
 			else {
 				sceneManager_->ChangeScene("StageSelectScene");
+				audio_->StopAudio(TutorialScene1::tutoBGMHandle_);
 			}
-			
+			//audio_->StopAudio(tutorialBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

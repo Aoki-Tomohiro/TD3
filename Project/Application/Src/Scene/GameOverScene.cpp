@@ -18,6 +18,10 @@ void GameOverScene::Initialize()
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
+	overBGMHandle_ = audio_->LoadAudioFile("selectBGM.wav");
+
+	audio_->PlayAudio(overBGMHandle_, true, 0.1f);
+
 }
 
 void GameOverScene::Finalize() 
@@ -145,6 +149,7 @@ void GameOverScene::Transition() {
 				sceneManager_->ChangeScene("GamePlayScene");
 				copyCount_ = 0;
 			}
+			audio_->StopAudio(overBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

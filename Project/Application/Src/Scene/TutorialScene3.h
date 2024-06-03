@@ -75,6 +75,7 @@ private:
 
 	//オーディオハンドル
 	uint32_t whiffAudioHandle_ = 0;
+	uint32_t tutorialBGMHandle_ = 0;
 
 	//巻き戻しのデータスキップ数
 	uint32_t stepSize_ = 4;

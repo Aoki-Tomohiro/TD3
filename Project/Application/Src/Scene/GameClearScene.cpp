@@ -39,6 +39,9 @@ void GameClearScene::Initialize()
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
+	clearBGMHandle_ = audio_->LoadAudioFile("selectBGM.wav");
+
+	audio_->PlayAudio(clearBGMHandle_, true, 0.1f);
 
 	//リザルトのスプライトの生成
 	for (uint32_t i = 0; i < resultSprites_.size(); i++)
@@ -246,6 +249,7 @@ void GameClearScene::Transition() {
 				sceneManager_->ChangeScene("StageSelectScene");
 				timeCount_ = 0;
 			}
+			audio_->StopAudio(clearBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

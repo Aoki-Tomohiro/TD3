@@ -81,6 +81,10 @@ void StageSelectScene::Initialize() {
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
+	selectBGMHandle_ = audio_->LoadAudioFile("selectBGM.wav");
+
+	audio_->PlayAudio(selectBGMHandle_, true, 0.3f);
+
 
 	//座標を合わせる
 	for (uint32_t i = 0; i < preSelectNumber_; i++)
@@ -422,6 +426,7 @@ void StageSelectScene::Transition() {
 				StageSelectScene::stageNumber_ = selectNumber_ + 2;
 				sceneManager_->ChangeScene("GamePlayScene");
 			}
+			audio_->StopAudio(selectBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

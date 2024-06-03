@@ -36,6 +36,7 @@ private:
 	std::unique_ptr<Sprite> resultSprite_ = nullptr;
 
 	uint32_t decisionHandle_ = 0;
+	uint32_t overBGMHandle_ = 0;
 
 	static int copyCount_;
 

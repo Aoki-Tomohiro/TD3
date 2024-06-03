@@ -2,6 +2,8 @@
 #include "Engine/Framework/Scene/SceneManager.h"
 #include <Engine/Components/PostEffects/PostEffects.h>
 
+uint32_t TutorialScene1::tutoBGMHandle_ = 0;
+
 void TutorialScene1::Initialize()
 {
 	renderer_ = Renderer::GetInstance();
@@ -55,7 +57,10 @@ void TutorialScene1::Initialize()
 
 	//音声データ読み込み
 	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
-
+	tutorialBGMHandle_ = audio_->LoadAudioFile("tutorialBGM.wav");
+	tutoBGMHandle_ = audio_->LoadAudioFile("tutorialBGM.wav");
+	audio_->PlayAudio(tutoBGMHandle_, true, 0.5f);
+	//audio_->PlayAudio(tutorialBGMHandle_, true, 0.5f);
 
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
@@ -308,6 +313,7 @@ void TutorialScene1::Transition() {
 		if (timer_ <= 0.0f)
 		{
 			sceneManager_->ChangeScene("TutorialScene2");
+			//audio_->StopAudio(tutorialBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

@@ -100,6 +100,10 @@ void GamePlayScene::Initialize()
 	//音声データの読み込み
 	reversePlayBackAudioHandle_ = audio_->LoadAudioFile("ReversePlayback.wav");
 	doubleSpeedAudioHandle_ = audio_->LoadAudioFile("DoubleSpeed.wav");
+	playBGMHandle_ = audio_->LoadAudioFile("playBGM.wav");
+
+	audio_->PlayAudio(playBGMHandle_, true, 0.1f);
+
 }
 
 void GamePlayScene::Finalize()
@@ -723,7 +727,7 @@ void GamePlayScene::Transition() {
 				sceneManager_->ChangeScene("GameOverScene");
 			}
 
-
+			audio_->StopAudio(playBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

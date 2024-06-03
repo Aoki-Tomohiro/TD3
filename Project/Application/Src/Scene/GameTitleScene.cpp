@@ -23,13 +23,16 @@ void GameTitleScene::Initialize()
 	//音声データの読み込み
 	bgmHandle_ = audio_->LoadAudioFile("BGM.wav");
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
+	titleBgmHandle_ = audio_->LoadAudioFile("titleBGM.wav");
 
 	//BGMの再生
 	if (!isStart_)
 	{
-		audio_->PlayAudio(bgmHandle_, true, 0.1f);
+		
 		isStart_ = true;
 	}
+
+	audio_->PlayAudio(titleBgmHandle_, true, 0.5f);
 }
 
 void GameTitleScene::Finalize()
@@ -170,10 +173,12 @@ void GameTitleScene::Transition() {
 	//フェードアウトの処理
 	if (isFadeOut_)
 	{
+		
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{
 			sceneManager_->ChangeScene("TutorialScene1");
+			audio_->StopAudio(titleBgmHandle_);
 			timer_ = 0.0f;
 		}
 	}

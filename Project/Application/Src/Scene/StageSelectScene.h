@@ -35,6 +35,8 @@ private:
 	//カメラ
 	//Camera camera_{};
 
+	
+
 	int selectNumber_ = 0;
 
 	//チュートリアル数
@@ -86,6 +88,7 @@ private:
 	//Vector2 SpriteSize_[3] = { {3.0f,3.0f},{3.0f,3.0f},{3.0f,3.0f} };
 
 	uint32_t decisionHandle_ = 0;
+	uint32_t selectBGMHandle_ = 0;
 
 	bool isMovementEnabled_ = true;
 	int MovementEnableTimer_ = 0;

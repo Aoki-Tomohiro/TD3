@@ -34,6 +34,8 @@ private:
 
 	uint32_t bgmHandle_ = 0;
 
+	uint32_t titleBgmHandle_ = 0;
+
 	uint32_t decisionHandle_ = 0;
 
 	std::unique_ptr<Sprite> backGroundSprite_ = nullptr;

@@ -55,6 +55,9 @@ void TutorialScene2::Initialize()
 
 	//音声データ読み込み
 	whiffAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Whiff.wav");
+	tutorialBGMHandle_ = audio_->LoadAudioFile("tutorialBGM.wav");
+	//audio_->PlayAudio(tutorialBGMHandle_, true, 0.5f);
+
 
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
@@ -505,6 +508,7 @@ void TutorialScene2::Transition() {
 		if (timer_ <= 0.0f)
 		{
 			sceneManager_->ChangeScene("TutorialScene3");
+			//audio_->StopAudio(tutorialBGMHandle_);
 			timer_ = 0.0f;
 		}
 	}

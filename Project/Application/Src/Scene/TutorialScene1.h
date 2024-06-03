@@ -28,6 +28,7 @@ public:
 
 	void Transition();
 
+	static uint32_t tutoBGMHandle_;
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -70,6 +71,7 @@ private:
 
 	//オーディオハンドル
 	uint32_t whiffAudioHandle_ = 0;
+	uint32_t tutorialBGMHandle_ = 0;
 
 	//チュートリアルのスプライト
 	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;

@@ -50,6 +50,7 @@ private:
 	Vector2 scoreSpriteSize_ = { 330.0f,330.0f };
 	
 	uint32_t decisionHandle_ = 0;
+	uint32_t clearBGMHandle_ = 0;
 
 	static int timeCount_;
 
