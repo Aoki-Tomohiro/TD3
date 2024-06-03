@@ -81,6 +81,7 @@ void GameTitleScene::Initialize()
 	//敵の生成
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize({ -60.0f,-4.2f,-16.2f }, 0);
+	enemy_->SetDestinationQuaternion({ 0.0f,0.707f,0.0f,0.707f });
 
 	//フォントのモデルの生成
 	fontModel_ = ModelManager::CreateFromModelFile("Font.gltf", "Font", Opaque);

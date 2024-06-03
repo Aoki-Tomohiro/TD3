@@ -75,6 +75,8 @@ public:
 
 	void TitleUpdate();
 
+	void SetDestinationQuaternion(const Quaternion& quaternion) { destinationQuaternion_ = quaternion; };
+
 private:
 	//プレイヤーの状態
 	enum class Behavior
@@ -174,7 +176,7 @@ private:
 	uint32_t waitAnimationCoolTimer_ = 0;
 
 	//クォータニオン
-	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
+	Quaternion destinationQuaternion_{ 0.0f,1.0f,0.0f,0.0f };
 
 	bool isEdit_ = false;
 
