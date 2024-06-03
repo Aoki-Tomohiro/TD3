@@ -90,22 +90,22 @@ void GameClearScene::Update()
 
 	//スコアのテクスチャを設定
 	if (kEnemyNumber < 3) {
-		if (score_ >= 1500)
+		if (score_ >= 1600)
 		{
 			currentEvaluation_ = "S";
 			scoreSprite_->SetTexture("Scores/S.png");
 		}
-		else if (score_ >= 1400 && score_ < 1500)
+		else if (score_ >= 1400 && score_ < 1600)
 		{
 			currentEvaluation_ = "A";
 			scoreSprite_->SetTexture("Scores/A.png");
 		}
-		else if (score_ >= 1300 && score_ < 1400)
+		else if (score_ >= 1000 && score_ < 1400)
 		{
 			currentEvaluation_ = "B";
 			scoreSprite_->SetTexture("Scores/B.png");
 		}
-		else if (score_ < 1300)
+		else if (score_ < 1000)
 		{
 			currentEvaluation_ = "C";
 			scoreSprite_->SetTexture("Scores/C.png");
