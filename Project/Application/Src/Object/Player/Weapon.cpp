@@ -16,7 +16,7 @@ void Weapon::Initialize(Model* model)
 	//スプライトの生成
 	TextureManager::Load("x.png");
 	xButtonSprite_.reset(Sprite::Create("x.png", { 0.0f,0.0f }));
-	xButtonSprite_->SetSize({ 150.0f,140.0f });
+	xButtonSprite_->SetSize({ 150.0f,120.0f });
 
 	//衝突判定の初期化
 	SetCollisionAttribute(kCollisionAttributeNoWeapon);
