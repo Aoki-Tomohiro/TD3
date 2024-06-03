@@ -41,6 +41,8 @@ public:
 
 	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
 
+	const bool GetIsEdit() const { return isEdit_; };
+
 	Wall* GetWall() const { return wall_.get(); };
 
 private:

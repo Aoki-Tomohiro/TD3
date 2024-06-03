@@ -628,11 +628,42 @@ void GamePlayScene::Reset()
 }
 
 void GamePlayScene::CalculateRating() {
-	//毎秒今いる敵の数*1ずつ減っていく
-	if (!cutIn_) {
-		dislikes_ += (1.0f / 60.0f);
+	bool advanceTimerFlag = true;
+	for (const std::unique_ptr<Block>& block : blockManager_->GetBlocks())
+	{
+		if (block->GetIsEditing())
+		{
+			advanceTimerFlag = false;
+		}
+	}
+	for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
+	{
+		if (enemy->GetIsEdit())
+		{
+			advanceTimerFlag = false;
+		}
+	}
+	for (const std::unique_ptr<Switch>& Switch : switchManager_->GetSwitches())
+	{
+		if (Switch->GetIsEdit())
+		{
+			advanceTimerFlag = false;
+		}
 	}
 
+	if (!advanceTimerFlag)
+	{
+		player_->SetIsEditing(true);
+	}
+	else
+	{
+		player_->SetIsEditing(false);
+	}
+
+	//毎秒今いる敵の数*1ずつ減っていく
+	if (!cutIn_ && advanceTimerFlag) {
+		dislikes_ += (1.0f / 60.0f);
+	}
 
 	const std::vector<std::unique_ptr<Enemy>>& enemies = enemyManager_->GetEnemies();
 	for (const std::unique_ptr<Copy>& copy : copyManager_->GetCopies())

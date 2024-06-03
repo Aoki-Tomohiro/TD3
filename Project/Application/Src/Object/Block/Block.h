@@ -43,11 +43,17 @@ public:
 		}
 	};
 
+	void SetIsEditing(const bool isEditing) { isEditing_ = isEditing; };
+
+	const bool GetIsEditing() const { return isEditing_; };
+
 private:
 	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_{};
 
 	bool isGround_ = false;
+
+	bool isEditing_ = false;
 };
 

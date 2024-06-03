@@ -75,7 +75,10 @@ void Player::Update()
 		isStop_ = !isMove_ && isLanded_;
 
 		//移動制限の処理
-		UpdateMovementRestriction();
+		if (!isEditing_)
+		{
+			UpdateMovementRestriction();
+		}
 	}
 
 	//プレイヤーの攻撃が当たっていなかったら

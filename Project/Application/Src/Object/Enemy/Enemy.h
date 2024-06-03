@@ -64,8 +64,8 @@ public:
 	void SetColor(const Vector4& color) { model_->GetMaterial(0)->SetColor(color); };
 
 	void SetIsEdit(const bool isEdit) { isEdit_ = isEdit; };
-
-	const bool GetIsEdit()const { return isEdit_; };
+	 
+	const bool GetIsEdit() const { return isEdit_; };
 
 	void UpdateMatrix();
 

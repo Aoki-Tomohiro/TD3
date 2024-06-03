@@ -58,6 +58,8 @@ public:
 
 	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
 
+	void SetIsEditing(const bool isEditing) { isEditing_ = isEditing; };
+
 private:
 	enum class Behavior
 	{
@@ -172,5 +174,7 @@ private:
 
 	//カットインフラグ
 	bool cutIn_;
+
+	bool isEditing_ = false;
 };
 

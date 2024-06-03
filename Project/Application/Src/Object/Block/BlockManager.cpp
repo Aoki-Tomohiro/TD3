@@ -76,6 +76,9 @@ void BlockManager::Update()
 			//スケールを設定
 			block->SetScale(scale);
 
+			//編集中に設定
+			block->SetIsEditing(true);
+
 			// 削除ボタンを追加
 			if (ImGui::Button("Delete"))
 			{
@@ -90,6 +93,9 @@ void BlockManager::Update()
 			/*block->SetColor({ 0.196f,0.196f,0.196f,1.0f });*/
 			/*block->SetColor({ 0.0f, 0.1059f, 0.4039f, 1.0f });*/
 			block->SetColor({ 0.0f, 0.047f, 0.196f, 1.0f });
+
+			//編集解除
+			block->SetIsEditing(false);
 		}
 
 		//IDをインクリメント
