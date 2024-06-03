@@ -65,6 +65,7 @@ void GameTitleScene::Update()
 	if (input_->IsPushKeyEnter(DIK_S))
 	{
 		sceneManager_->ChangeScene("StageSelectScene");
+		audio_->StopAudio(titleBgmHandle_);
 		audio_->PlayAudio(decisionHandle_, false, 0.4f);
 	}
 
