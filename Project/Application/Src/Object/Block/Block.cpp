@@ -41,6 +41,15 @@ void Block::Initialize(const Vector3& position, const Vector3& scale, const uint
 
 void Block::Update()
 {
+	if (!isGround_)
+	{
+		//衝突判定の初期化
+		AABB aabb = {
+		.min{-worldTransform_.scale_.x,-worldTransform_.scale_.y,-worldTransform_.scale_.z},
+		.max{worldTransform_.scale_.x,worldTransform_.scale_.y,worldTransform_.scale_.z},
+		};
+		SetAABB(aabb);
+	}
 	//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
 }
