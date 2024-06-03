@@ -57,7 +57,11 @@ void GameTitleScene::Initialize()
 	}
 
 	//地面の生成
-	groundModel_ = ModelManager::CreateFromModelFile("aoasi.gltf", "aoasi", Opaque);
+	TextureManager::Load("aoo.png");
+	groundModel_ = ModelManager::CreateFromModelFile("aoasi.gltf", "Block", Opaque);
+	groundModel_->GetMaterial(0)->SetTexture("aoo.png");
+	//groundModel_->GetMaterial(0)->SetColor({ -0.5f,1.0f,1.0f,1.0f });
+	groundModel_->GetMaterial(0)->SetUVScale({ 5.0f,1.0f });
 	for (int i = 0; i < groundWorldTransforms_.size(); i++)
 	{
 		groundWorldTransforms_[i].Initialize();
@@ -83,9 +87,9 @@ void GameTitleScene::Initialize()
 	//fontWorldTransform_.translation_ = { 16.2f,11.2f,-9.8f };
 	//fontWorldTransform_.rotation_ = { std::numbers::pi_v<float> / 2.0f ,-std::numbers::pi_v<float> ,0.0f };
 	//fontWorldTransform_.scale_ = { 5.0f,5.0f,5.0f };
-	fontWorldTransform_.translation_ = { 35.4f,4.0f,-25.1f };
+	fontWorldTransform_.translation_ = { 34.4f,4.6f,-25.1f };
 	fontWorldTransform_.rotation_ = { std::numbers::pi_v<float> / 2.0f ,-std::numbers::pi_v<float> -0.695f ,0.0f };
-	fontWorldTransform_.scale_ = { 2.5f,2.5f,2.5f };
+	fontWorldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 
 	//Aボタンのモデルの生成
 	AButtonModel_ = ModelManager::CreateFromModelFile("A.gltf", "A", Opaque);
@@ -94,7 +98,7 @@ void GameTitleScene::Initialize()
 	//aButtonWorldTransform_.rotation_ = { std::numbers::pi_v<float> / 2.0f ,-std::numbers::pi_v<float> ,0.0f };
 	//aButtonWorldTransform_.scale_ = { 4.0f,4.0f,4.0f };
 	aButtonWorldTransform_.translation_ = { 39.6f,-2.5f,-25.1f };
-	aButtonWorldTransform_.rotation_ = { std::numbers::pi_v<float> / 2.0f ,-std::numbers::pi_v<float> -0.695f ,0.0f };
+	aButtonWorldTransform_.rotation_ = { 1.511f ,-std::numbers::pi_v<float> -0.695f ,0.0f };
 	aButtonWorldTransform_.scale_ = { 2.0f,2.0f,2.0f };
 }
 
