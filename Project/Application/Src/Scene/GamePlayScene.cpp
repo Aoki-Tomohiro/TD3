@@ -776,6 +776,7 @@ void GamePlayScene::Transition() {
 		{
 
 			if (nextScene_ == kTitle) {
+
 				sceneManager_->ChangeScene("GameTitleScene");
 			}
 			if (nextScene_ == kSelect) {

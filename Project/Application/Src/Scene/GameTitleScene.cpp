@@ -2,6 +2,7 @@
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include <numbers>
+#include "StageSelectScene.h"
 
 bool GameTitleScene::isStart_ = false;
 
@@ -12,6 +13,7 @@ void GameTitleScene::Initialize()
 	input_ = Input::GetInstance();
 
 	audio_ = Audio::GetInstance();
+	StageSelectScene::stageNumber_ = 0;
 
 	//スプライトの生成
 	backGroundSprite_.reset(Sprite::Create("white.png", { 0.0f,0.0f }));
