@@ -22,8 +22,8 @@ void StageSelectScene::Initialize() {
 	selectNumber_ = preSelectNumber_;
 
 	//背景スプライトの生成
-	TextureManager::Load("backs.png");
-	backGroundSprite_.reset(Sprite::Create("backs.png", { 0.0f,0.0f }));
+	TextureManager::Load("selectBack.png");
+	backGroundSprite_.reset(Sprite::Create("selectBack.png", { 0.0f,0.0f }));
 
 	//矢印のスプライトの生成
 	TextureManager::Load("Arrow.png");
