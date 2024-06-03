@@ -328,7 +328,8 @@ void GamePlayScene::Update()
 		int time = 60 - int(dislikes_);
 		if (time < 0)
 		{
-			sceneManager_->ChangeScene("GameOverScene");
+			isFadeOut_ = true;
+			nextScene_ = kOver;
 		}
 		else
 		{

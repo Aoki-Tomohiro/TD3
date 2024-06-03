@@ -1,6 +1,14 @@
 #include "Player.h"
 #include <Engine/Components/Particle/ParticleManager.h>
 
+Player::~Player()
+{
+	if (audio_->isPlaying(moveAudioHandle_))
+	{
+		audio_->StopAudio(moveAudioHandle_);
+	}
+}
+
 void Player::Initialzie(std::vector<Model*> models)
 {
 	//モデルの初期化
@@ -387,7 +395,7 @@ void Player::BehaviorRootUpdate()
 		//移動中に音声を再生する
 		if (!audio_->isPlaying(moveAudioHandle_))
 		{
-			audio_->PlayAudio(moveAudioHandle_, false, 0.4f);
+			audio_->PlayAudio(moveAudioHandle_, true, 0.4f);
 			//moveAudioTimer_ = 0;
 		}
 		

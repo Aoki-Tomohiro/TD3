@@ -14,6 +14,8 @@
 class Player : public Collider
 {
 public:
+	~Player();
+
 	void Initialzie(std::vector<Model*> models);
 
 	void Update();
