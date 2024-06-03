@@ -26,5 +26,9 @@ private:
 	int blockNum = 0;
 
 	uint32_t stageNumber_ = 0;
+
+	Model* aoasiModel_ = nullptr;
+	WorldTransform worldTransForm = {};
+	Vector4 color_ = {-0.5f,1.0f,1.0f,1.0f};
 };
 

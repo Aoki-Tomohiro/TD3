@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <Engine/Externals/nlohmann/json.hpp>
+#include <Engine/Base/TextureManager.h>
 
 void BlockManager::Initialize(uint32_t stageNumber)
 {
@@ -16,10 +17,22 @@ void BlockManager::Initialize(uint32_t stageNumber)
 
 	//ファイル読み込み
 	LoadFile();
+
+	TextureManager::Load("aoo.png");
+	aoasiModel_ = ModelManager::CreateFromModelFile("aoasi.gltf", "Block", Opaque);
+	aoasiModel_->GetMaterial(0)->SetTexture("aoo.png");
+	aoasiModel_->GetMaterial(0)->SetColor({ -0.5f,1.0f,1.0f,1.0f });
+	aoasiModel_->GetMaterial(0)->SetUVScale({ 5.0f,1.0f });
+	worldTransForm.Initialize();
+	worldTransForm.translation_ = {0.0f,-10.85f,-1.3f};
+	
 }
 
 void BlockManager::Update()
 {
+	
+	worldTransForm.UpdateMatrixFromEuler();
+
 	//ブロックの更新
 	for (std::unique_ptr<Block>& block : blocks_)
 	{
@@ -101,6 +114,10 @@ void BlockManager::Update()
 		SaveData();
 	}
 
+	ImGui::DragFloat3("transform", &worldTransForm.translation_.x);
+	ImGui::DragFloat3("rotation", &worldTransForm.rotation_.x);
+	ImGui::DragFloat3("size", &worldTransForm.scale_.x);
+	ImGui::DragFloat4("Color", &color_.x);
 	ImGui::End();
 }
 
@@ -111,6 +128,8 @@ void BlockManager::Draw(const Camera& camera)
 	{
 		block->Draw(camera);
 	}
+
+	aoasiModel_->Draw(worldTransForm, camera);
 }
 
 void BlockManager::AddBlock(const Vector3& position, const Vector3& scale, const bool isGround)
