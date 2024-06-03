@@ -101,6 +101,7 @@ void GamePlayScene::Initialize()
 	reversePlayBackAudioHandle_ = audio_->LoadAudioFile("ReversePlayback.wav");
 	doubleSpeedAudioHandle_ = audio_->LoadAudioFile("DoubleSpeed.wav");
 	playBGMHandle_ = audio_->LoadAudioFile("playBGM.wav");
+	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	audio_->PlayAudio(playBGMHandle_, true, 0.1f);
 
@@ -122,9 +123,11 @@ void GamePlayScene::Update()
 		{
 			if (!cutIn_) {
 				if (!pause_) {
+					audio_->PlayAudio(decisionHandle_, false, 0.4f);
 					pause_ = true;
 				}
 				else {
+					audio_->PlayAudio(decisionHandle_, false, 0.4f);
 					pause_ = false;
 					rule_ = false;
 				}
@@ -803,21 +806,25 @@ void GamePlayScene::Pause() {
 		//ゲームタイトル画面
 		if (cursorPosition_.y == -40.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE)))
 		{
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			isFadeOut_ = true;
 			nextScene_ = kTitle;
 		}
 
 		//セレクト画面
 		if (cursorPosition_.y == 60.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE))) {
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			isFadeOut_ = true;
 			nextScene_ = kSelect;
 		}
 
 		//ルール画面
 		if (rule_ && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			rule_ = false;
 		}
 		else if (cursorPosition_.y == 120.0f && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			rule_ = true;
 		}
 

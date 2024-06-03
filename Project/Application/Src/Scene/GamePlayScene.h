@@ -163,5 +163,6 @@ private:
 	uint32_t reversePlayBackAudioHandle_ = 0;
 	uint32_t doubleSpeedAudioHandle_ = 0;
 	uint32_t playBGMHandle_ = 0;
+	uint32_t decisionHandle_ = 0;
 };
 
