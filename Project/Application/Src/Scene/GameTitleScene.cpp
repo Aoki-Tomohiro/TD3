@@ -74,8 +74,7 @@ void GameTitleScene::Initialize()
 	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
 	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
-	player_->Initialzie(playerModels);
-	player_->SetPosition({ -80.0f,-4.2f,-16.2f });
+	player_->Initialzie(playerModels, { -80.0f,-4.2f,-16.2f });
 
 	//敵の生成
 	enemy_ = std::make_unique<Enemy>();

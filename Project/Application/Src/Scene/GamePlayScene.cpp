@@ -43,7 +43,7 @@ void GamePlayScene::Initialize()
 	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
 	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
-	player_->Initialzie(playerModels);
+	player_->Initialzie(playerModels, { 0.0f,-10.0f,0.0f });
 
 	//ブロックを生成
 	blockManager_ = std::make_unique<BlockManager>();
@@ -264,24 +264,27 @@ void GamePlayScene::Update()
 		collisionManager_->CheckAllCollisions();
 
 		//プレイヤーが動いているときののデータを保存
-		if (!player_->GetIsStop())
+		if (!player_->GetIsStop() && advanceTimerFlag_)
 		{
 			//プレイヤーの座標を保存
 			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 		}
 
 		//逆再生に必要なプレイヤーのデータを保存
-		reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
-		if (isDoubleSpeed_)
+		if (advanceTimerFlag_)
 		{
-			for (uint32_t i = 0; i < 4; i++)
+			reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+			if (isDoubleSpeed_)
 			{
-				reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+				for (uint32_t i = 0; i < 4; i++)
+				{
+					reversePlayerPositions.push_back({ player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime() });
+				}
 			}
-		}
 
-		//敵の逆再生時に必要なデータを保存
-		enemyManager_->SaveReverseData();
+			//敵の逆再生時に必要なデータを保存
+			enemyManager_->SaveReverseData();
+		}
 
 		//スコアの更新
 		score_->Update(player_.get(), copies);
@@ -628,30 +631,30 @@ void GamePlayScene::Reset()
 }
 
 void GamePlayScene::CalculateRating() {
-	bool advanceTimerFlag = true;
+	advanceTimerFlag_ = true;
 	for (const std::unique_ptr<Block>& block : blockManager_->GetBlocks())
 	{
 		if (block->GetIsEditing())
 		{
-			advanceTimerFlag = false;
+			advanceTimerFlag_ = false;
 		}
 	}
 	for (const std::unique_ptr<Enemy>& enemy : enemyManager_->GetEnemies())
 	{
 		if (enemy->GetIsEdit())
 		{
-			advanceTimerFlag = false;
+			advanceTimerFlag_ = false;
 		}
 	}
 	for (const std::unique_ptr<Switch>& Switch : switchManager_->GetSwitches())
 	{
 		if (Switch->GetIsEdit())
 		{
-			advanceTimerFlag = false;
+			advanceTimerFlag_ = false;
 		}
 	}
 
-	if (!advanceTimerFlag)
+	if (!advanceTimerFlag_)
 	{
 		player_->SetIsEditing(true);
 	}
@@ -661,7 +664,7 @@ void GamePlayScene::CalculateRating() {
 	}
 
 	//毎秒今いる敵の数*1ずつ減っていく
-	if (!cutIn_ && advanceTimerFlag) {
+	if (!cutIn_ && advanceTimerFlag_) {
 		dislikes_ += (1.0f / 60.0f);
 	}
 
@@ -739,7 +742,7 @@ void GamePlayScene::Reverse()
 		else
 		{
 			//位置ズレ対策
-			player_->SetPositions({ 0.0f,-10.0f,0.0f }, false, 1, 0.0f);
+			player_->SetPositions(player_->GetStartPosition() , false, 1, 0.0f);
 		}
 	}
 

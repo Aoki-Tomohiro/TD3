@@ -25,7 +25,7 @@ void TutorialScene1::Initialize()
 	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
 	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
-	player_->Initialzie(playerModels);
+	player_->Initialzie(playerModels, { 0.0f,-10.0f,0.0f });
 	player_->SetIsTutorial(true);
 
 	//敵の生成

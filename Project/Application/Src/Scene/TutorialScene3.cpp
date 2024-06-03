@@ -25,8 +25,8 @@ void TutorialScene3::Initialize()
 	weaponModel_ = ModelManager::CreateFromModelFile("Cube.obj", "PlayerWeapon", Transparent);
 	std::vector<Model*> playerModels = { playerModel_,weaponModel_ };
 	player_ = std::make_unique<Player>();
-	player_->Initialzie(playerModels);
-	player_->SetPosition({ 0.0f,-2.0f,0.0f });
+	player_->Initialzie(playerModels, { 0.0f,-2.0f,0.0f });
+	//player_->SetPosition({ 0.0f,-2.0f,0.0f });
 
 	//敵の生成
 	enemyManager_ = std::make_unique<EnemyManager>();
@@ -128,8 +128,6 @@ void TutorialScene3::Update()
 			copyManager_->AddCopy();
 			//プレイヤーのアニメーションを再生
 			player_->PlayAnimation();
-			//元の位置にプレイヤーを戻す
-			player_->SetPosition({ 0.0f,-2.0f,0.0f });
 			//最初の情報を保存
 			copyManager_->SetPlayerData(player_->GetWorldPosition(), player_->GetWeapon()->GetIsAttack(), player_->GetAnimationNumber(), player_->GetAnimationTime());
 			enemyManager_->SaveReverseData();
@@ -545,7 +543,7 @@ void TutorialScene3::Reverse()
 		else
 		{
 			//位置ズレ対策
-			player_->SetPositions({ 0.0f,-10.0f,0.0f }, false, 1, 0.0f);
+			player_->SetPositions(player_->GetStartPosition(), false, 1, 0.0f);
 		}
 	}
 

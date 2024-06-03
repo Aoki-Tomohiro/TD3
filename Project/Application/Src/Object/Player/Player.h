@@ -16,7 +16,7 @@ class Player : public Collider
 public:
 	~Player();
 
-	void Initialzie(std::vector<Model*> models);
+	void Initialzie(std::vector<Model*> models, const Vector3& position);
 
 	void Update();
 
@@ -59,6 +59,8 @@ public:
 	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
 
 	void SetIsEditing(const bool isEditing) { isEditing_ = isEditing; };
+
+	const Vector3& GetStartPosition() const { return startPosition_; };
 
 private:
 	enum class Behavior
@@ -176,5 +178,7 @@ private:
 	bool cutIn_;
 
 	bool isEditing_ = false;
+
+	Vector3 startPosition_{};
 };
 

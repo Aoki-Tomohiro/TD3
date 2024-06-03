@@ -9,7 +9,7 @@ Player::~Player()
 	}
 }
 
-void Player::Initialzie(std::vector<Model*> models)
+void Player::Initialzie(std::vector<Model*> models, const Vector3& position)
 {
 	//モデルの初期化
 	models_ = models;
@@ -23,7 +23,9 @@ void Player::Initialzie(std::vector<Model*> models)
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_.y = -10.0f;
+	startPosition_ = position;
+	worldTransform_.translation_ = position;
+	//worldTransform_.translation_.y = -10.0f;
 	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.UpdateMatrixFromQuaternion();
@@ -94,96 +96,100 @@ void Player::Update()
 	weapon_->SetIsHit(false);
 
 	//Behaviorの遷移処理
-	if (behaviorRequest_)
+	if (!isEditing_)
 	{
-		behavior_ = behaviorRequest_.value();
-		switch (behavior_) {
+		if (behaviorRequest_)
+		{
+			behavior_ = behaviorRequest_.value();
+			switch (behavior_) {
+			case Behavior::kRoot:
+			default:
+				BehaviorRootInitialize();
+				break;
+			case Behavior::kJump:
+				BehaviorJumpInitialize();
+				break;
+			case Behavior::kAttack:
+				BehaviorAttackInitialize();
+				break;
+			}
+			behaviorRequest_ = std::nullopt;
+		}
+
+		//Behaviorの実行とアニメーション番号の変更
+		switch (behavior_)
+		{
 		case Behavior::kRoot:
 		default:
-			BehaviorRootInitialize();
+			BehaviorRootUpdate();
+			//移動しているとき
+			if (velocity_.x != 0.0f)
+			{
+				//着地しているとき
+				if (isLanded_)
+				{
+					//走りアニメーション
+					animationNumber_ = 4;
+				}
+			}
+			//移動していないときは直立アニメーション
+			else
+			{
+				//着地しているとき
+				if (isLanded_)
+				{
+					animationNumber_ = 1;
+				}
+			}
 			break;
 		case Behavior::kJump:
-			BehaviorJumpInitialize();
+			BehaviorJumpUpdate();
+			//ジャンプアニメーション
+			animationNumber_ = 2;
 			break;
 		case Behavior::kAttack:
-			BehaviorAttackInitialize();
+			BehaviorAttackUpdate();
+			//攻撃アニメーション
+			animationNumber_ = 3;
 			break;
 		}
-		behaviorRequest_ = std::nullopt;
-	}
+		//0踊り 1待機 2ジャンプ 3攻撃 4走り
 
-	//Behaviorの実行とアニメーション番号の変更
-	switch (behavior_)
-	{
-	case Behavior::kRoot:
-	default:
-		BehaviorRootUpdate();
-		//移動しているとき
-		if (velocity_.x != 0.0f)
-		{
-			//着地しているとき
-			if (isLanded_)
-			{
-				//走りアニメーション
-				animationNumber_ = 4;
-			}
-		}
-		//移動していないときは直立アニメーション
-		else
-		{
-			//着地しているとき
-			if (isLanded_)
-			{
-				animationNumber_ = 1;
-			}
-		}
-		break;
-	case Behavior::kJump:
-		BehaviorJumpUpdate();
-		//ジャンプアニメーション
-		animationNumber_ = 2;
-		break;
-	case Behavior::kAttack:
-		BehaviorAttackUpdate();
-		//攻撃アニメーション
-		animationNumber_ = 3;
-		break;
-	}
-	//0踊り 1待機 2ジャンプ 3攻撃 4走り
 
 	//着地フラグをリセット
-	isLanded_ = false;
+		isLanded_ = false;
 
-	//地面に埋まらないようにする
-	if (worldTransform_.translation_.y <= -10.0f)
-	{
-		worldTransform_.translation_.y = -10.0f;
-		velocity_.y = 0.0f;
+		//地面に埋まらないようにする
+		if (worldTransform_.translation_.y <= -10.0f)
+		{
+			worldTransform_.translation_.y = -10.0f;
+			velocity_.y = 0.0f;
+		}
+
+		//移動制限
+		const float kMoveLimit = 36;
+		worldTransform_.translation_.x = std::max<float>(worldTransform_.translation_.x, -kMoveLimit);
+		worldTransform_.translation_.x = std::min<float>(worldTransform_.translation_.x, +kMoveLimit);
+
+		//ワールドトランスフォームの更新
+		worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+		worldTransform_.UpdateMatrixFromQuaternion();
+
+		//モデルの更新
+		models_[0]->Update(worldTransform_, animationNumber_);
+
+		//アニメーションタイムを記録
+		animationTime_ = models_[0]->GetAnimation()->GetAnimationTime();
+
+		//武器の更新
+		weapon_->Update();
+
+		//着地のパーティクル
+		Landing();
+
+		//環境変数の適用
+		ApplyGlobalVariables();
 	}
-
-	//移動制限
-	const float kMoveLimit = 36;
-	worldTransform_.translation_.x = std::max<float>(worldTransform_.translation_.x, -kMoveLimit);
-	worldTransform_.translation_.x = std::min<float>(worldTransform_.translation_.x, +kMoveLimit);
-
-	//ワールドトランスフォームの更新
-	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
-	worldTransform_.UpdateMatrixFromQuaternion();
-
-	//モデルの更新
-	models_[0]->Update(worldTransform_, animationNumber_);
-
-	//アニメーションタイムを記録
-	animationTime_ = models_[0]->GetAnimation()->GetAnimationTime();
-
-	//武器の更新
-	weapon_->Update();
-
-	//着地のパーティクル
-	Landing();
-
-	//環境変数の適用
-	ApplyGlobalVariables();
 	
 	//ParticleEmitter* newParticleEmitter = ParticleEmitterBuilder()
 	//	.SetEmitterName("Move")
