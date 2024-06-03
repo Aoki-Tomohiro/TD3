@@ -71,8 +71,9 @@ void TutorialScene1::Initialize()
 	numberSprite_->SetScale({ 0.6f,0.6f });
 	//UI
 	TextureManager::Load("botan.png");
-	botanUI_.reset(Sprite::Create("botan.png", { 1000.0f,580.0f }));;
-	
+	botanUI_.reset(Sprite::Create("botan.png", { 1000.0f,600.0f }));;
+	botanUI_->SetScale({ 0.8f,0.8f });
+
 	//Switchの生成
 	switchManager_ = std::make_unique<SwitchManager>();
 	switchManager_->Initialize(0);

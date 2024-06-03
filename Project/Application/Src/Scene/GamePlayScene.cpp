@@ -77,8 +77,9 @@ void GamePlayScene::Initialize()
 	//UI
 	TextureManager::Load("botan.png");
 	TextureManager::Load("rb.png");
-	botanUI_.reset(Sprite::Create("botan.png", { 800.0f,580.0f }));
-	rbUI_.reset(Sprite::Create("rb.png", { 1050.0f,610.0f }));
+	botanUI_.reset(Sprite::Create("botan.png", { 900.0f,600.0f }));
+	rbUI_.reset(Sprite::Create("rb.png", { 1100.0f,610.0f }));
+	botanUI_->SetScale({ 0.8f,0.8f });
 
 	//倍速スプライト
 	TextureManager::Load("yajirusiz.png");
