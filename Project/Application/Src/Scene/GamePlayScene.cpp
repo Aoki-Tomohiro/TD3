@@ -682,6 +682,7 @@ void GamePlayScene::CalculateRating() {
 void GamePlayScene::Reverse()
 {
 	//プレイヤーを逆再生
+	player_->GetWeapon()->SetIsHit(false);
 	auto it = reversePlayerPositions.back();
 	reversePlayerPositions.pop_back();
 	player_->SetPositions(std::get<0>(it), std::get<1>(it), std::get<2>(it), std::get<3>(it));

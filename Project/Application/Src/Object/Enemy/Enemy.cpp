@@ -55,6 +55,23 @@ void Enemy::Initialize(const Vector3& position, const uint32_t id)
 	attackAudioHandle_ = audio_->LoadAudioFile("Application/Resources/Sounds/Attack.wav");
 }
 
+void Enemy::TitleUpdate()
+{
+	const float kMoveSpeed = 0.3f;
+	worldTransform_.translation_.x += kMoveSpeed;
+	if (worldTransform_.translation_.x > 80.0f)
+	{
+		worldTransform_.translation_.x = -80.0f;
+	}
+	worldTransform_.quaternion_ = Mathf::Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+	worldTransform_.UpdateMatrixFromQuaternion();
+	model_->Update(worldTransform_, 4);
+
+	ImGui::Begin("TitlePlayer");
+	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x, 0.1f);
+	ImGui::End();
+}
+
 void Enemy::Update()
 {
 	if (!isTutorial_)

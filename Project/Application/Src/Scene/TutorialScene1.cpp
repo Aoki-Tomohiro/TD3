@@ -237,10 +237,7 @@ void TutorialScene1::Draw()
 	//パーティクル描画後処理
 	renderer_->PostDrawParticles();
 #pragma endregion
-}
 
-void TutorialScene1::DrawUI()
-{
 #pragma region 前景スプライト描画
 	//前景スプライト描画前処理
 	renderer_->PreDrawSprites(kBlendModeNormal);
@@ -254,6 +251,17 @@ void TutorialScene1::DrawUI()
 
 	//スコアの描画
 	score_->Draw();
+
+	//前景スプライト描画後処理
+	renderer_->PostDrawSprites();
+#pragma endregion
+}
+
+void TutorialScene1::DrawUI()
+{
+#pragma region 前景スプライト描画
+	//前景スプライト描画前処理
+	renderer_->PreDrawSprites(kBlendModeNormal);
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

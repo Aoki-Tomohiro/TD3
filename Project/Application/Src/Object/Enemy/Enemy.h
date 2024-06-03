@@ -73,6 +73,8 @@ public:
 
 	void SetIsDoubleSpeed(const bool isDoubleSpeed) { isDoubleSpeed_ = isDoubleSpeed; };
 
+	void TitleUpdate();
+
 private:
 	//プレイヤーの状態
 	enum class Behavior

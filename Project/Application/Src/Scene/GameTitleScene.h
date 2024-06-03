@@ -7,6 +7,8 @@
 #include "Engine/Components/Audio/Audio.h"
 #include "Engine/3D/Model/ModelManager.h"
 #include "Engine/2D/Sprite.h"
+#include "Application/Src/Object/Player/Player.h"
+#include "Application/Src/Object/Enemy/Enemy.h"
 
 class GameTitleScene : public IScene
 {
@@ -58,5 +60,35 @@ private:
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
 	float timer_ = 0.0f;
+
+	Camera camera_{};
+
+	//壁
+	Model* wallModel_ = nullptr;
+	std::array<WorldTransform, 4> wallWorldTransforms_{};
+
+	//地面
+	Model* groundModel_ = nullptr;
+	std::array<WorldTransform, 2> groundWorldTransforms_{};
+
+	//プレイヤー
+	Model* playerModel_ = nullptr;
+	Model* weaponModel_ = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
+
+	//敵
+	std::unique_ptr<Enemy> enemy_ = nullptr;
+
+	//フォント
+	Model* fontModel_ = nullptr;
+	WorldTransform fontWorldTransform_{};
+
+	//Aボタン
+	Model* AButtonModel_ = nullptr;
+	WorldTransform aButtonWorldTransform_{};
+
+	//Light
+	Vector3 direction_{ -0.858f,-0.235f,0.457f };
+	float intensity_ = 0.8f;
 };
 
