@@ -113,7 +113,7 @@ void GamePlayScene::Initialize()
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	audio_->PlayAudio(playBGMHandle_, true, 0.1f);
-
+	GameClearScene::kEnemyNumber = enemyNum_;
 }
 
 void GamePlayScene::Finalize()

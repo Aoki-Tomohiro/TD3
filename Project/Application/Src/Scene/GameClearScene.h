@@ -28,6 +28,8 @@ public:
 	static void SetScore(const int score) { score_ = score; };
 
 	void Transition();
+
+	static int kEnemyNumber;
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -44,7 +46,6 @@ private:
 	Vector2 SpriteSize_[2] = { {3.0f,3.0f},{3.0f,3.0f} };
 
 	std::unique_ptr<Sprite> scoreSprite_ = nullptr;
-	
 
 	Vector2 scoreSpritePosition_ = { -15.0f,405.0f };
 
@@ -56,6 +57,9 @@ private:
 	static int timeCount_;
 
 	static int score_;
+
+	
+
 
 	std::array<std::unique_ptr<Sprite>, 5> resultSprites_{};
 

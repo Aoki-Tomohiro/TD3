@@ -8,6 +8,7 @@
 
 int GameClearScene::timeCount_ = 0;
 int GameClearScene::score_ = 0;
+int GameClearScene::kEnemyNumber = 0;
 
 void GameClearScene::Initialize() 
 {
@@ -88,22 +89,43 @@ void GameClearScene::Update()
 	}
 
 	//スコアのテクスチャを設定
-	if (timeCount_ < 21)
-	{
-		scoreSprite_->SetTexture("Scores/S.png");
+	if (kEnemyNumber < 3) {
+		if (score_ >= 1500)
+		{
+			scoreSprite_->SetTexture("Scores/S.png");
+		}
+		else if (score_ >= 1400 && score_ < 1500)
+		{
+			scoreSprite_->SetTexture("Scores/A.png");
+		}
+		else if (score_ >= 1300 && score_ < 1400)
+		{
+			scoreSprite_->SetTexture("Scores/B.png");
+		}
+		else if (score_ < 1300)
+		{
+			scoreSprite_->SetTexture("Scores/C.png");
+		}
 	}
-	else if (timeCount_ >= 21 && timeCount_ < 31)
-	{
-		scoreSprite_->SetTexture("Scores/A.png");
+	else {
+		if (score_ >= 2400)
+		{
+			scoreSprite_->SetTexture("Scores/S.png");
+		}
+		else if (score_ >= 2100 && score_ < 2400)
+		{
+			scoreSprite_->SetTexture("Scores/A.png");
+		}
+		else if (score_ >= 1800 && score_ < 2100)
+		{
+			scoreSprite_->SetTexture("Scores/B.png");
+		}
+		else if (score_ < 1800)
+		{
+			scoreSprite_->SetTexture("Scores/C.png");
+		}
 	}
-	else if (timeCount_ >= 31 && timeCount_ < 41)
-	{
-		scoreSprite_->SetTexture("Scores/B.png");
-	}
-	else if (timeCount_ >= 41)
-	{
-		scoreSprite_->SetTexture("Scores/C.png");
-	}
+	
 
 	//スプライトの座標を設定
 	for (uint32_t i = 0; i < 2; i++)
