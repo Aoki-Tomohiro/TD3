@@ -91,7 +91,7 @@ private:
 	//Vector2 numberPositions_[3]{ {60.0f,11.0f},{380.0f,11.0f}, {700.0f,11.0f} };
 
 	//Vector2 SpriteSize_[3] = { {3.0f,3.0f},{3.0f,3.0f},{3.0f,3.0f} };
-
+	uint32_t selectSEHandle_ = 0;
 	uint32_t decisionHandle_ = 0;
 	uint32_t selectBGMHandle_ = 0;
 

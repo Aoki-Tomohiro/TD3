@@ -80,6 +80,7 @@ void StageSelectScene::Initialize() {
 	pushASpriteScale_ = { 0.6f,0.6f };
 
 	//音声データの読み込み
+	selectSEHandle_ = audio_->LoadAudioFile("selectSE.wav");
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 	selectBGMHandle_ = audio_->LoadAudioFile("selectBGM.wav");
 
@@ -144,6 +145,7 @@ void StageSelectScene::Update() {
 						--selectNumber_;
 						delta = delta_;
 					}
+					audio_->PlayAudio(selectSEHandle_, false, 0.3f);
 				}
 				else if (stickTilt.x > threshold) {
 					isMovementEnabled_ = false;
@@ -158,6 +160,7 @@ void StageSelectScene::Update() {
 						++selectNumber_;
 						delta = -delta_;
 					}
+					audio_->PlayAudio(selectSEHandle_, false, 0.3f);
 				}
 				//ステージ上限を超えないようにする
 				if (selectNumber_ < 0)
@@ -198,11 +201,13 @@ void StageSelectScene::Update() {
 			++selectNumber_;
 			isMovementEnabled_ = false;
 			delta = -delta_;
+			audio_->PlayAudio(selectSEHandle_, false, 0.3f);
 		}
 		else if (input_->IsPushKeyEnter(DIK_A)) {
 			--selectNumber_;
 			isMovementEnabled_ = false;
 			delta = delta_;
+			audio_->PlayAudio(selectSEHandle_, false, 0.3f);
 		}
 
 		if (selectNumber_ < 0)

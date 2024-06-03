@@ -18,9 +18,9 @@ void GameOverScene::Initialize()
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
-	overBGMHandle_ = audio_->LoadAudioFile("selectBGM.wav");
+	overBGMHandle_ = audio_->LoadAudioFile("overBGM.wav");
 
-	audio_->PlayAudio(overBGMHandle_, true, 0.1f);
+	audio_->PlayAudio(overBGMHandle_, true, 0.5f);
 
 }
 

@@ -85,8 +85,8 @@ void GamePlayScene::Initialize()
 	reversedSprite_->SetRotation(std::numbers::pi_v<float>);
 
 	//スターとスプライト
-	TextureManager::Load("Tutorial.png");
-	stertSprite_.reset(Sprite::Create("Tutorial.png", { 1280.0f,360.0f }));
+	TextureManager::Load("stert.png");
+	stertSprite_.reset(Sprite::Create("stert.png", { 1280.0f,360.0f }));
 	stertSprite_->SetAnchorPoint({ 0.5f,0.5f });
 
 	//パーティクルマネージャーのインスタンスを取得

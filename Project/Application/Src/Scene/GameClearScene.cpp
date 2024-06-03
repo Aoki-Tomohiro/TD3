@@ -40,7 +40,7 @@ void GameClearScene::Initialize()
 
 	//音声データの読み込み
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
-	clearBGMHandle_ = audio_->LoadAudioFile("selectBGM.wav");
+	clearBGMHandle_ = audio_->LoadAudioFile("clearBGM.wav");
 
 	audio_->PlayAudio(clearBGMHandle_, true, 0.1f);
 
