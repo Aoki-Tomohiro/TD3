@@ -493,14 +493,14 @@ void GamePlayScene::Draw()
 	//プレイヤーの描画
 	player_->Draw(camera_);
 
+	//スイッチの描画
+	switchManager_->Draw(camera_);
+
 	//敵の描画
 	enemyManager_->Draw(camera_);
 
 	//ブロックの描画
 	blockManager_->Draw(camera_);
-
-	//スイッチの描画
-	switchManager_->Draw(camera_);
 
 	//コピーの描画
 	copyManager_->Draw(camera_);
