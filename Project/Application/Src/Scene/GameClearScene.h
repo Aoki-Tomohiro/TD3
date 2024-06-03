@@ -28,6 +28,8 @@ public:
 	static void SetScore(const int score) { score_ = score; };
 
 	void Transition();
+
+	static int kEnemyNumber;
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -56,6 +58,9 @@ private:
 
 	static int score_;
 
+	
+
+
 	std::array<std::unique_ptr<Sprite>, 5> resultSprites_{};
 
 	std::array<Vector2, 5> position_{};
@@ -66,5 +71,7 @@ private:
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
 	float timer_ = 0.0f;
+
+	std::string currentEvaluation_{};
 };
 

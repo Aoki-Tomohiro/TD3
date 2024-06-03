@@ -8,6 +8,7 @@
 
 int GameClearScene::timeCount_ = 0;
 int GameClearScene::score_ = 0;
+int GameClearScene::kEnemyNumber = 0;
 
 void GameClearScene::Initialize() 
 {
@@ -88,22 +89,51 @@ void GameClearScene::Update()
 	}
 
 	//スコアのテクスチャを設定
-	if (timeCount_ < 21)
-	{
-		scoreSprite_->SetTexture("Scores/S.png");
+	if (kEnemyNumber < 3) {
+		if (score_ >= 1500)
+		{
+			currentEvaluation_ = "S";
+			scoreSprite_->SetTexture("Scores/S.png");
+		}
+		else if (score_ >= 1400 && score_ < 1500)
+		{
+			currentEvaluation_ = "A";
+			scoreSprite_->SetTexture("Scores/A.png");
+		}
+		else if (score_ >= 1300 && score_ < 1400)
+		{
+			currentEvaluation_ = "B";
+			scoreSprite_->SetTexture("Scores/B.png");
+		}
+		else if (score_ < 1300)
+		{
+			currentEvaluation_ = "C";
+			scoreSprite_->SetTexture("Scores/C.png");
+		}
 	}
-	else if (timeCount_ >= 21 && timeCount_ < 31)
-	{
-		scoreSprite_->SetTexture("Scores/A.png");
+	else {
+		if (score_ >= 2400)
+		{
+			currentEvaluation_ = "S";
+			scoreSprite_->SetTexture("Scores/S.png");
+		}
+		else if (score_ >= 2100 && score_ < 2400)
+		{
+			currentEvaluation_ = "A";
+			scoreSprite_->SetTexture("Scores/A.png");
+		}
+		else if (score_ >= 1800 && score_ < 2100)
+		{
+			currentEvaluation_ = "B";
+			scoreSprite_->SetTexture("Scores/B.png");
+		}
+		else if (score_ < 1800)
+		{
+			currentEvaluation_ = "C";
+			scoreSprite_->SetTexture("Scores/C.png");
+		}
 	}
-	else if (timeCount_ >= 31 && timeCount_ < 41)
-	{
-		scoreSprite_->SetTexture("Scores/B.png");
-	}
-	else if (timeCount_ >= 41)
-	{
-		scoreSprite_->SetTexture("Scores/C.png");
-	}
+	
 
 	//スプライトの座標を設定
 	for (uint32_t i = 0; i < 2; i++)
@@ -156,6 +186,7 @@ void GameClearScene::Update()
 	//	resultSprites_[i]->SetScale(scale_[i]);
 	//}
 	ImGui::End();
+	
 }
 
 void GameClearScene::Draw() 
@@ -250,7 +281,7 @@ void GameClearScene::Transition() {
 				sceneManager_->ChangeScene("StageSelectScene");
 				timeCount_ = 0;
 			}
-			StageSelectScene::SetStageScore(GamePlayScene::currentStageNumber - 3, score_);
+			StageSelectScene::SetStageScore(GamePlayScene::currentStageNumber - 3, score_, currentEvaluation_);
 			audio_->StopAudio(clearBGMHandle_);
 			timer_ = 0.0f;
 		}

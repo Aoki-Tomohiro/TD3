@@ -65,6 +65,7 @@ private:
 
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;
+	
 
 	//パーティクルマネージャー
 	ParticleManager* particleManager_ = nullptr;

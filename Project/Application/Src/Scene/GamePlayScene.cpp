@@ -28,6 +28,7 @@ void GamePlayScene::Initialize()
 	timeCountSprites_[0].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[0]));
 	timeCountSprites_[1].reset(Sprite::Create("Numbers/0.png", timeCountSpritePositions_[1]));
 
+	
 	//敵の生成
 	enemyManager_ = std::make_unique<EnemyManager>();
 	enemyManager_->Initialize(currentStageNumber);
@@ -71,8 +72,8 @@ void GamePlayScene::Initialize()
 	pauseUISprite_.reset(Sprite::Create("pauseUI.png", { 80.0f,600.0f }));
 	TextureManager::Load("yaji.png");
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
-	TextureManager::Load("yaji.png");
-	ruleSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
+	TextureManager::Load("sukoa.png");
+	ruleSprite_.reset(Sprite::Create("sukoa.png", { 0.0f,0.0f }));
 
 	//UI
 	TextureManager::Load("botan.png");
@@ -112,7 +113,7 @@ void GamePlayScene::Initialize()
 	decisionHandle_ = audio_->LoadAudioFile("Decision.wav");
 
 	audio_->PlayAudio(playBGMHandle_, true, 0.1f);
-
+	GameClearScene::kEnemyNumber = enemyNum_;
 }
 
 void GamePlayScene::Finalize()
@@ -458,7 +459,10 @@ void GamePlayScene::Update()
 	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x, 1.0f, 1.0f, 3.0f);
 	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x, 1.0f, 1.0f, 3.0f);
 	ImGui::Text("cursorPosition_%f", cursorPosition_.y);
+	ImGui::DragFloat2("RulePosition", &rulePos_.x);
+	ImGui::DragFloat2("RuleScale", &ruleSize_.x, 0.1f, 1.0f);
 	ImGui::End();
+	
 }
 
 void GamePlayScene::Draw()
@@ -543,21 +547,12 @@ void GamePlayScene::Draw()
 		backSprite_->Draw();
 	}
 
-	if (pause_) {
-		backSprite_->Draw();
-		yajiSprite_->Draw();
-		pauseSprite_->Draw();
-		if (rule_) {
-			ruleSprite_->Draw();
-		}
 
-	}
-
-	
-	botanUI_->Draw();
 	if (player_->GetIsStop()) {
 		rbUI_->Draw();
 	}
+	
+	botanUI_->Draw();
 	
 
 	//ポーズUI
@@ -565,6 +560,15 @@ void GamePlayScene::Draw()
 
 	//スターとスプライト
 	stertSprite_->Draw();
+
+	if (pause_) {
+		backSprite_->Draw();
+		yajiSprite_->Draw();
+		pauseSprite_->Draw();
+		if (rule_) {
+			ruleSprite_->Draw();
+		}
+	}
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -800,10 +804,6 @@ void GamePlayScene::Transition() {
 
 void GamePlayScene::Pause() {
 
-
-
-
-
 	if (pause_) {
 
 		if (!isCursorMovementEnabled_) {
@@ -884,10 +884,12 @@ void GamePlayScene::Pause() {
 		if (rule_ && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE))) {
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			rule_ = false;
+			PostEffects::GetInstance()->GetBloom()->SetIsEnable(true);
 		}
 		else if (cursorPosition_.y == 160.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE))) {
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			rule_ = true;
+			PostEffects::GetInstance()->GetBloom()->SetIsEnable(false);
 		}
 
 	}

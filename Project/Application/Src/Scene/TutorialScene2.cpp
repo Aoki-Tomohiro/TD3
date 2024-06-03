@@ -83,6 +83,9 @@ void TutorialScene2::Initialize()
 	reversedSprite_->SetAnchorPoint({ 0.5f,0.5f });
 	reversedSprite_->SetRotation(std::numbers::pi_v<float>);
 
+	TextureManager::Load("sukoa.png");
+	ruleSprite_.reset(Sprite::Create("sukoa.png", { 0.0f,0.0f }));
+	
 	//UI
 	TextureManager::Load("botan.png");
 	TextureManager::Load("rb.png");
@@ -338,7 +341,11 @@ void TutorialScene2::Update()
 	ImGui::DragFloat2("NumberSpriteScale", &numberSpriteScale_.x);
 	ImGui::DragFloat2("KnockDownSpritePosition", &knockDownPosition_.x);
 	ImGui::DragFloat2("KnockDownSpriteScale", &knockDownScale_.x);
+	ImGui::DragFloat2("RulePosition", &rulePos_.x);
+	ImGui::DragFloat2("RuleScale", &ruleSize_.x,0.1f,1.0f);
 	ImGui::End();
+	ruleSprite_->SetPosition(rulePos_);
+	ruleSprite_->SetScale(ruleSize_);
 	tutorialSprite_->SetPosition(tutorialSpritePosition_);
 	tutorialSprite_->SetScale(tutorialSpriteScale_);
 	numberSprite_->SetPosition(numberSpritePosition_);
@@ -362,6 +369,9 @@ void TutorialScene2::Draw()
 
 	//敵を倒すチュートリアルのスプライトの描画
 	knockDownsprite_->Draw();
+
+	//スコア説明
+	ruleSprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -433,6 +443,8 @@ void TutorialScene2::Draw()
 	if (player_->GetIsStop()) {
 		rbUI_->Draw();
 	}
+
+
 
 	//前景スプライト描画後処理
 	renderer_->PostDrawSprites();

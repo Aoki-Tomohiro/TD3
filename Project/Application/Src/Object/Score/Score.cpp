@@ -20,6 +20,12 @@ void Score::Initialize()
 		scoreSprites_[i]->SetPosition({ float(i * 65.0f),30.0f });
 		scoreSprites_[i]->SetScale({ 0.8f,0.8f });
 	}
+
+	
+	TextureManager::Load("sukoaRear.png");
+	scoreRearSprite_.reset(Sprite::Create("sukoaRear.png", { 0.0f,0.0f }));
+	scoreRearSprite_->SetPosition(rearPos_);
+	scoreRearSprite_->SetScale(rearSize_);
 }
 
 void Score::Update(Player* player, const std::list<std::unique_ptr<Copy>>& copies)
@@ -68,6 +74,8 @@ void Score::Update(Player* player, const std::list<std::unique_ptr<Copy>>& copie
 
 void Score::Draw()
 {
+
+	scoreRearSprite_->Draw();
 	for (uint32_t i = 0; i < scoreSprites_.size(); i++)
 	{
 		scoreSprites_[i]->Draw();

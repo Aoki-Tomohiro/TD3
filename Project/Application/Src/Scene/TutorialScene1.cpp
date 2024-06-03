@@ -44,7 +44,9 @@ void TutorialScene1::Initialize()
 
 	//スコアの生成
 	score_ = std::make_unique<Score>();
-	score_->Initialize();
+	score_->Initialize(); 
+	
+
 
 	//FollowCameraの生成
 	followCamera_ = std::make_unique<FollowCamera>();

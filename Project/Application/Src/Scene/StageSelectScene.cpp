@@ -8,6 +8,7 @@
 uint32_t StageSelectScene::stageNumber_ = 0;
 uint32_t StageSelectScene::preSelectNumber_ = 0;
 std::array<uint32_t, StageSelectScene::kMaxStages> StageSelectScene::stageScores_{};
+std::array<std::string, StageSelectScene::kMaxStages> StageSelectScene::stageEvaluations_;
 
 void StageSelectScene::Initialize() {
 	//camera_.Initialize();
@@ -23,8 +24,8 @@ void StageSelectScene::Initialize() {
 	selectNumber_ = preSelectNumber_;
 
 	//背景スプライトの生成
-	TextureManager::Load("StageSelectBack.png");
-	backGroundSprite_.reset(Sprite::Create("StageSelectBack.png", { 0.0f,0.0f }));
+	TextureManager::Load("selectBack.png");
+	backGroundSprite_.reset(Sprite::Create("selectBack.png", { 0.0f,0.0f }));
 
 	//矢印のスプライトの生成
 	TextureManager::Load("Arrow.png");
@@ -322,9 +323,13 @@ void StageSelectScene::Update() {
 		scoreSprites_[i][4]->SetTexture("Numbers/" + std::to_string(currentScore) + ".png");
 
 		//スコアが無かったら評価を表示しない
-		if (currentScore == 0)
+		if (stageScores_[i] == 0)
 		{
 			evaluationSprites_[i]->SetTexture("NoScore.png");
+		}
+		else
+		{
+			evaluationSprites_[i]->SetTexture("Scores/" + stageEvaluations_[i] + ".png");
 		}
 	}
 
