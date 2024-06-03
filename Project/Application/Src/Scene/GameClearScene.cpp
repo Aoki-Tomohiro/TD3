@@ -250,6 +250,7 @@ void GameClearScene::Transition() {
 				sceneManager_->ChangeScene("StageSelectScene");
 				timeCount_ = 0;
 			}
+			StageSelectScene::SetStageScore(GamePlayScene::currentStageNumber - 3, score_);
 			audio_->StopAudio(clearBGMHandle_);
 			timer_ = 0.0f;
 		}
