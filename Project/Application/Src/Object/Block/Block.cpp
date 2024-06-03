@@ -41,7 +41,7 @@ void Block::Initialize(const Vector3& position, const Vector3& scale, const uint
 
 void Block::Update()
 {
-	//ワールドトランスフォームの更新
+//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
 }
 
