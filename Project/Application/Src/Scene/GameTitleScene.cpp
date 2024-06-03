@@ -63,6 +63,10 @@ void GameTitleScene::Initialize()
 	player_ = std::make_unique<Player>();
 	player_->Initialzie(playerModels);
 	player_->SetPosition({ -80.0f,-4.2f,-16.2f });
+
+	//敵の生成
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Initialize({ -60.0f,-4.2f,-16.2f }, 0);
 }
 
 void GameTitleScene::Finalize()
@@ -74,6 +78,9 @@ void GameTitleScene::Update()
 {
 	//プレイヤーの更新
 	player_->TitleUpdate();
+
+	//敵の更新
+	enemy_->TitleUpdate();
 
 	//壁のワールドトランスフォームの更新
 	wallWorldTransform_.UpdateMatrixFromEuler();
@@ -151,7 +158,7 @@ void GameTitleScene::Draw()
 	//backGroundSprite_->Draw();
 
 	//タイトルのスプライトの描画
-	//titleSprite_->Draw();
+	titleSprite_->Draw();
 
 	//背景スプライト描画後処理
 	renderer_->PostDrawSprites();
@@ -163,6 +170,9 @@ void GameTitleScene::Draw()
 #pragma region 3Dオブジェクト描画
 	//プレイヤーの描画
 	player_->Draw(camera_);
+
+	//敵の描画
+	enemy_->Draw(camera_);
 
 	//壁の描画
 	wallModel_->Draw(wallWorldTransform_, camera_);
