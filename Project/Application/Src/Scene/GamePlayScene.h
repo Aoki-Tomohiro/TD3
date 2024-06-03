@@ -107,6 +107,7 @@ private:
 	std::unique_ptr<Sprite> backSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseSprite_ = nullptr;
 	std::unique_ptr<Sprite> pauseUISprite_ = nullptr;
+	std::unique_ptr<Sprite> ruleSprite_ = nullptr;
 
 	//倍速の時のスプライト
 	std::unique_ptr<Sprite> doubleSprite_ = nullptr;

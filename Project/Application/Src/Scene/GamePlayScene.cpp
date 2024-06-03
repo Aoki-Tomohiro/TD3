@@ -71,7 +71,8 @@ void GamePlayScene::Initialize()
 	pauseUISprite_.reset(Sprite::Create("pauseUI.png", { 80.0f,600.0f }));
 	TextureManager::Load("yaji.png");
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
-
+	TextureManager::Load("yaji.png");
+	ruleSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
 
 	//倍速スプライト
 	TextureManager::Load("yajirusiz.png");
@@ -446,7 +447,7 @@ void GamePlayScene::Update()
 	ImGui::DragFloat2("SpritePositon[1]", &timeCountSpritePositions_[1].x);
 	ImGui::DragFloat2("SpriteSize[0]", &SpriteSize_[0].x, 1.0f, 1.0f, 3.0f);
 	ImGui::DragFloat2("SpriteSize[1]", &SpriteSize_[1].x, 1.0f, 1.0f, 3.0f);
-	ImGui::Text("stertSpritePos%f", stertPos_.x);
+	ImGui::Text("cursorPosition_%f", cursorPosition_.y);
 	ImGui::End();
 }
 
@@ -536,7 +537,13 @@ void GamePlayScene::Draw()
 		backSprite_->Draw();
 		yajiSprite_->Draw();
 		pauseSprite_->Draw();
+		if (rule_) {
+			ruleSprite_->Draw();
+		}
+
 	}
+
+
 
 	pauseUISprite_->Draw();
 
@@ -783,7 +790,7 @@ void GamePlayScene::Pause() {
 			}
 		}
 
-		if (isCursorMovementEnabled_) {
+		if (isCursorMovementEnabled_ && !rule_) {
 			if (input_->IsPushKeyEnter(DIK_S)) {
 				audio_->PlayAudio(decisionHandle_, false, 0.4f);
 				cursorPosition_.y += cursorVelocity_.y;
@@ -823,11 +830,11 @@ void GamePlayScene::Pause() {
 		}
 
 		//ルール画面
-		if (rule_ && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+		if (rule_ && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE))) {
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			rule_ = false;
 		}
-		else if (cursorPosition_.y == 120.0f && input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
+		else if (cursorPosition_.y == 160.0f && (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A) || input_->IsPushKeyEnter(DIK_SPACE))) {
 			audio_->PlayAudio(decisionHandle_, false, 0.4f);
 			rule_ = true;
 		}
