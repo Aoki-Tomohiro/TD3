@@ -16,7 +16,7 @@ void Weapon::Initialize(Model* model)
 	//スプライトの生成
 	TextureManager::Load("x.png");
 	xButtonSprite_.reset(Sprite::Create("x.png", { 0.0f,0.0f }));
-	xButtonSprite_->SetSize({ 48.0f,48.0f });
+	xButtonSprite_->SetSize({ 150.0f,120.0f });
 
 	//衝突判定の初期化
 	SetCollisionAttribute(kCollisionAttributeNoWeapon);
@@ -95,7 +95,7 @@ void Weapon::DrawUI(const Camera& camera)
 		spritePosition += offset;
 		spritePosition = Mathf::Transform(spritePosition, matViewProjectionViewport);
 		//スプライトに座標を設定
-		xButtonSprite_->SetPosition({ spritePosition.x,spritePosition.y });
+		xButtonSprite_->SetPosition({ spritePosition.x-10,spritePosition.y -10});
 		//描画
 		xButtonSprite_->Draw();
 	}
