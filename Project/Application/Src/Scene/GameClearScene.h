@@ -71,5 +71,7 @@ private:
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
 	float timer_ = 0.0f;
+
+	std::string currentEvaluation_{};
 };
 

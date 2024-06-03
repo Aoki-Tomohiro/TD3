@@ -7,6 +7,8 @@
 
 uint32_t StageSelectScene::stageNumber_ = 0;
 uint32_t StageSelectScene::preSelectNumber_ = 0;
+std::array<uint32_t, StageSelectScene::kMaxStages> StageSelectScene::stageScores_{};
+std::array<std::string, StageSelectScene::kMaxStages> StageSelectScene::stageEvaluations_;
 
 void StageSelectScene::Initialize() {
 	//camera_.Initialize();
@@ -22,8 +24,8 @@ void StageSelectScene::Initialize() {
 	selectNumber_ = preSelectNumber_;
 
 	//背景スプライトの生成
-	TextureManager::Load("backs.png");
-	backGroundSprite_.reset(Sprite::Create("backs.png", { 0.0f,0.0f }));
+	TextureManager::Load("selectBack.png");
+	backGroundSprite_.reset(Sprite::Create("selectBack.png", { 0.0f,0.0f }));
 
 	//矢印のスプライトの生成
 	TextureManager::Load("Arrow.png");
@@ -58,9 +60,9 @@ void StageSelectScene::Initialize() {
 	{
 		stageSprites_[i].reset(Sprite::Create("Stage.png", { 0.0f,0.0f }));
 		numberSprites_[i].reset(Sprite::Create("Numbers/" + std::to_string(i + 1) + ".png", { 0.0f,0.0f }));
-		stageSpriteTargetPosition_[i] = { 430.0f + (tutorialSprites_.size() + i) * delta_,142.0f };
+		stageSpriteTargetPosition_[i] = { 430.0f + (tutorialSprites_.size() + i) * delta_,20.0f };
 		stageSpritePosition_[i] = stageSpriteTargetPosition_[i];
-		numberSpriteTargetPosition_[i] = { 760.0f + (tutorialSprites_.size() + i) * delta_,142.0f };
+		numberSpriteTargetPosition_[i] = { 760.0f + (tutorialSprites_.size() + i) * delta_,20.0f };
 		numberSpritePosition_[i] = numberSpriteTargetPosition_[i];
 	}
 
@@ -71,6 +73,28 @@ void StageSelectScene::Initialize() {
 		stageScreenSpriteTargetPosition_[i] = { 418.0f + delta_ * i,300.0f };
 		stageScreenSpritePosition_[i] = stageScreenSpriteTargetPosition_[i];
 		stageScreenSpriteSize_[i] = { 500.0f,280.0f };
+	}
+
+	//スコアのスプライトの生成
+	TextureManager::Load("Scores/S.png");
+	TextureManager::Load("Scores/A.png");
+	TextureManager::Load("Scores/B.png");
+	TextureManager::Load("Scores/C.png");
+	TextureManager::Load("NoScore.png");
+	TextureManager::Load("ScoreFont.png");
+	TextureManager::Load("EvaluationFont.png");
+	for (uint32_t i = 0; i < scoreSprites_.size(); i++)
+	{
+		scoreFontSprites_[i].reset(Sprite::Create("ScoreFont.png", { 0.0f,0.0f }));
+		for (uint32_t j = 0; j < scoreSprites_[i].size(); j++)
+		{
+			scoreSprites_[i][j].reset(Sprite::Create("Numbers/0.png", { 0.0f,0.0f }));
+		}
+	}
+	for (uint32_t i = 0; i < evaluationSprites_.size(); i++)
+	{
+		evaluationFontSprites_[i].reset(Sprite::Create("EvaluationFont.png", { 0.0f,0.0f }));
+		evaluationSprites_[i].reset(Sprite::Create("Scores/S.png", { 0.0f,0.0f }));
 	}
 
 	//PushAのスプライトの作成
@@ -283,29 +307,43 @@ void StageSelectScene::Update() {
 		}
 	}
 
+	//スコアの計算
+	for (uint32_t i = 0; i < kMaxStages; i++)
+	{
+		//スコアのテクスチャを設定
+		int currentScore = stageScores_[i];
+		scoreSprites_[i][0]->SetTexture("Numbers/" + std::to_string(currentScore / 10000) + ".png");
+		currentScore %= 10000;
+		scoreSprites_[i][1]->SetTexture("Numbers/" + std::to_string(currentScore / 1000) + ".png");
+		currentScore %= 1000;
+		scoreSprites_[i][2]->SetTexture("Numbers/" + std::to_string(currentScore / 100) + ".png");
+		currentScore %= 100;
+		scoreSprites_[i][3]->SetTexture("Numbers/" + std::to_string(currentScore / 10) + ".png");
+		currentScore %= 10;
+		scoreSprites_[i][4]->SetTexture("Numbers/" + std::to_string(currentScore) + ".png");
 
+		//スコアが無かったら評価を表示しない
+		if (stageScores_[i] == 0)
+		{
+			evaluationSprites_[i]->SetTexture("NoScore.png");
+		}
+		else
+		{
+			evaluationSprites_[i]->SetTexture("Scores/" + stageEvaluations_[i] + ".png");
+		}
+	}
 
 	ImGui::Begin("SelectScene");
 	ImGui::Text("SelectNumber : %d", selectNumber_);
 	//矢印
 	for (uint32_t i = 0; i < arrowSprites_.size(); i++)
 	{
-		std::string positionName = "ArrowSpritePosition" + std::to_string(i);
-		ImGui::DragFloat2(positionName.c_str(), &arrowSpritePosition_[i].x);
-		std::string sizeName = "ArrowSpriteSize" + std::to_string(i);
-		ImGui::DragFloat2(sizeName.c_str(), &arrowSpriteSize_[i].x);
 		arrowSprites_[i]->SetPosition(arrowSpritePosition_[i]);
-		//arrowSprites_[i]->SetSize(arrowSpriteSize_[i]);
 	}
 	//チュートリアル
 	for (uint32_t i = 0; i < tutorialSprites_.size(); i++)
 	{
-		std::string positionName = "TutorialSpritePosition" + std::to_string(i);
-		ImGui::DragFloat2(positionName.c_str(), &tutorialSpritePosition_[i].x);
-		std::string sizeName = "TutorialSpriteSize" + std::to_string(i);
-		ImGui::DragFloat2(sizeName.c_str(), &tutorialSpriteSize_[i].x);
 		tutorialSprites_[i]->SetPosition(tutorialSpritePosition_[i]);
-		//tutorialSprites_[i]->SetSize(tutorialSpriteSize_[i]);
 	}
 	//ステージ
 	for (uint32_t i = 0; i < kMaxStages; i++)
@@ -315,22 +353,37 @@ void StageSelectScene::Update() {
 		std::string stageSizeName = "StageSpriteSize" + std::to_string(i);
 		ImGui::DragFloat2(stageSizeName.c_str(), &stageSpriteSize_[i].x);
 		stageSprites_[i]->SetPosition(stageSpritePosition_[i]);
-		//stageSprites_[i]->SetSize(stageSpriteSize_[i]);
-
-		std::string numberPositionName = "NumberSpritePosition" + std::to_string(i);
-		ImGui::DragFloat2(numberPositionName.c_str(), &numberSpritePosition_[i].x);
-		std::string numberSizeName = "NumberSpriteSize" + std::to_string(i);
-		ImGui::DragFloat2(numberSizeName.c_str(), &numberSpriteSize_[i].x);
 		numberSprites_[i]->SetPosition(numberSpritePosition_[i]);
-		//numberSprites_[i]->SetSize(numberSpriteSize_[i]);
+	}
+	//スコア
+	for (uint32_t i = 0; i < scoreSprites_.size(); i++)
+	{
+		Vector2 offset = { scoreOffset_.x + 6.0f,scoreOffset_.y - 40.0f };
+		scoreFontSprites_[i]->SetPosition(stageSpritePosition_[i] + offset);
+		for (uint32_t j = 0; j < scoreSprites_[i].size(); j++)
+		{
+			offset = { scoreOffset_.x + (j * scoreInterval_),scoreOffset_.y };
+			scoreSprites_[i][j]->SetPosition(stageSpritePosition_[i] + offset);
+			scoreSprites_[i][j]->SetScale({0.6f,0.6f});
+		}
+	}
+	for (uint32_t i = 0; i < evaluationSprites_.size(); i++)
+	{
+		Vector2 evaluationFontOffset = { evaluationOffset_.x + 8.0f,evaluationOffset_.y - 20.0f };
+		evaluationFontSprites_[i]->SetPosition(stageSpritePosition_[i] + evaluationFontOffset);
+		if (!stageScores_[i] == 0)
+		{
+			evaluationSprites_[i]->SetPosition(stageSpritePosition_[i] + evaluationOffset_);
+		}
+		else
+		{
+			Vector2 noScoreOffset = { evaluationOffset_.x,evaluationOffset_.y - 45.0f };
+			evaluationSprites_[i]->SetPosition(stageSpritePosition_[i] + noScoreOffset);
+		}
 	}
 	//ステージ画面
 	for (uint32_t i = 0; i < stageScreenSprites_.size(); i++)
 	{
-		std::string positionName = "StageScreenPosition" + std::to_string(i);
-		ImGui::DragFloat2(positionName.c_str(), &stageScreenSpritePosition_[i].x);
-		std::string sizeName = "StageScreenSpriteSize" + std::to_string(i);
-		ImGui::DragFloat2(sizeName.c_str(), &stageScreenSpriteSize_[i].x);
 		stageScreenSprites_[i]->SetPosition(stageScreenSpritePosition_[i]);
 		stageScreenSprites_[i]->SetSize(stageScreenSpriteSize_[i]);
 	}
@@ -372,6 +425,21 @@ void StageSelectScene::Draw() {
 	{
 		stageSprites_[i]->Draw();
 		numberSprites_[i]->Draw();
+	}
+
+	//スコアのスプライトの描画
+	for (uint32_t i = 0; i < scoreSprites_.size(); i++)
+	{
+		scoreFontSprites_[i]->Draw();
+		for (uint32_t j = 0; j < scoreSprites_[i].size(); j++)
+		{
+			scoreSprites_[i][j]->Draw();
+		}
+	}
+	for (uint32_t i = 0; i < evaluationSprites_.size(); i++)
+	{
+		evaluationFontSprites_[i]->Draw();
+		evaluationSprites_[i]->Draw();
 	}
 
 	//ステージ画面のスプライトの描画

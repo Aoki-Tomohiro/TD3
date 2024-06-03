@@ -24,6 +24,11 @@ public:
 	void Transition();
 
 	static const uint32_t GetMaxStageCount(){ return kMaxStageCount; };
+	
+	static void SetStageScore(const uint32_t stageNum, const uint32_t score,const std::string& evaluation) { 
+		stageScores_[stageNum] = score;
+		stageEvaluations_[stageNum] = evaluation;
+	};
 
 	static uint32_t stageNumber_;
 	static uint32_t preSelectNumber_;
@@ -104,4 +109,14 @@ private:
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
 	float timer_ = 0.0f;
+
+	static std::array<uint32_t, kMaxStages> stageScores_;
+	static std::array<std::string, kMaxStages> stageEvaluations_;
+	std::array<std::array<std::unique_ptr<Sprite>, 5>, kMaxStages> scoreSprites_{};
+	std::array<std::unique_ptr<Sprite>, kMaxStages> scoreFontSprites_{};
+	std::array<std::unique_ptr<Sprite>, kMaxStages> evaluationSprites_{};
+	std::array<std::unique_ptr<Sprite>, kMaxStages> evaluationFontSprites_{};
+	Vector2 scoreOffset_{ -11.0f,180.0f };
+	float scoreInterval_ = 55.25f;
+	Vector2 evaluationOffset_ = { 318.0f,146.0f };
 };
