@@ -156,6 +156,7 @@ void GameClearScene::Update()
 	//	resultSprites_[i]->SetScale(scale_[i]);
 	//}
 	ImGui::End();
+	
 }
 
 void GameClearScene::Draw() 

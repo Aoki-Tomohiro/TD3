@@ -44,6 +44,7 @@ private:
 	Vector2 SpriteSize_[2] = { {3.0f,3.0f},{3.0f,3.0f} };
 
 	std::unique_ptr<Sprite> scoreSprite_ = nullptr;
+	
 
 	Vector2 scoreSpritePosition_ = { -15.0f,405.0f };
 

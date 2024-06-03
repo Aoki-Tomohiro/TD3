@@ -104,6 +104,11 @@ private:
 	//巻き戻し時のスプライト
 	std::unique_ptr<Sprite> reversedSprite_ = nullptr;
 
+	//スコア説明
+	std::unique_ptr <Sprite> ruleSprite_ = nullptr;
+	Vector2 rulePos_ = {320.0f,285.0f};
+	Vector2 ruleSize_ = { 0.3f,0.3f };
+
 	//UI
 	std::unique_ptr<Sprite> botanUI_ = nullptr;
 	std::unique_ptr<Sprite> rbUI_ = nullptr;

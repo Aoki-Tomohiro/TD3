@@ -25,5 +25,10 @@ private:
 	std::array<Vector2, 5> scale_{};
 
 	int score_ = 0;
+
+	std::unique_ptr<Sprite> scoreRearSprite_ = nullptr;
+
+	Vector2 rearPos_ = { 25.5f,61.0f };
+	Vector2 rearSize_ = { 0.85f,0.8f };
 };
 
