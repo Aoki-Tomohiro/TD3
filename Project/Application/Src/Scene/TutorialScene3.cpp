@@ -88,6 +88,7 @@ void TutorialScene3::Initialize()
 	botanUI_.reset(Sprite::Create("botan.png", { 900.0f,600.0f }));
 	rbUI_.reset(Sprite::Create("rb.png", { 1100.0f,610.0f }));
 	botanUI_->SetScale({ 0.8f,0.8f });
+	skipSprite_.reset(Sprite::Create("Skip.png", { 70.0f,610.0f }));
 
 	//敵が逃げるチュートリアルのスプライトの生成
 	for (uint32_t i = 0; i < 4; ++i)
@@ -282,6 +283,15 @@ void TutorialScene3::Update()
 			over_ = true;
 		}
 
+		if (!isFadeIn_)
+		{
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START))
+			{
+				isFadeOut_ = true;
+				skip_ = true;
+			}
+		}
+
 		//プレイヤーが攻撃終わった後のコピーの動きを倍速にする
 		if (player_->GetIsStop())
 		{
@@ -446,6 +456,7 @@ void TutorialScene3::Draw()
 	//チュートリアルのスプライトの描画
 	tutorialSprite_->Draw();
 	numberSprite_->Draw();
+	skipSprite_->Draw();
 
 	//スコアの描画
 	score_->Draw();
@@ -578,6 +589,11 @@ void TutorialScene3::Transition() {
 			if (over_) {
 				sceneManager_->ChangeScene("TutorialScene3");
 
+			}
+			else if (skip_)
+			{
+				sceneManager_->ChangeScene("StageSelectScene");
+				audio_->StopAudio(TutorialScene1::tutoBGMHandle_);
 			}
 			else {
 				sceneManager_->ChangeScene("StageSelectScene");

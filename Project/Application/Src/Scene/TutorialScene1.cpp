@@ -66,11 +66,13 @@ void TutorialScene1::Initialize()
 
 	//チュートリアルのスプライトの生成
 	TextureManager::Load("Tutorial.png");
+	TextureManager::Load("Skip.png");
 	TextureManager::Load("Numbers/1.png");
 	tutorialSprite_.reset(Sprite::Create("Tutorial.png", tutorialSpritePosition_));
 	tutorialSprite_->SetScale({ 0.6f,0.6f });
 	numberSprite_.reset(Sprite::Create("Numbers/1.png", numberSpritePosition_));
 	numberSprite_->SetScale({ 0.6f,0.6f });
+	skipSprite_.reset(Sprite::Create("Skip.png", { 70.0f,610.0f }));
 	//UI
 	TextureManager::Load("botan.png");
 	botanUI_.reset(Sprite::Create("botan.png", { 1000.0f,600.0f }));;
@@ -171,6 +173,15 @@ void TutorialScene1::Update()
 		}
 	}
 
+	if (!isFadeIn_)
+	{
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START))
+		{
+			isFadeOut_ = true;
+			skip_ = true;
+		}
+	}
+
 	//空振りの音を鳴らす
 	if (player_->GetWeapon()->GetIsAttack() && !isClear)
 	{
@@ -254,6 +265,7 @@ void TutorialScene1::Draw()
 	//チュートリアルのスプライトの描画
 	tutorialSprite_->Draw();
 	numberSprite_->Draw();
+	skipSprite_->Draw();
 
 	//スコアの描画
 	score_->Draw();
@@ -329,8 +341,15 @@ void TutorialScene1::Transition() {
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{
-			sceneManager_->ChangeScene("TutorialScene2");
-			//audio_->StopAudio(tutorialBGMHandle_);
+			if (skip_)
+			{
+				sceneManager_->ChangeScene("StageSelectScene");
+				audio_->StopAudio(tutoBGMHandle_);
+			}
+			else
+			{
+				sceneManager_->ChangeScene("TutorialScene2");
+			}
 			timer_ = 0.0f;
 		}
 	}

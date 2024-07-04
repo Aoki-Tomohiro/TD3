@@ -2,6 +2,7 @@
 #include "Engine/Framework/Scene/SceneManager.h"
 #include "Engine/Components/PostEffects/PostEffects.h"
 #include <numbers>
+#include "TutorialScene1.h"
 
 void TutorialScene2::Initialize()
 {
@@ -91,6 +92,7 @@ void TutorialScene2::Initialize()
 	TextureManager::Load("rb.png");
 	botanUI_.reset(Sprite::Create("botan.png", { 900.0f,600.0f }));
 	rbUI_.reset(Sprite::Create("rb.png", { 1100.0f,610.0f }));
+	skipSprite_.reset(Sprite::Create("Skip.png", { 70.0f,610.0f }));
 	botanUI_->SetScale({ 0.8f,0.8f });
 
 	//敵を倒すスプライトの生成
@@ -287,6 +289,15 @@ void TutorialScene2::Update()
 		}
 	}
 
+	if (!isFadeIn_)
+	{
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START))
+		{
+			isFadeOut_ = true;
+			skip_ = true;
+		}
+	}
+
 	//リセットのフラグ
 	bool isReset = true;
 	if (isClear)
@@ -427,6 +438,7 @@ void TutorialScene2::Draw()
 	//チュートリアルのスプライトの描画
 	tutorialSprite_->Draw();
 	numberSprite_->Draw();
+	skipSprite_->Draw();
 
 	//スコアの描画
 	score_->Draw();
@@ -561,8 +573,15 @@ void TutorialScene2::Transition() {
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{
-			sceneManager_->ChangeScene("TutorialScene3");
-			//audio_->StopAudio(tutorialBGMHandle_);
+			if (skip_)
+			{
+				sceneManager_->ChangeScene("StageSelectScene");
+				audio_->StopAudio(TutorialScene1::tutoBGMHandle_);
+			}
+			else
+			{
+				sceneManager_->ChangeScene("TutorialScene3");
+			}
 			timer_ = 0.0f;
 		}
 	}

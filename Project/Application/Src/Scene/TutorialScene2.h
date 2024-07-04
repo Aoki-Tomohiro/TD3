@@ -86,6 +86,7 @@ private:
 	//チュートリアルのスプライト
 	std::unique_ptr<Sprite> tutorialSprite_ = nullptr;
 	std::unique_ptr<Sprite> numberSprite_ = nullptr;
+	std::unique_ptr<Sprite> skipSprite_ = nullptr;
 	Vector2 tutorialSpritePosition_{ 446.0f,25.0f };
 	Vector2 tutorialSpriteScale_{ 0.6f,0.6f };
 	Vector2 numberSpritePosition_{ 780.0f,25.0f };
@@ -94,6 +95,7 @@ private:
 	//トランジションのフラグ
 	bool isFadeIn_ = true;
 	bool isFadeOut_ = false;
+	bool skip_ = false;
 	float timer_ = 0.0f;
 
 	//スイッチ
