@@ -16,7 +16,7 @@ public:
 
 	void Reset();
 
-	void SetBlockData(const Vector3& position, const Vector3& size);
+	void SetBlockData(const Vector3& position, const Vector3& size,size_t i);
 
 	void SetPlayerPosition(const Vector3& position);
 

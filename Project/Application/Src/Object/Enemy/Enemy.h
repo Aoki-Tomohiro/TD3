@@ -44,16 +44,24 @@ public:
 	void SetCopy(Copy* copy) {copy_.push_back(copy);};
 	void ClearCopy() { copy_.clear(); };
 	//ブロック関連
-	void SetBlockPosition(const Vector3& pos) { 
+	void SetBlockPosition(const Vector3& pos ,size_t i) { 
+		if (blockCount_ >= i) {
+			blockCount_ = 0;
+		}
 		blockPosition_[blockCount_] = {(36 + pos.x) / 2.0f,(36 - pos.y) / 2.0f,pos.z};
 		blockCount_++;
 	}
 
-	void SetBlockSize(const Vector3& size) {
+	void SetBlockSize(const Vector3& size,size_t i) {
+		if (blockSizeCount_ >= i) {
+			blockSizeCount_ = 0;
+		}
 		blockSize_[blockSizeCount_] = size/2;
 		blockSizeCount_++;
 
 	}
+
+	void SetBlockCount(int i) { blockCount_ = i; }
 
 	void Reset();
 

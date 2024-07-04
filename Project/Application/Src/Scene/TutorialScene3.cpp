@@ -157,7 +157,7 @@ void TutorialScene3::Update()
 	const std::vector<std::unique_ptr<Block>>& blocks = blockManager_->GetBlocks();
 	for (const std::unique_ptr<Block>& block : blocks)
 	{
-		enemyManager_->SetBlockData(block->GetWorldPosition(), block->GetSize());
+		enemyManager_->SetBlockData(block->GetWorldPosition(), block->GetSize(),blocks.size());
 	}
 
 	//コピーの更新

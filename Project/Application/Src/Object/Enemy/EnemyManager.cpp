@@ -281,7 +281,7 @@ void EnemyManager::Reset()
 	}
 }
 
-void EnemyManager::SetBlockData(const Vector3& position, const Vector3& size)
+void EnemyManager::SetBlockData(const Vector3& position, const Vector3& size,size_t i)
 {
 	for (const std::unique_ptr<Enemy>& enemy : enemies_)
 	{
@@ -292,10 +292,11 @@ void EnemyManager::SetBlockData(const Vector3& position, const Vector3& size)
 
 		if (enemy->GetIsActive() && !enemy->GetIsGameOver())
 		{
-			enemy->SetBlockPosition(position);
-			enemy->SetBlockSize(size);
+			enemy->SetBlockPosition(position,i);
+			enemy->SetBlockSize(size,i);
 		}
 	}
+	
 }
 
 void EnemyManager::SetPlayerPosition(const Vector3& position)
