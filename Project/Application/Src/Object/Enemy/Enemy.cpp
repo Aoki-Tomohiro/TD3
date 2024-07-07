@@ -20,6 +20,7 @@ void Enemy::Initialize(const Vector3& position, const uint32_t id)
 
 	startPosition_ = position;
 	worldTransform_.Initialize();
+	viewWorldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.quaternion_ = destinationQuaternion_;
 	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
@@ -177,7 +178,10 @@ void Enemy::Update()
 
 void Enemy::Draw(const Camera& camera)
 {
-	model_->Draw(worldTransform_, camera);
+	viewWorldTransform_ = worldTransform_;
+	viewWorldTransform_.translation_ += Vector3{ 0.0f,-1.0f,0.0f };
+	viewWorldTransform_.UpdateMatrixFromQuaternion();
+	model_->Draw(viewWorldTransform_, camera);
 	if (!isTutorial_)
 	{
 		impactScopeModel_->Draw(impactScopeWorldTransform_, camera);
@@ -379,7 +383,7 @@ void Enemy::BehaviorRootUpdate() {
 		animationNumber_ = 1;
 		if (++waitAnimationCoolTimer_ > 60)
 		{
-			animationNumber_ = 0;
+			animationNumber_ = 2;
 			destinationQuaternion_ = { 0.0f,1.0f,0.0f,0.0f };
 		}
 	}
@@ -412,7 +416,7 @@ void Enemy::BehaviorJumpInitialize()
 	velocity_.y = kJumpFirstSpeed;
 	model_->GetAnimation()->SetAnimationTime(0.0f);
 	model_->GetAnimation()->SetLoop(false);
-	animationNumber_ = 2;
+	animationNumber_ = 3;
 	float speed = 0.3f;
 	if (isDoubleSpeed_)
 	{

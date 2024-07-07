@@ -14,6 +14,7 @@ void Copy::Initialize(const std::vector<std::tuple<Vector3, bool, uint32_t, floa
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
+	viewWorldTransform_.Initialize();
 	worldTransform_.scale_ = { 3.0f,3.0f,3.0f };
 
 	//impactScopeWorldTransform_.Initialize();
@@ -145,7 +146,10 @@ void Copy::Update()
 void Copy::Draw(const Camera& camera)
 {
 	//モデルの描画
-	model_->Draw(worldTransform_, camera);
+	viewWorldTransform_ = worldTransform_;
+	viewWorldTransform_.translation_ += Vector3{ 0.0f,-1.0f,0.0f };
+	viewWorldTransform_.UpdateMatrixFromQuaternion();
+	model_->Draw(viewWorldTransform_, camera);
 
 	//影響範囲の表示
 	if (!isReverse_) {

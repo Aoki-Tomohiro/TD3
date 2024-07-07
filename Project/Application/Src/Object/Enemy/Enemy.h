@@ -119,6 +119,7 @@ private:
 	Model* impactScopeModel_ = nullptr;
 	WorldTransform worldTransform_{};
 	WorldTransform impactScopeWorldTransform_{};
+	WorldTransform viewWorldTransform_{};
 
 
 	Behavior behavior_ = Behavior::kRoot;
@@ -180,7 +181,7 @@ private:
 	//チュートリアルか
 	bool isTutorial_ = false;
 
-	uint32_t animationNumber_ = 0;
+	uint32_t animationNumber_ = 2;
 	uint32_t waitAnimationCoolTimer_ = 0;
 
 	//クォータニオン

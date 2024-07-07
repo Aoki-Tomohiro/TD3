@@ -23,6 +23,7 @@ void Player::Initialzie(std::vector<Model*> models, const Vector3& position)
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
+	viewWorldTransform_.Initialize();
 	startPosition_ = position;
 	worldTransform_.translation_ = position;
 	//worldTransform_.translation_.y = -10.0f;
@@ -145,12 +146,12 @@ void Player::Update()
 		case Behavior::kJump:
 			BehaviorJumpUpdate();
 			//ジャンプアニメーション
-			animationNumber_ = 2;
+			animationNumber_ = 3;
 			break;
 		case Behavior::kAttack:
 			BehaviorAttackUpdate();
 			//攻撃アニメーション
-			animationNumber_ = 3;
+			animationNumber_ = 0;
 			break;
 		}
 		//0踊り 1待機 2ジャンプ 3攻撃 4走り
@@ -233,10 +234,13 @@ void Player::Update()
 void Player::Draw(const Camera& camera)
 {
 	//モデルの描画
-	models_[0]->Draw(worldTransform_, camera);
+	viewWorldTransform_ = worldTransform_;
+	viewWorldTransform_.translation_ += Vector3{ 0.0f,-1.0f,0.0f };
+	viewWorldTransform_.UpdateMatrixFromQuaternion();
+	models_[0]->Draw(viewWorldTransform_, camera);
 
 	//武器の描画
-	//weapon_->Draw(camera);
+	weapon_->Draw(camera);
 }
 
 void Player::DrawUI(const Camera& camera)

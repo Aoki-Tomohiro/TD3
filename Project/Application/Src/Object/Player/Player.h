@@ -101,6 +101,7 @@ private:
 
 	//ワールドトランスフォーム
 	WorldTransform worldTransform_{};
+	WorldTransform viewWorldTransform_{};
 
 	//状態
 	Behavior behavior_ = Behavior::kRoot;

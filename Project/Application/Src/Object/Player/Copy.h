@@ -38,6 +38,7 @@ private:
 	Model* model_ = nullptr;
 	//std::unique_ptr<Model>impactScopeModel_ = nullptr;
 	WorldTransform worldTransform_{};
+	WorldTransform viewWorldTransform_{};
 	//WorldTransform impactScopeWorldTransform_{};
 	Quaternion destinationQuaternion_{ 0.0f,0.707f,0.0f,0.707f };
 
