@@ -374,6 +374,15 @@ void Player::TitleUpdate()
 	ImGui::End();
 }
 
+void Player::Restart()
+{
+	worldTransform_.translation_ = startPosition_;
+	destinationQuaternion_ = Mathf::IdentityQuaternion();
+	worldTransform_.quaternion_ = destinationQuaternion_;
+	movementRestrictionTimer_ = movementRestrictionTime_;
+	Reset();
+}
+
 void Player::BehaviorRootInitialize()
 {
 	//当たり判定をなくす

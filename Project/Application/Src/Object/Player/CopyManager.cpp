@@ -130,6 +130,13 @@ void CopyManager::SetIsDoubleSpeed(const bool isDoubleSpeed)
 	}
 }
 
+void CopyManager::Restart()
+{
+	copies_.clear();
+	playerPositions_.clear();
+	copyCount_ = 0;
+}
+
 void CopyManager::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();

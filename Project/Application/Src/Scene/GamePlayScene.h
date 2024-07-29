@@ -56,6 +56,8 @@ private:
 
 	void Reverse();
 
+	void Restart();
+
 private:
 	Renderer* renderer_ = nullptr;
 
@@ -176,5 +178,8 @@ private:
 	uint32_t decisionHandle_ = 0;
 
 	bool advanceTimerFlag_ = false;
+
+	//リスタートフラグ
+	bool isRestart_ = false;
 };
 

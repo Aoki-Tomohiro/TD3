@@ -28,6 +28,8 @@ public:
 
 	void SetIsDoubleSpeed(const bool isDoubleSpeed);
 
+	void Restart();
+
 private:
 	void ApplyGlobalVariables();
 

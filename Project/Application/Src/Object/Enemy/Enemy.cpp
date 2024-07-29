@@ -74,6 +74,15 @@ void Enemy::TitleUpdate()
 	ImGui::End();
 }
 
+void Enemy::Restart()
+{
+	worldTransform_.translation_ = startPosition_;
+	destinationQuaternion_ = Mathf::IdentityQuaternion();
+	worldTransform_.quaternion_ = destinationQuaternion_;
+	reverseData_.clear();
+	Reset();
+}
+
 void Enemy::Update()
 {
 	if (!isTutorial_)
@@ -787,7 +796,9 @@ void Enemy::Reverse(const uint32_t stepSize)
 
 void Enemy::UpdateMatrix()
 {
+	impactScopeWorldTransform_.translation_ = worldTransform_.translation_ + impactScopeOffset_;
 	worldTransform_.UpdateMatrixFromQuaternion();
+	impactScopeWorldTransform_.UpdateMatrixFromEuler();
 }
 
 void Enemy::SaveReverseData()

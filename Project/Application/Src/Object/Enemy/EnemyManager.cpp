@@ -144,6 +144,14 @@ void EnemyManager::SetIsDoubleSpeed(const bool isDoubleSpeed)
 	}
 }
 
+void EnemyManager::Restart()
+{
+	for (std::unique_ptr<Enemy>& enemy : enemies_)
+	{
+		enemy->Restart();
+	}
+}
+
 void EnemyManager::SaveData()
 {
 	nlohmann::json root;

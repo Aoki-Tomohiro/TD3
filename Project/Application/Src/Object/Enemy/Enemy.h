@@ -85,6 +85,8 @@ public:
 
 	void SetDestinationQuaternion(const Quaternion& quaternion) { destinationQuaternion_ = quaternion; };
 
+	void Restart();
+
 private:
 	//プレイヤーの状態
 	enum class Behavior

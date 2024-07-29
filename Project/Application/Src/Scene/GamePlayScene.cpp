@@ -133,6 +133,9 @@ void GamePlayScene::Update()
 	//カットイン
 	CutIn();
 
+	//リスタート
+	Restart();
+
 	//ポーズメニュ
 	if (!isFadeIn_ && !isFadeOut_) {
 		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_START) || input_->IsPushKeyEnter(DIK_P))
@@ -141,11 +144,19 @@ void GamePlayScene::Update()
 				if (!pause_) {
 					audio_->PlayAudio(decisionHandle_, false, 0.4f);
 					pause_ = true;
+					if (isReversed_)
+					{
+						PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
+					}
 				}
 				else {
 					audio_->PlayAudio(decisionHandle_, false, 0.4f);
 					pause_ = false;
 					rule_ = false;
+					if (isReversed_)
+					{
+						PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(true);
+					}
 				}
 			}
 		}
@@ -438,15 +449,12 @@ void GamePlayScene::Update()
 			//逆再生のSEを再生
 			audio_->PlayAudio(reversePlayBackAudioHandle_, false, 0.2f);
 		}
-
 	}
 
 
 
 	//ポーズ
 	Pause();
-
-
 
 	//トランジション
 	Transition();
@@ -766,6 +774,23 @@ void GamePlayScene::Reverse()
 	copyManager_->Reverse(stepSize_);
 }
 
+void GamePlayScene::Restart()
+{
+	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_Y))
+	{
+		isFadeOut_ = true;
+		isRestart_ = true;
+		//逆再生のフラグを折る
+		isReversed_ = false;
+		//プレイヤーのアニメーションを再生
+		player_->PlayAnimation();
+		//倍速をなくす
+		isDoubleSpeed_ = false;
+		copyManager_->SetIsDoubleSpeed(false);
+		enemyManager_->SetIsDoubleSpeed(false);
+	}
+}
+
 void GamePlayScene::Transition() {
 	//フェードインの処理
 	if (isFadeIn_)
@@ -774,6 +799,7 @@ void GamePlayScene::Transition() {
 
 		if (timer_ >= 3.0f)
 		{
+			isRestart_ = false;
 			timer_ = 3.0f;
 			isFadeIn_ = false;
 		}
@@ -787,7 +813,25 @@ void GamePlayScene::Transition() {
 		timer_ -= 1.0f / 10.0f;
 		if (timer_ <= 0.0f)
 		{
-
+			//リスタートのフラグが立っているときはシーン遷移をせずにもう一度フェードインさせる
+			if (isRestart_)
+			{
+				timer_ = 0.0f;
+				isFadeIn_ = true;
+				isFadeOut_ = false;
+				enemyManager_->Restart();
+				copyManager_->Restart();
+				player_->Restart();
+				reversePlayerPositions.clear();
+				dislikes_ = 0.0f;
+				//スコアをリセット
+				score_->Reset();
+				//ノイズエフェクト無効化
+				PostEffects::GetInstance()->GetGlitchNoise()->SetIsEnable(false);
+				//逆再生のSEを止める
+				audio_->StopAudio(reversePlayBackAudioHandle_);
+				return;
+			}
 			if (nextScene_ == kTitle) {
 
 				sceneManager_->ChangeScene("GameTitleScene");

@@ -62,6 +62,8 @@ public:
 
 	const Vector3& GetStartPosition() const { return startPosition_; };
 
+	void Restart();
+
 private:
 	enum class Behavior
 	{

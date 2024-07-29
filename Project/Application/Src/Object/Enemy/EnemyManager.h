@@ -31,6 +31,8 @@ public:
 	const std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies_; };
 
 	void SetIsDoubleSpeed(const bool isDoubleSpeed);
+
+	void Restart();
 	
 private:
 	void SaveData();
