@@ -22,12 +22,12 @@ void LoadScene::Update()
 	if (++timer_ > 10)
 	{
 		timer_ = 0;
-		animationCount_++;
+		animationCount_--;
 	}
 
-	if (animationCount_ > 3)
+	if (animationCount_ < 0)
 	{
-		animationCount_ = 0;
+		animationCount_ = 3;
 	}
 
 	switch (animationCount_)
