@@ -129,6 +129,9 @@ private:
 	//スタートスプライト
 	std::unique_ptr<Sprite> stertSprite_ = nullptr;
 	Vector2 stertPos_ = { 1920.0f,360.0f };
+	//リセットのスプライト
+	std::unique_ptr<Sprite> resetSprite_ = nullptr;
+	Vector2 resetPos_ = { 50.0f,520.0f };
 
 	//スコア
 	std::unique_ptr<Score> score_ = nullptr;

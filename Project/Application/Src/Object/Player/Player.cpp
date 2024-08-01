@@ -240,7 +240,7 @@ void Player::Draw(const Camera& camera)
 	models_[0]->Draw(viewWorldTransform_, camera);
 
 	//武器の描画
-	//weapon_->Draw(camera);
+	weapon_->Draw(camera);
 }
 
 void Player::DrawUI(const Camera& camera)

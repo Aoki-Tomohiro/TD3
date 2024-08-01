@@ -81,6 +81,8 @@ void GamePlayScene::Initialize()
 	yajiSprite_.reset(Sprite::Create("yaji.png", { 0.0f,0.0f }));
 	TextureManager::Load("sukoa.png");
 	ruleSprite_.reset(Sprite::Create("sukoa.png", { 0.0f,0.0f }));
+	TextureManager::Load("resetY.png");
+	resetSprite_.reset(Sprite::Create("resetY.png", resetPos_));
 
 	//UI
 	TextureManager::Load("botan.png");
@@ -577,6 +579,9 @@ void GamePlayScene::Draw()
 
 	//スターとスプライト
 	stertSprite_->Draw();
+
+	//リセットスプライト
+	resetSprite_->Draw();
 
 	if (pause_) {
 		backSprite_->Draw();
