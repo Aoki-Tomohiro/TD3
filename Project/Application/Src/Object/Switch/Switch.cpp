@@ -45,12 +45,12 @@ void Switch::Update()
 		if (isPressed_)
 		{
 			wall_->SetIsActive(true);
-			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.0f, 0.1f);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.1f, 0.1f);
 		}
 		else
 		{
 			wall_->SetIsActive(false);
-			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.2f, 0.1f);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.6f, 0.1f);
 		}
 		break;
 	//消失壁の場合
@@ -58,12 +58,12 @@ void Switch::Update()
 		if (isPressed_)
 		{
 			wall_->SetIsActive(false);
-			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.0f, 0.1f);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.1f, 0.1f);
 		}
 		else
 		{
 			wall_->SetIsActive(true);
-			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.2f, 0.1f);
+			worldTransform_.scale_.y = Mathf::Lerp(worldTransform_.scale_.y, 0.6f, 0.1f);
 		}
 		break;
 	}
@@ -76,7 +76,7 @@ void Switch::Update()
 	}
 	else
 	{
-		model_->GetMaterial(1)->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+		model_->GetMaterial(1)->SetColor({ 1.0f,1.0f,0.0f,1.0f });
 		wall_->SetIsEdit(false);
 	}
 
